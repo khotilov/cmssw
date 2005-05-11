@@ -1,0 +1,58 @@
+\section{Introduction}\label{sec:Introduction}
+
+Some introduction; outline of the note
+
+Here are some examples of tables with data formats:
+
+% Example of a table for a 32-bit format
+\begin{table}[htb]
+  \caption{Example of a table for a 32-bit format}\label{tab:test1}
+    \begin{bittabular}{32}
+      & \bitNumFourByte
+      \bitline{TDC & 0 & 0 & 0 & 0 & \field{4}{TDC ID} & \field{12}{Event ID} & \field{12}{Bunch ID}}
+      \bitline{ROS & 0 & 0 & 0 & \field{5}{ROB ID (0-30)} & \field{12}{Event ID} & \field{12}{Bunch ID}}
+      & \bitNumFourByte
+    \end{bittabular}
+\end{table}
+
+$\leftarrow$\hfill Width of a line \hfill$\rightarrow$
+
+% Example of a table for a 64-bit format, in a landscape-rotated page
+\begin{landscape}
+\begin{table}[htb]
+  \caption{Example of a table for a 64-bit format}\label{tab:test2}
+    \begin{bittabular}{64}
+      & \bitNumEightByte
+      \bitline{K & 
+        \field{4}{BOE\_1} & 
+        \field{4}{Evt\_ty} &
+        \field{24}{LV1\_id} & 
+        \field{12}{BX\_id} & 
+        \field{12}{Source\_id} &
+        \field{4}{FOV} &
+        H & x & \$ & \$}
+      \bitline{ D & \field{64}{Sub-detector payload} }
+      \bitline{ D & \field{64}{Sub-detector payload} }
+      \bitline{K & 
+        \field{4}{EOE\_1} & 
+        \field{4}{xxxx} &
+        \field{24}{Evt\_lgth} & 
+        \field{16}{CRC} & 
+        \field{4}{xxxx} &
+        \field{4}{EVT\_stat} &
+        \field{4}{TTS} & T & x & \$ & \$}
+      & \bitNumEightByte
+    \end{bittabular}
+\end{table}
+
+$\leftarrow$\hfill Width of a line \hfill$\rightarrow$
+
+\end{landscape}
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "DataFormats"
+%%% End: 

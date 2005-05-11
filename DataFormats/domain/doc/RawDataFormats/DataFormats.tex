@@ -1,0 +1,150 @@
+%======================================================================
+% To compile this file you have to set the .tex file path:
+% setenv TEXINPUTS .:${PWD}/../../../::
+%
+% Either latex and pdflatex can be used to compile it.
+%
+% Some definitions can be used to prepare tables with format
+% specification. (to be documented)
+%
+% Author: N. Amapane  
+% $Date: $  $Revision: $
+%
+%======================================================================
+
+\documentclass[a4paper]{cmspaper}
+\usepackage{lineno} % line numbering for draft
+\usepackage{ifthen}
+%\usepackage{multido}
+\usepackage{array}
+
+
+%======================================================================
+% Check for PDFLaTeX/LaTeX 
+
+\newif\ifpdf
+\ifx\pdfoutput\undefined
+\pdffalse 
+\else
+\pdfoutput=1 
+\pdftrue
+\fi
+
+\ifpdf  % ============== we are running PDFLaTeX
+\usepackage{color}
+\usepackage[pdftex]{graphicx,graphics}
+\usepackage{epsfig}
+\usepackage{pdflscape}
+\usepackage[bookmarksnumbered,bookmarksopen,bookmarksopenlevel=1,
+              colorlinks,
+              linkcolor=blue,                      
+              citecolor=blue, 
+              urlcolor=blue]{hyperref}                                 
+\pdfinfo{
+  /Title  (Description of Detector Raw Data Formats)
+  /Author (...)
+  /Keywords (FED Raw data Formats)
+  }
+
+\DeclareGraphicsExtensions{.pdf}
+
+\else   % ============== we are not running PDFLaTeX
+\usepackage{epsfig}
+\usepackage{lscape}
+
+\special{!userdict begin /bop-hook{gsave 200 30 translate
+         65 rotate /Times-Roman findfont 216 scalefont setfont
+         0 0 moveto 0.93 setgray (DRAFT) show grestore} def end}
+
+\DeclareGraphicsExtensions{.eps}
+
+%fake pdflatex commands.
+\newcommand{\pdfbookmark}[3][1]{}
+\newcommand{\href}[2]{#2}
+
+\fi
+
+%==============================================================================
+
+% A set of definitions to create tables with data formats.
+
+% The header line with byte numbers
+\newcounter{bitCounter}
+\def\bitNum{\addtocounter{bitCounter}{-1} \tiny \arabic{bitCounter}}
+\def\oneByte{\bitNum&\bitNum&\bitNum&\bitNum&\bitNum&\bitNum&\bitNum&\bitNum}
+
+% Row with byte numbers for a 32-bit fragment
+\newcommand{\bitNumFourByte}{
+  \setcounter{bitCounter}{32}
+  \oneByte&\oneByte&\oneByte&\oneByte\\\hline 
+}
+
+% Row with byte numbers for a 64-bit fragment
+\newcommand{\bitNumEightByte}{
+  \setcounter{bitCounter}{64}
+  \oneByte&\oneByte&\oneByte&\oneByte&
+  \oneByte&\oneByte&\oneByte&\oneByte\\\hline 
+}
+
+% A field spanning several bits
+\newcommand{\field}[2]{\multicolumn{#1}{c|}{ #2}}
+
+% A row (simple shortcut)
+\newcommand{\bitline}[1]{#1\\\hline}
+
+% A tabular with the specified number of bits (plus one leading description field)
+\newenvironment{bittabular}[1] 
+{\begin{center}\tiny
+\begin{tabular}{|c|*{#1}{>{\hspace{-1.5mm}}{c}<{\hspace{-1.1mm}}|}}\hline}
+{\end{tabular}\end{center}}
+
+%\begin{tabular*}{\textwidth}{|c|*{#1}{p{1ex}|}}\hline}
+
+%======================================================================
+
+\begin{document}
+\begin{titlepage}
+
+  \internalnote{2005/XXX}
+  \date{\today}
+
+  \title{Description of Detector Raw Data Formats}
+  \begin{Authlist}
+    N.~Amapane\Aref{1},
+    E.~Meschi\Aref{1},
+    ...
+    \Anotfoot{1}{CERN, Geneva, Switzerland}
+  \end{Authlist}
+
+  \begin{abstract}
+    \pdfbookmark[1]{Abstract}{Abstract}
+    This note describes the format of the raw data sent to the DAQ by
+    the FEDs of the various detectors.
+  \end{abstract} 
+  
+\end{titlepage}
+
+\setcounter{page}{2}
+
+\linenumbers % line numbering for draft
+
+\input{Introduction} 
+\input{CommonFormat.tex} 
+%\input{PixelRawData/doc/tex/RawDataFormat.tex}
+%\input{StripRawData/doc/tex/RawDataFormat.tex}
+%\input{ECALRawData/doc/tex/RawDataFormat.tex}
+%\input{HCALRawData/doc/tex/RawDataFormat.tex}
+\input{DTRawData/doc/tex/RawDataFormat.tex}
+%\input{CSCRawData/doc/tex/RawDataFormat.tex}
+%\input{RPCRawData/doc/tex/RawDataFormat.tex}
+\input{Conclusions}
+\input{References} 
+
+%==============================================================================
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
