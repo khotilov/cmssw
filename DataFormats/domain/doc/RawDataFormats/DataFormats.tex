@@ -8,7 +8,7 @@
 % specification. (to be documented)
 %
 % Author: N. Amapane  
-% $Date: 2005/05/11 11:41:04 $  $Revision: 1.1 $
+% $Date: 2005/05/11 12:02:02 $  $Revision: 1.2 $
 %
 %======================================================================
 
@@ -70,7 +70,7 @@
 
 % The header line with byte numbers
 \newcounter{bitCounter}
-\def\bitNum{\addtocounter{bitCounter}{-1} \tiny \arabic{bitCounter}}
+\def\bitNum{\addtocounter{bitCounter}{-1} \arabic{bitCounter}}
 \def\oneByte{\bitNum&\bitNum&\bitNum&\bitNum&\bitNum&\bitNum&\bitNum&\bitNum}
 
 % Row with byte numbers for a 32-bit fragment
@@ -94,9 +94,11 @@
 
 % A tabular with the specified number of bits (plus one leading description field)
 \newenvironment{bittabular}[1] 
-{\begin{center}\tiny
-\begin{tabular}{|c|*{#1}{>{\hspace{-1.5mm}}{c}<{\hspace{-1.1mm}}|}}\hline}
-{\end{tabular}\end{center}}
+{\hspace{-0.1\linewidth}\begin{minipage}[t]{1.2\linewidth}
+\begin{center}
+\small\tabcolsep0.2mm
+\begin{tabular}{|c|*{#1}{m{3.5mm}<{\centering}|}}\hline}
+{\end{tabular}\end{center}\end{minipage}}
 
 %\begin{tabular*}{\textwidth}{|c|*{#1}{p{1ex}|}}\hline}
 
