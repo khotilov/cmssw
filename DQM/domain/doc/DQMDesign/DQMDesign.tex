@@ -1,0 +1,278 @@
+Specifications and Requirements for the Physics and Data Quality
+Monitoring infrastructure at CMS.
+
+Introduction
+==============
+The Physics and Data Quality Monitoring framework (DQM) aims to
+provide a homogeneous monitoring environment across various
+applications related to data taking at CMS. It must be fairly flexible
+and easily customizable so it can be used by different groups across the
+experiment. Examples of "customers" that can benefit from a common monitoring
+package are: the high-level trigger algorithms in the Filter Farm,
+subdetector groups that wish to supervise the operation of local DAQ
+systems, or even purely off-line batch jobs in a potentially
+"production validation" scheme. 
+
+The DQM organizes the information received by a number of monitoring
+producers and redirects it to monitoring-consuming clients according to their
+subscription requests (Figure 1). On the producer side, it uses an
+implementation-neutral interface allowing direct insertion of
+monitoring statements in the reconstruction code. This interface can
+be accessed from standalone programs, or can be used from within
+e.g. ORCA "applications" and "modules". On the client side, an
+interface connects the received objects with a set of tools for
+evaluating the monitoring information, setting alarms and accessing a
+monitoring database for storing objects and editing log files.
+
+Architecture/Design
+====================
+The DQM organizes sets of objects (monitoring elements, or ME)
+received by monitoring producers ("sources"). Sources are defined as
+individual nodes that have either direct access to or can process
+and produce information we are interested in. At the other end of this
+architecture are the monitoring information consumers ("clients") that
+receive a list with the available monitoring information ("monitorable")
+from all sources combined. The clients can subscribe to and receive
+periodic updates for any desired subset of the monitorable, in a
+classic implementation of a publish/subscribe service.
+
+We introduce a hierarchical system of nodes that are responsible for
+the communication between sources and clients (e.g. subscription
+requests) and the actual monitoring transfer. These nodes serve as
+collectors for the sources and as monitoring servers for the clients,
+and will be called "collectors" in the rest of this document.
+
+For small monitoring systems, a single collector should be
+sufficient (Figure 2). For larger systems (e.g. HLT Farm), one could envision
+different levels of merging and elaboration. For example, in Figure 3
+a first level of collectors is responsible for gathering all
+monitoring information from multiple sources, effectively sharing the
+bandwidth and the workload. A second level of collectors is used to sort
+the monitoring already gathered according to content. A client could
+connect to one or more collectors, depending on the kind of
+information it is interested in subscribing.
+
+The collector "hierarchy", namely the full network of nodes that connects a
+source to the client and the exact configuration of its members, is
+static. It is never modified after startup. The configuration should
+clearly define the "coupling point" (i.e. collector) that  every
+source and client can connect to. Whereas source and clients should be
+able to disconnect and reconnect at run-time, the collector network
+must be always running.
+
+A decision has been made that the DQM process should do the minimum
+necessary work at the source level. This is simply an attempt to minimize the
+interference with the "main" application running at the source
+node (e.g. analysis, calibration/alignment, trigger algorithm,
+etc). To that end, sources are connected to only one collector each
+(but a collector can connect to multiple sources). Clients do not have
+direct access to the sources. All communication is done via the
+collector(s). 
+
+All CPU-intensive tasks (e.g. comparison to reference monitoring
+element, display, database storage, etc.) should be attached at the client's
+side. 
+
+This designs aims at (a) shielding the sources from connecting clients
+that could slow down the main application or threaten the stability of
+the source (b) facilitating the quick transfer of the monitoring
+information from the sources to the collectors. The production of the
+monitoring information is clearly separated from the collection and
+the processing. The collectors act as the "middle man": they are responsible
+for advertising the monitorable to different clients and serve
+monitoring requests.
+
+In normal running mode, sources and clients are in an infinite
+monitoring loop:
+(a) The source task list consists of 
+- sending the full monitorable to the collector once (and updates,
+when necessary) 
+- receiving (un)subscription requests (if any)
+- sending the udpdated monitoring information when requested by the
+collector
+
+(b) The client task list consists of 
+- receiving the monitorable from all sources when connecting
+(including updates, when necessary)
+- (un)subscribing to (any) subset of the available monitoring
+information
+- receiving the updated monitoring information
+- performing operations on monitoring elements, setting alarms,
+accessing the monitoring database (see below).
+
+Limitations
+==============
+The nature of the collection & processing of the monitoring
+information is statistical. The DQM 
+- should help the experts identify problems that occur (and monitored)
+over a period of time
+- does not give access to particular events
+- does not guarantee that two clients will receive identical
+monitoring information
+
+A monitoring cycle is defined as the time between
+(a) two consecutive requests from the collector to the source for the shipment
+of the updated monitoring elements (for the source) 
+(b) two consecutive shipments from the collector to the client of the
+updated monitoring elements (for the client)
+
+The monitoring cycle may not be constant in time (especially for large
+and complex monitoring systems in which the shipping time is
+comparable to the requested update period). 
+
+Requirements
+=============
+(A) General:
+1. The DQM provides support for 
+(a) storing monitoring information into 1D-, 2D- and 3D-histograms,
+profiles, scalars (integer and real numbers) and string messages. It
+does NOT provide support for full events, raw data or other objects
+that cannot be accomodated in one of the above formats. 
+(b) abstract interfaces for booking/filling/accessing monitoring
+elements (see "rationale" below)
+(c) directory structures; that is, unix-like directories with
+virtually unlimited depth, from which the monitoring client can "pick
+& choose". 
+(e) creation of root-tuples with the monitoring structure
+(f) dynamic lists of sources and clients: Individual sources and
+clients can be added/removed at run-time
+
+(*** Should this be in some appendix instead?***)
+Rationale for providing a neutral interface that does not depend on a specific
+implementation:
+- An abstract interface does not bound the user access methods to a
+specific analysis framework and/or implementation. In our particular
+case, the transfer mechanism and the actual "behind-the-scenes"
+monitoring element format (ROOT) could change in the future, without
+breaking the source and client programs.
+- Having an abstract interface that hides the raw monitoring data from
+the user is a good OO practice. The set of allowed operations on the
+monitoring objects should be defined by the (abstract) user interface,
+not the framework used for the implementation (here: ROOT)
+- Additional functionality can be added to the monitoring objects
+(e.g. alarms) without directly inheriting from ROOT classes.
+
+(B) Sources:
+1. Support for static monitorables
+2. Support for dynamic monitorables: the sources should be able to
+update the list of available monitoring information at run-time and
+advertise it to the monitoring clients (through the collectors)
+3. The sources need not do more than booking/filling (and potentially
+deleting) monitoring elements. The framework takes care of
+communicating this information with the client
+4. Stability: main application should not be affected if the connection
+with the collector is lost (e.g. collector has crashed)
+5. "Reset" flag per monitoring element (whether monitoring
+contents should be reset at the end of monitoring cycle; default: true). 
+This flag should be true for monitoring elements that describe dynamic
+content (e.g. hit occupancy) and false for monitoring elements that
+describe accumulating quantities (e.g. # of events processed, # of
+fatal errors caught, or rare counters)
+
+(C) Clients:
+1. Should be able to connect to multiple sources (but not directly) 
+2. Support for reception of static and dynamic monitorables from all
+sources (i.e. "initial" list of monitoring elements at startup, and
+subsequent updates if necessary)
+3. Support for static monitoring subscription lists (load & subscribe,
+but also modify & save)
+4. Support for dynamic monitoring subscription lists: the clients
+should be able to subscribe/unsubcribe at run time ("a la carte")
+5. Should be able to request additional monitoring information (not
+listed in the initial monitorable). This would be equivalent to a "debug"
+command that requests the creation of an extra (temporary) set of
+monitoring elements from one or more sources. At some subsequent time,
+the client is expected to issue another command cancelling the request
+(instructing the sources to cease producing the extra monitoring
+information, and therefore, lower the monitoring load).
+
+6. User interface that provides access to a set of tools:
+
+(a) Analysis tools for operating on monitoring elements:
+
+- "Soft" reset: operation that resets the contents of a monitoring
+element for t < t0 (user still has access to both t < t0 and t > t0
+intervals). This functionality is useful only for monitoring elements
+with the reset flag set to false (specified at the source).
+
+- "Accumulate": operation that sums the contents of a monitoring
+element over many monitoring cycles. This functionality is useful only
+for monitoring elements with the reset flag set to true (specified at
+the source).
+
+- Collation: sum up monitoring elements at client's side (doable
+through a configuration file). It is the client's responsibility to make
+sure that the resulted "summary" monitoring element makes sense
+(i.e. collation of identical-in-format monitoring elements). In
+addition to the "soft" reset functionality, the user has the option of
+permanently erasing the content of a collation-type monitoring element
+(property of particular client).
+
+- Comparison to reference histograms: eg. Kolmogorov's test ("% CL"
+that histogram and reference are consistent), "# of sigmas away from
+expected value", etc.
+
+- Save monitoring elements (or sets of them) on disk, database
+
+(b) Alarm class for each monitoring element:
+(I) Warning types (color on display)
+- new (red)
+- acknowledged (orange)
+- addressed (yellow)
+- no warning (green)
+
+(II) Set/Raise/Lower alarms
+- Manual at beginning
+- Automatic in the long run
+- Hybrid should be possible
+
+(c) Monitoring database (archiving capabilities)
+- Support for various sets of monitoring elemets : "current" (eg. last
+hr, day, week) or "older" (eg. last run/month/year). Capability for
+saving on server ("official") or locally.
+- Access to "reference" sets (determined by trigger configuration,
+ie. luminosity, trigger streams, prescales, etc)
+- Support for configuration lists for DQM clients (default
+subscription lists, update frequencies, etc)
+- Access to problem/solution history (flexible about quering: per
+subdetector/group and/or per run/week and/or with "keyword")
+
+(d) Control structure
+- configure & startup DQM
+- report on status of DQM
+- interface with run control for automated actions (stop/start run,
+reset, reconfigure)
+
+7. Graphic User Interface
+- connect with above UI
+- customizable; allow groups to define their own
+
+8. Web-based display client (less functionality than #6)
+
+9. Display 
+- Global display with individual tabs per group (giving a "one button"
+access to the state of all subdetectors)
+- Tabs customized per group
+- State of FU/subdetector: warnings, # of events, rates, etc
+- Static display or cycling through subscription list
+- Navigation capability: browse though monitoring structure and click
+on monitoring element)
+
+10. Stability: main application should not be affected if the connection
+with the collector is lost (e.g. collector has crashed)
+
+
+(D) Collectors:
+1. Support for dynamic lists of sources and clients: A collector
+should be able to handle (a) disconnecting or dying nodes (sources and
+clients),  as well as (b) new connections at run-time. Every time the
+number of nodes changes, it must modify accordingly monitorable and
+subscription requests. 
+
+Implementation (*** where does this go? ****)
+
+Currently the transfer mechanism of monitoring elements from the
+sources to the clients involves ROOT (classes TSockets, TServerSocket
+and TMessages), but this is transparent to both sources and
+clients.
+
