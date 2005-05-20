@@ -113,7 +113,7 @@ and will be called ``collectors'' in the rest of this document.
 For small monitoring systems, a single collector should be
 sufficient (Figure ~\ref{fig:single_collector}). For larger systems
 (\eg the HLT Farm), one could envisage different levels of merging
-and elaboration. For example, in Figure ~\ref{fig:multiple_collectors}
+and elaboration. For example, in Figure \ref{fig:multiple_collectors}
 a first level of collectors is responsible for gathering all the
 monitoring information from multiple sources, effectively sharing the
 bandwidth and the workload. A second level of collectors is used to
@@ -247,8 +247,9 @@ profiles, scalars (integer and real numbers) and string messages. It
 does \emph{not} provide support for full events, raw data or other
 objects\footnote{This is provided by an independent mechanism, not
 discussed here.} that cannot be accomodated in one of the above formats.} 
-\item{abstract interfaces for booking, filling and MEs (see Appendix,
-Sec.~\ref{app:neutral_interface} for the rationale of this choice).}
+\item{abstract interfaces for booking, filling and accessing MEs (see
+Appendix, Sec.~\ref{app:neutral_interface} for the rationale of this
+choice).} 
 \item{directory structures, \ie unix-like directories with
 virtually unlimited depth, from which the monitoring client can ``pick
 and choose'' (Fig.~\ref{fig:dir_structure_support}). }
@@ -360,7 +361,7 @@ $$C \equiv \sum_i h_i $$
 where $h_i$ is the $i^{\rm th}$ ME and $C$ the sum of all MEs.
 
 It is the client's responsibility to make sure that the resulting ``summary''
-ME makes sense (\ie collation of identical-in-format
+ME makes sense (\ie collation of identical-in-form
 MEs).}
 
 \item{``Hard'' reset: In addition to the ``soft'' reset functionality, the
