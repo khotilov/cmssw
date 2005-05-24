@@ -1,4 +1,64 @@
-\documentclass{cmspaper}
+%======================================================================
+% To compile this file you have to set the .tex file path:
+% setenv TEXINPUTS .:${PWD}/../../../::
+%
+% Use latex or pdflatex to compile.
+%
+% Author: C.Leonidopoulos, E. Meschi (parts stolen from N. Amapane)
+% $Date$  $Revision$
+%
+%======================================================================
+\documentclass[a4paper]{cmspaper}
+\usepackage{lineno} % line numbering for draft
+\usepackage{ifthen}
+
+%======================================================================
+% Check for PDFLaTeX/LaTeX 
+
+\newif\ifpdf
+\ifx\pdfoutput\undefined
+\pdffalse 
+\else
+\pdfoutput=1 
+\pdftrue
+\fi
+
+\ifpdf  % ============== we are running PDFLaTeX
+\usepackage{color}
+\usepackage[pdftex]{graphicx,graphics}
+\usepackage{epsfig}
+\usepackage{pdflscape}
+\usepackage[bookmarksnumbered,bookmarksopen,bookmarksopenlevel=1,
+              colorlinks,
+              linkcolor=blue,                      
+              citecolor=blue, 
+              urlcolor=blue]{hyperref}                                 
+\pdfinfo{
+  /Title  (Description of Detector Raw Data Formats)
+  /Author (...)
+  /Keywords (FED Raw data Formats)
+  }
+
+\DeclareGraphicsExtensions{.pdf}
+
+\else   % ============== we are not running PDFLaTeX
+\usepackage{epsfig}
+\usepackage{lscape}
+
+\special{!userdict begin /bop-hook{gsave 200 30 translate
+         65 rotate /Times-Roman findfont 216 scalefont setfont
+         0 0 moveto 0.93 setgray (DRAFT) show grestore} def end}
+
+\DeclareGraphicsExtensions{.eps}
+
+%fake pdflatex commands.
+\newcommand{\pdfbookmark}[3][1]{}
+\newcommand{\href}[2]{#2}
+
+\fi
+
+%==============================================================================
+
 
 \newcommand {\ie}{\mbox{\sl i.e. }}     %i.e.
 \newcommand {\eg}{\mbox{\sl e.g. }}     %e.g.
@@ -22,7 +82,7 @@
 
 
   \title{Requirements and Design of the Physics and Data Quality
-Monitoring infrastructure at CMS}
+Monitoring Infrastructure at CMS}
 
   \begin{Authlist}
     C.~Leonidopoulos and E.~Meschi
@@ -35,7 +95,7 @@ Monitoring infrastructure at CMS}
 
   \begin{abstract}
   This note describes the set of requirements and the architecture of
-the Physics and Data Quality Monitoring framework. 
+the CMS Physics and Data Quality Monitoring infrastructure. 
   \end{abstract} 
 
 % if needed, use the following:
@@ -46,9 +106,10 @@ the Physics and Data Quality Monitoring framework.
 \end{titlepage}
 
 \setcounter{page}{2}%JPP
-
+\linenumbers
 %==========================================
 \section{Introduction} \label{sec:introduction}
+\pdfbookmark[1]{Introduction}{Introduction}
 %==========================================
 %
 The Physics and Data Quality Monitoring framework (DQM) aims at
@@ -78,7 +139,7 @@ and editing log files.
   \begin{center}
   \rotatebox{90}{
     \resizebox{17cm}{!}
-	{\includegraphics{figures/generic_diagram.eps}} }
+	{\includegraphics{figures/generic_diagram}} }
 \caption{DQM is a generic monitoring framework serving different customers.}
 \label{fig:generic_diagram}
   \end{center}
@@ -88,6 +149,7 @@ and editing log files.
 %
 %==========================================
 \section{General} \label{sec:general}
+\pdfbookmark[2]{General}{General}
 %==========================================
 %
 The DQM is designed to receive sets of objects (``monitoring elements'', or ME)
@@ -124,7 +186,7 @@ information it is interested in subscribing.
 \begin{figure}[hbtp]
   \begin{center}
     \resizebox{10cm}{!}
-	{\includegraphics{figures/single_collector.eps}} 
+	{\includegraphics{figures/single_collector}} 
 \caption{A simple monitoring system with a single collector.}
 \label{fig:single_collector}
   \end{center}
@@ -133,7 +195,7 @@ information it is interested in subscribing.
 \begin{figure}[hbtp]
   \begin{center}
     \resizebox{13cm}{!}
-	{\includegraphics{figures/multiple_collectors.eps}} 
+	{\includegraphics{figures/multiple_collectors}} 
 \caption{The high-level trigger farm as an example of a more complex monitoring
 system with two levels of collectors needed.}
 \label{fig:multiple_collectors}
@@ -207,6 +269,7 @@ accessing the monitoring database (see below)}
 %
 %==========================================
 \section{Limitations}\label{sec:limitations}
+\pdfbookmark[3]{Limitations}{Limitations}
 %==========================================
 %
 The nature of the collection and processing of the monitoring
@@ -236,6 +299,7 @@ the monitoring cycles received by the client is known.
 %
 %==========================================
 \section{Requirements}\label{sec:requirements}
+\pdfbookmark[4]{Requirements}{Requirements}
 %==========================================
 %
 \subsection{General}
@@ -261,7 +325,7 @@ clients can be added or removed at run-time.}
 \begin{figure}[hbtp]
   \begin{center}
     \resizebox{10cm}{!}
-	{\includegraphics{figures/dir_structure_support.eps}} 
+	{\includegraphics{figures/dir_structure_support}} 
 \caption{DQM support for directory structures and subscription ``\`a
 la carte''.}
 \label{fig:dir_structure_support}
@@ -470,6 +534,7 @@ suitable application development framework.
 \bigskip
 
 \section{Rationale for accessing monitoring elements via a neutral interface}
+\pdfbookmark[5]{Appendix}{Appendix}
 % that does not depend on a specific implementation:
 \label{app:neutral_interface}
 The current implementation of the monitoring transfer mechanism from a node to

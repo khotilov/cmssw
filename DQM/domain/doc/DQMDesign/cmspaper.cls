@@ -182,17 +182,17 @@
 % CMS NOTE header \cmsnote
 \def\cmsnote#1{{Available on CMS information server
 \hfill\Large\bf CMS NOTE #1} 
-\begin{center}\includegraphics{cms_note.eps}\end{center}\vspace*{0mm}}
+\begin{center}\includegraphics{cms_note}\end{center}\vspace*{0mm}}
 
 % CMS INTERNAL NOTE header \internalnote
 \def\internalnote#1{{Available on CMS information server
 \hfill\Large\bf CMS IN #1} 
-\begin{center}\includegraphics{cms_in.eps}\end{center}}
+\begin{center}\includegraphics{cms_in}\end{center}}
 
 % CMS CONFERENCE REPORT header \conferencereport
 \def\conferencereport#1{{Available on CMS information server
 \hfill\Large\bf CMS CR #1} 
-\begin{center}\includegraphics{cms_cr.eps}\end{center}}
+\begin{center}\includegraphics{cms_cr}\end{center}}
 
 % Date (flushright)
 \def\date#1{{\large\bf\hfill #1}}
