@@ -3,7 +3,7 @@
 % For instructions see the file README.txt.
 %
 % Author: N. Amapane  
-% $Date: 2005/05/12 18:40:00 $  $Revision: 1.4 $
+% $Date: 2005/05/12 23:33:32 $  $Revision: 1.5 $
 %
 %======================================================================
 
@@ -105,11 +105,11 @@
 \newcommand{\bitline}[1]{#1\\\hline}
 
 % A tabular with the specified number of bits (plus one leading description field)
-\newenvironment{bittabular}[1] 
+\newenvironment{bittabular}[2][3.5mm]
 {\hspace{-0.1\linewidth}\begin{minipage}[t]{1.2\linewidth}
 \begin{center}
 \small\tabcolsep0.2mm
-\begin{tabular}{|c|*{#1}{m{3.5mm}<{\centering}|}}\hline}
+\begin{tabular}{|c|*{#2}{m{#1}<{\centering}|}}\hline}
 {\end{tabular}\end{center}\end{minipage}}
 
 %======================================================================
@@ -123,9 +123,11 @@
   \title{Description of Detector Raw Data Formats}
   \begin{Authlist}
     N.~Amapane\Aref{1},
+    J.~Mans\Aref{2},
     E.~Meschi\Aref{1},
-    ...
+    
     \Anotfoot{1}{CERN, Geneva, Switzerland}
+    \Anotfoot{2}{University of Maryland}
   \end{Authlist}
 
   \begin{abstract}
