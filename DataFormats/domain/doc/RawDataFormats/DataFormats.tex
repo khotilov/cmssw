@@ -3,7 +3,7 @@
 % For instructions see the file README.txt.
 %
 % Author: N. Amapane  
-% $Date: 2005/07/12 09:44:41 $  $Revision: 1.9 $
+% $Date: 2005/07/15 12:58:48 $  $Revision: 1.10 $
 %
 %======================================================================
 
@@ -12,6 +12,7 @@
 \usepackage{ifthen}
 %\usepackage{multido}
 \usepackage{array}
+\usepackage[newitem,newenum]{paralist}
 
 % Temporary way to set the input path (until a configuration for
 % CMSSW is ready)
@@ -106,11 +107,14 @@
 
 % A tabular with the specified number of bits (plus one leading description field)
 \newenvironment{bittabular}[2][3.5mm]
-{\hspace{-0.1\linewidth}\begin{minipage}[t]{1.2\linewidth}
+{\vspace{2mm}\hspace{-0.1\linewidth}\begin{minipage}[t]{1.2\linewidth}
 \begin{center}
 \small\tabcolsep0.2mm
 \begin{tabular}{|c|*{#2}{m{#1}<{\centering}|}}\hline}
 {\end{tabular}\end{center}\end{minipage}}
+
+% An empty row of the specified lenght with ...
+\newcommand{\vdotline}[1]{\multicolumn{#1}{c}{$\vdots$}\\\hline}
 
 %======================================================================
 
@@ -124,11 +128,12 @@
   \begin{Authlist}
     N.~Amapane\Aref{1},
     R.~Alemany Fernandez\Aref{2},
+    N.~Almeida\Aref{2},
     D.~Kotlinski\Aref{3},
     G.~Bruno\Aref{4},
     M.~Maggi\Aref{5},
     J.~Mans\Aref{6},
-    E.~Meschi\Aref{1}
+    E.~Meschi\Aref{1}, [list incomplete]
 
     \Anotfoot{1}{CERN, Geneva, Switzerland}
     \Anotfoot{2}{LIP, Lisboa, Portugal}
@@ -156,8 +161,8 @@
 \input{SiPixelRawData/doc/tex/RawDataFormat.tex}
 \input{SiStripRawData/doc/tex/RawDataFormat.tex}
 \graphicspath{{../../../EcalRawData/doc/tex/}}
-\input{EcalRawData/doc/tex/RawDataFormat.tex}
-\input{HcalRawData/doc/tex/RawDataFormat.tex}
+\input{EcalRawData/doc/tex/RawDataFormat.tex} \clearpage
+\input{HcalRawData/doc/tex/RawDataFormat.tex} \clearpage
 \input{DTRawData/doc/tex/RawDataFormat.tex}
 \input{CSCRawData/doc/tex/RawDataFormat.tex}
 \input{RPCRawData/doc/tex/RawDataFormat.tex}
@@ -165,7 +170,7 @@
 \input{References} 
 
 %This section is just an example of how to format tables with data formats.
-\input{Examples} 
+%\input{Examples} 
 
 
 %==============================================================================
