@@ -1,0 +1,40 @@
+/*!
+\page PhysicsTools_RecoAlgos Package PhysicsTools/RecoAlgos
+<center>
+<small>
+<a href=http://cmsdoc.cern.ch/swdev/viewcvs/viewcvs.cgi/CMSSW/PhysicsTools/RecoAlgos/?cvsroot=CMSSW>CVS head for this package</a> - 
+<a href=http://cmsdoc.cern.ch/swdev/viewcvs/viewcvs.cgi/CMSSW/PhysicsTools/RecoAlgos/.admin/developers?rev=HEAD&cvsroot=CMSSW&content-type=text/vnd.viewcvs-markup>Administrative privileges</a>
+</small>
+</center>
+
+\section desc Description
+Common algorihtm specific for \ref DataFormats_Candidate "Candidate" types
+with \ref RecoPackages "Reco" components.
+
+\subsection interface Public interface
+None.
+
+\subsection modules Modules
+- TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
+- ElectroCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
+- MuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
+- CaloTowerCandidateProducer: produces a collection of reco::Candidate with a CaloTower component.
+<br>
+Examples of configuration for the merger modules is the following:
+\htmlonly
+<pre>
+  module muonCandidates = MuonCandidateProducer {
+    string src = "Muons"
+  }
+</pre>
+\endhtmlonly
+
+\subsection tests Unit tests and examples
+None.
+
+\section status Status and planned development
+To be reviewed.
+
+<hr>
+Last updated: @DATE@ L. Lista
+*/
