@@ -16,15 +16,26 @@ None.
 
 \subsection modules Modules
 - TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
-- ElectroCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
-- MuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
 - CaloTowerCandidateProducer: produces a collection of reco::Candidate with a CaloTower component.
+- MuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
+- ElectroCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
+- PhotonCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
 <br>
 Examples of configuration for the merger modules is the following:
 \htmlonly
 <pre>
+  module muonCandidates = ElectronCandidateProducer {
+    string src = "Electrons"
+  }
+</pre>
+\endhtmlonly
+For charge candidates it is also possible to specify the particle mass
+to be used, if different from the default one:
+\htmlonly
+<pre>
   module muonCandidates = MuonCandidateProducer {
     string src = "Muons"
+    untracked double mass = 0.105658369
   }
 </pre>
 \endhtmlonly
