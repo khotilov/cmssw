@@ -20,8 +20,8 @@ None.
 - MuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
 - ElectroCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
 - PhotonCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
-<br>
-Examples of configuration for the merger modules is the following:
+<br><br>
+Examples of configuration for the above modules is the following:
 \htmlonly
 <pre>
   module muonCandidates = ElectronCandidateProducer {
