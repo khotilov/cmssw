@@ -1,0 +1,45 @@
+/*!
+\page PhysicsTools_RecoExamples Package PhysicsTools/RecoExample
+<center>
+<small>
+<a href=http://cmsdoc.cern.ch/swdev/viewcvs/viewcvs.cgi/CMSSW/PhysicsTools/RecoExamples/?cvsroot=CMSSW>CVS head for this package</a> - 
+<a href=http://cmsdoc.cern.ch/swdev/viewcvs/viewcvs.cgi/CMSSW/PhysicsTools/RecoExamples/.admin/developers?rev=HEAD&cvsroot=CMSSW&content-type=text/vnd.viewcvs-markup>Administrative privileges</a>
+</small>
+</center>
+
+\section desc Description
+Examples of access to \ref RecoPackages "Reco" data.
+
+\subsection interface Public interface
+None.
+
+\subsection modules Modules
+None.
+
+\subsection tests Unit tests and examples
+- <b>test/merge.cfg</b>: sample script to merge two track collections. 
+  Similar modules from \ref PhysicsTools_RecoAlgos "RecoAlgos" package
+  allow merging any \ref RecoPackages "Reco" object types.
+
+- <b>test/testBatchPlot.cpp</b>: sample executable to produce root plots. It uses
+  the POOL interface directly due to a Root bug fixed with since version 5.09.
+
+- <b>test/testBatchRoot.cpp</b>: sample executable to produce root plots. It uses
+  the Root API's, but crashes with Root versions until 5.08. Should replace
+  testBatchPool.cpp as soon as CMSSW migrates to a new Root version.
+
+- <b>test/branchList.C</b>: Cint macro that prints the list of branches 
+  available on a file. Usage, from Root prompt:
+\htmlonly
+<pre>  
+  [] TFile f("reco.root");  
+  [] .x branchList.C
+</pre>  
+\endhtmlonly
+
+\section status Status and planned development
+To be reviewed.
+
+<hr>
+Last updated: @DATE@ L. Lista
+*/
