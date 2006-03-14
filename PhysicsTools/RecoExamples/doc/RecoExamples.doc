@@ -17,18 +17,18 @@ None.
 None.
 
 \subsection tests Unit tests and examples
-- <b>test/merge.cfg</b>: sample script to merge two track collections. 
+- <b>merge.cfg</b>: sample script to merge two track collections. 
   Similar modules from \ref PhysicsTools_RecoAlgos "RecoAlgos" package
   allow merging any \ref RecoPackages "Reco" object types.
 
-- <b>test/testBatchPlot.cpp</b>: sample executable to produce root plots. It uses
+- <b>testBatchPlot.cpp</b>: sample executable to produce root plots. It uses
   the POOL interface directly due to a Root bug fixed with since version 5.09.
 
-- <b>test/testBatchRoot.cpp</b>: sample executable to produce root plots. It uses
+- <b>testBatchRoot.cpp</b>: sample executable to produce root plots. It uses
   the Root API's, but crashes with Root versions until 5.08. Should replace
   testBatchPool.cpp as soon as CMSSW migrates to a new Root version.
 
-- <b>test/branchList.C</b>: Cint macro that prints the list of branches 
+- <b>branchList.C</b>: Cint macro that prints the list of branches 
   available on a file. Usage, from Root prompt:
 \htmlonly
 <pre>  
