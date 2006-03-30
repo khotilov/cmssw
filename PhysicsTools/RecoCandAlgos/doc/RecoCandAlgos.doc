@@ -32,14 +32,7 @@ Examples of configuration for the above modules is the following:
   }
 </pre>
 \endhtmlonly
-For charge candidates it is also possible to specify the particle mass
-to be used, if different from the default one:
-\htmlonly
-<pre>
-  module muonCandidates = MuonCandidateProducer {
-    string src = "Muons"
-    untracked double mass = 0.105658369
-  }
+For charge candidates the particle mass is taken from the Particle Data Table.
 </pre>
 \endhtmlonly
 
