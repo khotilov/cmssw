@@ -18,6 +18,9 @@ None.
 - TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
 - CaloTowerCandidateProducer: produces a collection of reco::Candidate with a CaloTower component.
 - MuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
+  The momentum estimate is taken from the combined fit using tracker and muon detector.
+- TrackerOnlyMuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
+  The momentum estimate is taken from the track measurement.
 - ElectroCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
 - PhotonCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
 <br><br>
