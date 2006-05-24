@@ -16,25 +16,6 @@ None.
 
 \subsection modules Modules
 - TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
-- CaloTowerCandidateProducer: produces a collection of reco::Candidate with a CaloTower component.
-- MuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
-  The momentum estimate is taken from the combined fit using tracker and muon detector.
-- TrackerOnlyMuonCandidateProducer: produces a collection of reco::Candidate with a reco::Muon component.
-  The momentum estimate is taken from the track measurement.
-- ElectroCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
-- PhotonCandidateProducer: produces a collection of reco::Candidate with a reco::Electro component.
-<br><br>
-Examples of configuration for the above modules is the following:
-\htmlonly
-<pre>
-  module muonCandidates = ElectronCandidateProducer {
-    string src = "Electrons"
-  }
-</pre>
-\endhtmlonly
-For charge candidates the particle mass is taken from the Particle Data Table.
-</pre>
-\endhtmlonly
 
 \subsection tests Unit tests and examples
 None.
