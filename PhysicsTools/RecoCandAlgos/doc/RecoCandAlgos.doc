@@ -16,9 +16,14 @@ None.
 
 \subsection modules Modules
 - TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
+The default configuration file <tt>allTracks.cfi</tt> is the following:
+
+\htmlinclude allTracks.cfi
+
 
 \subsection othermodules Modules from other packages
 - CaloTowerCandidateCreator (from \ref RecoLocalCalo/CaloTowersCreator RecoLocalCalo/CaloTowersCreator): produces a collection of reco::Candidate with CaloTower component.
+
 
 \subsection tests Unit tests and examples
 None.
