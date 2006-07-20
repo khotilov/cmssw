@@ -23,7 +23,7 @@ The default configuration file <tt>allTracks.cfi</tt> is the following:
 </pre>
 
 \subsection othermodules Modules from other packages
-- CaloTowerCandidateCreator (from \ref RecoLocalCalo/CaloTowersCreator RecoLocalCalo/CaloTowersCreator): produces a collection of reco::Candidate with CaloTower component.
+- CaloTowerCandidateCreator (from \ref RecoLocalCalo_CaloTowersCreator RecoLocalCalo/CaloTowersCreator): produces a collection of reco::Candidate with CaloTower component.
 
 
 \subsection tests Unit tests and examples
