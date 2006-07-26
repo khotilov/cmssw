@@ -16,10 +16,14 @@ None.
 
 \subsection modules Modules
 - TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
-The default configuration file <tt>allTracks.cfi</tt> is the following:
-
+The default configuration file <tt>AllTracks.cfi</tt> is the following:
 <pre>
-\htmlinclude allTracks.cfi
+\htmlinclude AllTracks.cfi
+</pre>
+- EcalCandidateProducer: produces a collection of reco::Candidate with a reco::SuperCluster component.
+The default configuration file <tt>AllSuperClusters.cfi</tt> is the following:
+<pre>
+\htmlinclude AllSuperClusters.cfi
 </pre>
 
 \subsection othermodules Modules from other packages
