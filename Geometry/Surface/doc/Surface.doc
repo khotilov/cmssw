@@ -17,6 +17,10 @@
 
 Classes defining surfaces with or without bounds and related classes.
 
+Surfaces are reference counted: they handle their lifetime themslves,
+providing that the proper pointer typedefs are used to handle them.
+To enforce this, they should be built using the static build() method. 
+
 \subsection interface Public interface
 <!-- List the classes that are provided for use in other packages (if any) -->
 
@@ -29,7 +33,6 @@ Surfaces:
 
 Bound surfaces:
 - BoundSurface
-- BoundCone
 - BoundCylinder
 - BoundDisk
 - BoundingBox
@@ -49,10 +52,6 @@ Bounds:
 
 Helpers:
 - GeometricSorting
-- PlaneBuilder
-- ConeBuilder
-- CylinderBuilder
-- DiskBuilder
 
 Other classes:
 - GeomExceptions
