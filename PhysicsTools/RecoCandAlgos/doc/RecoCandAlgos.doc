@@ -18,13 +18,33 @@ None.
 - TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
 The default configuration file <tt>AllTracks.cfi</tt> is the following:
 <pre>
-\htmlinclude AllTracks.cfi
+\htmlinclude allTracks.cfi
 </pre>
 - EcalCandidateProducer: produces a collection of reco::Candidate with a reco::SuperCluster component.
 The default configuration file <tt>AllSuperClusters.cfi</tt> is the following:
 <pre>
-\htmlinclude AllSuperClusters.cfi
+\htmlinclude allSuperClusters.cfi
 </pre>
+
+For the above producers one (and only one) of the following parameters must
+be specified in order to set the particle mass hypothesis:
+\htmlonly
+<pre>
+  string particleType = "pi+"
+</pre>
+\endthmlonly
+or:
+\htmlonly
+<pre>
+  string particleId = 211
+</pre>
+\endthmlonly
+or:
+\htmlonly
+<pre>
+  string particleMass = 0.13957
+</pre>
+\endthmlonly
 
 \subsection othermodules Modules from other packages
 - CaloTowerCandidateCreator (from \ref RecoLocalCalo_CaloTowersCreator RecoLocalCalo/CaloTowersCreator): produces a collection of reco::Candidate with CaloTower component.
