@@ -36,13 +36,13 @@ be specified in order to set the particle mass hypothesis:
 or:
 \htmlonly
 <pre>
-  string particleId = 211
+  int32 particleId = 211
 </pre>
 \endthmlonly
 or:
 \htmlonly
 <pre>
-  string particleMass = 0.13957
+  double particleMass = 0.13957
 </pre>
 \endthmlonly
 
