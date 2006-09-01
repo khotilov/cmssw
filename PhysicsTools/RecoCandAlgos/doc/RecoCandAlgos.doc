@@ -13,7 +13,6 @@ with \ref RecoPackages "Reco" components.
 
 \subsection interface Public interface
 None.
-
 \subsection modules Modules
 - TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
 The default configuration file <tt>AllTracks.cfi</tt> is the following:
@@ -32,29 +31,24 @@ be specified in order to set the particle mass hypothesis:
 <pre>
   string particleType = "pi+"
 </pre>
-\endthmlonly
+\endhtmlonly
 or:
 \htmlonly
 <pre>
   int32 particleId = 211
 </pre>
-\endthmlonly
+\endhtmlonly
 or:
 \htmlonly
 <pre>
   double particleMass = 0.13957
 </pre>
-\endthmlonly
+\endhtmlonly
+If a particle type or paricle ID is specified to determine the mass value,
+a PDT service must be loaded in the configuration file.
 
 \subsection othermodules Modules from other packages
 - CaloTowerCandidateCreator (from \ref RecoLocalCalo_CaloTowersCreator "RecoLocalCalo/CaloTowersCreator"): produces a collection of reco::Candidate with CaloTower component.
-
-
-\subsection tests Unit tests and examples
-None.
-
-\section status Status and planned development
-To be reviewed.
 
 <hr>
 Last updated: @DATE@ L. Lista
