@@ -14,7 +14,8 @@ Examples of access to \ref RecoPackages "Reco" data.
 None.
 
 \subsection modules Modules
-None.
+- TrackExtrapolatorExample: example of track extrapolation
+- TrackPlotsExample: simple example of track plots
 
 \subsection tests Unit tests and examples
 - <b>merge.cfg</b>: sample script to merge two track collections. 
