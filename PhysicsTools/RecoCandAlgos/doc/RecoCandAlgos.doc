@@ -14,7 +14,7 @@ with \ref RecoPackages "Reco" components.
 \subsection interface Public interface
 None.
 \subsection modules Modules
-- TrackCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
+- ChargedCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
 The default configuration file <tt>AllTracks.cfi</tt> is the following:
 <pre>
 \htmlinclude allTracks.cfi
