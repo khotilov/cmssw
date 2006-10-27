@@ -11,10 +11,7 @@
 General statistics on \ref RecoPackages "Reco" data.
 
 \subsection modules Modules
-- StopAfterNEvents: EDFilter that filters out all events but the first <i>N</i>,
-  <i>N</i> being a configurable parameter. It is used to write out only the
-  first <i>N</i> events, for event size measurements
-  <i>Should probably be migrated to \ref PhysicsTools_UtilAlgos "UtilAlgos" package</i>.
+- basic unit test and object counter modules for different RECO types
 
 \subsection tests Unit tests and examples
 - <b>objectCount.cfg</b>: produces a statistics of number of \ref RecoPackages "Reco" 
