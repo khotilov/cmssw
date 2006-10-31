@@ -14,28 +14,15 @@ Examples of access to \ref RecoPackages "Reco" data.
 None.
 
 \subsection modules Modules
-- TrackExtrapolatorExample: example of track extrapolation
+- TrackPointsProducer: example that saves track outermost and innermost points
 - TrackPlotsExample: simple example of track plots
-
+	
 \subsection tests Unit tests and examples
-- <b>merge.cfg</b>: sample script to merge two track collections. 
-  Similar modules from \ref PhysicsTools_RecoAlgos "RecoAlgos" package
-  allow merging any \ref RecoPackages "Reco" object types.
-
-- <b>testBatchPlot.cpp</b>: sample executable to produce root plots. It uses
-  the POOL interface directly due to a Root bug fixed with since version 5.09.
 
 - <b>testBatchRoot.cpp</b>: sample executable to produce root plots. It uses
   the Root API's, but crashes with Root versions until 5.08. Should replace
   testBatchPool.cpp as soon as CMSSW migrates to a new Root version.
 
-- <b>branchList.C</b>: Cint macro that prints the list of branches 
-  available on a file. Usage, from Root prompt:
-\htmlonly
-<pre>  
-  [] TFile f("reco.root");  
-  [] .x branchList.C
-</pre>  
 \endhtmlonly
 
 <hr>
