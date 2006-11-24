@@ -1,0 +1,38 @@
+
+/*!
+
+\page Configuration_Examples  Package Configuration/Examples
+
+<center>
+<small>
+
+<!-- @CVS_TAG@ will be substituted at build time, no need to touch -->
+<a href=http://cmsdoc.cern.ch/swdev/viewcvs/viewcvs.cgi/CMSSW/Configuration/Examples/?cvsroot=CMSSW&only_with_tag=@CVS_TAG@>Source code (CVS tag: @CVS_TAG@)</a> - 
+<a href=http://cmsdoc.cern.ch/swdev/viewcvs/viewcvs.cgi/CMSSW/Configuration/Examples/.admin/developers?rev=HEAD&cvsroot=CMSSW&content-type=text/vnd.viewcvs-markup>Administrative privileges</a>
+</small>
+</center>
+
+
+\section desc ConfigurationExamples Package which contains the Simulation, Reconstruction and Full Chain Examples
+
+\subsection files Examples
+
+- \b SimExample.cfg:
+- \b RecoExample.cfg: Example config file for Reconstruction. The only options available are
+ - Input file: edit filenames to match the input file
+ - Output file: edit filename to match the wanted output file
+ - path: use one of the paths explained in the Reconstruction.cff fragment.
+ - Data Tier: choose between FEVT, RECO, AOD, FEVTSIM, RECOSIM, AODSIM.	
+
+- \b FullChain.cfg: Example config file for a full chain processing (from 0 to reconstructed sample). It has the same options as the RecoExample.cfg, plus these simulation related
+ - vertex smearing option: see ...
+ - mixing option: see ...
+
+
+<hr>
+
+Last updated: @DATE@ Tommaso Boccali
+
+
+*/
+
