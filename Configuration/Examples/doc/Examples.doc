@@ -13,7 +13,7 @@
 </center>
 
 
-\section desc ConfigurationExamples Package which contains the Simulation, Reconstruction and Full Chain Examples
+\section desc  Standard Examples
 
 \subsection files Examples
 
@@ -24,12 +24,163 @@
  - path: use one of the paths explained in the Reconstruction.cff fragment.
  - Data Tier: choose between FEVT, RECO, AOD, FEVTSIM, RECOSIM, AODSIM.	
 
-- \b FullChain.cfg: Example config file for a full chain processing (from 0 to reconstructed sample). It has the same options as the RecoExample.cfg, plus these simulation related
- - vertex smearing option: see ...
- - mixing option: see ...
+- \b FullChainExample.cfg: Example config file for a full chain processing (from 0 to reconstructed sample). It has the same options as the RecoExample.cfg, plus these simulation related
+ - vertex smearing option: see \ref Software_StandardSequences
+ - mixing option: see \ref Software_StandardSequences
+ 
+\subsection General Structure
 
+The general structure of a .cfg file is explained here, for the Full Chain case.
+A .cfg \b needs the following pieces
+- A random number service 
+\htmlonly
+<pre>
+   service = RandomNumberGeneratorService
+   {
+      untracked uint32 sourceSeed = 123456789
+      PSet moduleSeeds =
+      {
+         untracked uint32 VtxSmeared = 98765432
+	 untracked uint32 g4SimHits  = 11
+	 untracked uint32 mix        = 12345   
+      }
+   }
+</pre>
+\endhtmlonly
+\b sourceSeed serves for general purposes use cases, VtxSmeared for vertex smearing, g4SimHits is used for in Geant, and mix is used in the MixingModule
 
+- A \b source. In most cases, it is either a \b PythiaSource or a \b ParticleGunSource
+ - A PythiaSource contains the parameters passed to Pythia and used to generate the sample. See an example below:
+\htmlonly
+<pre>
+source = PythiaSource 
+  {
+    untracked int32 maxEvents = 1
+    untracked bool pythiaVerbosity = true
+
+    PSet PythiaParameters = 
+    {
+      # This is a vector of ParameterSet names to be read, in this order
+      vstring parameterSets = 
+      {
+        "pythiaUESettings",
+        "pythiaUDSJets"
+      }
+
+      # CMS default pythia parameters
+      include "Configuration/Generator/data/PythiaUESettings.cfi"
+
+      # all flavour jets (configuration by Thomas Speer)
+      vstring pythiaUDSJets = 
+      {
+        'MSEL=0          ! User defined processes',
+        'MSUB(11)=1      ! qq->qq',
+        'CKIN(3)=50.     ! Pt hat lower cut',
+        'CKIN(4)=120.    ! Pt hat upper cut',
+        'CKIN(13)=0.     ! etamin',
+        'CKIN(14)=2.5    ! etamax',
+        'CKIN(15)=-2.5   ! -etamax',
+        'CKIN(16)=0.     ! -etamin'
+      }
+    }
+  }
+</pre>
+\endhtmlonly
+ - A ParticleGun Source. You must specify the type, energy, angular range, and much more. You can use a RandomPt or RanndomE source:
+\htmlonly
+<pre>
+  source = FlatRandomPtGunSource 
+  { 
+    untracked uint32 firstRun  =  1
+    untracked int32 maxEvents = 1
+    untracked PSet PGunParameters =
+    {
+      untracked vint32  PartID = {13}
+      untracked double MinEta = -2.5
+      untracked double MaxEta =  2.5
+      untracked double MinPhi = -3.14159265358979323846 # in radians
+      untracked double MaxPhi =  3.14159265358979323846
+      untracked double MinPt  =  0.999
+      untracked double MaxPt  = 1.001
+    }
+    untracked int32 Verbosity = 0 # set to 1 (or greater)  for printouts
+  }
+</pre>
+\endhtmlonly
+
+- From this point on, you have simply to include and slightly modify lines. 
+ - If you want to run \b reconstruction in the .cfg, you need to include the relevant sequence:
+\htmlonly
+<pre>
+include "Configuration/StandardSequences/data/Reconstruction.cff"
+</pre>
+\endhtmlonly
 <hr>
+ - If you want to run \b simulation, you need to
+  - include the sequence
+\htmlonly
+<pre>
+include "Configuration/StandardSequences/data/Simulation.cff"
+</pre>
+\endhtmlonly
+  - include one Vertex Smearing option (and only one!) among
+  \htmlonly
+<pre>
+include "Configuration/StandardSequences/data/VtxSmearedFlat.cff"
+include "Configuration/StandardSequences/data/VtxSmearedGauss.cff"
+include "Configuration/StandardSequences/data/VtxSmearedNoSmear.cff"
+</pre>
+\endhtmlonly
+please refer to \ref Software_StandardSequences for a more detailed explanation.
+  - include one PileUp option (and only one!) among
+  \htmlonly
+<pre>
+include "Configuration/StandardSequences/data/MixingNoPileUp.cff"
+include "Configuration/StandardSequences/data/MixingLowLumiPileUp.cff"
+include "Configuration/StandardSequences/data/MixingHighLumiPileUp.cff"
+</pre>
+\endhtmlonly
+again, refer to \ref Software_StandardSequences for a more detailed explanation.
+
+ - You need to setup your path / your paths. For example, in a Full Chain case,
+  \htmlonly
+<pre>
+path p = {simulation,reconstruction}
+</pre>
+\endhtmlonly
+ - The only other part missing is the definition of the Output; you need to
+  - define \b where to write (e.g. file name)
+  - define \b what to write (e.g. whether to write FEVT, RECO, AOD; with or without SIM info)
+you need to include the Event definition fragment
+  \htmlonly
+<pre>
+include "Configuration/StandardSequences/data/EventContent.cff"
+</pre>
+\endhtmlonly
+and then define a \b PoolOutputModule as in 
+  \htmlonly
+<pre>
+   module FEVT = PoolOutputModule 
+   { 
+     	using FEVTSIMEventContent
+	untracked string fileName = "PhysVal-DiElectron-Ene10.root"
+   }
+</pre>
+\endhtmlonly
+The different options usable for the EventContent are explained in \ref Configuration_EventContent.
+
+ - Simply add the lines
+  \htmlonly
+<pre>
+   endpath outpath = {FEVT}
+   schedule = {p,outpath}
+</pre>
+\endhtmlonly
+ 
+
+
+
+
 
 Last updated: @DATE@ Tommaso Boccali
 
