@@ -5,7 +5,7 @@
 % Use latex or pdflatex to compile.
 %
 % Author: C.Leonidopoulos, E. Meschi (parts stolen from N. Amapane)
-% $Date: 2005/05/24 12:39:38 $  $Revision: 1.4 $
+% $Date: 2005/05/24 12:55:47 $  $Revision: 1.5 $
 %
 %======================================================================
 \documentclass[a4paper]{cmspaper}
@@ -34,9 +34,9 @@
               citecolor=blue, 
               urlcolor=blue]{hyperref}                                 
 \pdfinfo{
-  /Title  (Description of Detector Raw Data Formats)
+  /Title  (Design and Operation of the DQM Infrastructure)
   /Author (...)
-  /Keywords (FED Raw data Formats)
+  /Keywords (DQM, Online, DAQ, CMS)
   }
 
 \DeclareGraphicsExtensions{.pdf}
@@ -73,20 +73,22 @@
 
 % select one of the following and type in the proper number:
 %   \cmsnote{2005/000}
-  \internalnote{2005/XYZ}
+  \cmsnote{2007/XYZ}
 %  \conferencereport{2005/000}
    \date{\today}
 \smallskip
 \smallskip
- \rightline{\bf Version 0.1}
+ \rightline{\bf Version 1.0}
 
 
-  \title{Requirements and Design of the Physics and Data Quality
-Monitoring Infrastructure at CMS}
+  \title{Design and Operation of the CMS Physics and Data Quality
+Monitoring Infrastructure}
 
   \begin{Authlist}
-    C.~Leonidopoulos and E.~Meschi
+    C.~Leonidopoulos, E.~Meschi, I.~Segoni and D.~Tsirigkas
        \Instfoot{cern}{CERN, Geneva, Switzerland}
+    G.~Eulisse
+       \Instfoot{nort}{Northeastern University, Somewhere-In-The-States, USA}
   \end{Authlist}
 
 % if needed, use the following:
@@ -95,8 +97,14 @@ Monitoring Infrastructure at CMS}
 
   \begin{abstract}
     \pdfbookmark[1]{Abstract}{Abstract}
-  This note describes the set of requirements and the architecture of
-the CMS Physics and Data Quality Monitoring infrastructure. 
+  This note describes the architecture and implementation of
+the CMS Physics and Data Quality Monitoring infrastructure. The DQM system 
+underwent its first real-life test during the CMS Magnet Test and 
+Cosmic Challenge (MTCC) in 2006, where a significant fraction of
+the sub-detectors composing CMS where operated together and read-out using 
+final front-end electronics and the general DAQ system. Experience 
+of the use of the DQM during the MTCC is reported and perspectives 
+for LHC-beam operation of CMS in 2007-2008 are discussed.
   \end{abstract} 
 
 % if needed, use the following:
@@ -113,418 +121,288 @@ the CMS Physics and Data Quality Monitoring infrastructure.
 %\pdfbookmark[1]{Introduction}{Introduction}
 %==========================================
 %
-The Physics and Data Quality Monitoring framework (DQM) aims at
+The Physics and Data Quality Monitoring system (DQM) aims at
 providing a homogeneous monitoring environment across various
-applications related to data taking at CMS. It must be fairly flexible
-and easily customizable so it can be used by different groups across the
-experiment. Examples of ``customers'' that can benefit from a common monitoring
-package are: the high-level trigger algorithms in the Filter Farm,
-subdetector groups that wish to supervise the operation of local DAQ
-systems, or even purely off-line batch jobs in a potentially
-``production validation'' scheme. 
+applications related to data taking at CMS. Its infrastructure must be fairly
+flexible and easily customizable so as to be usable by different
+groups across the experiment. Applications that can
+benefit from a unified approach to monitoring range from the high-level
+trigger algorithms in the Filter Farm to local DAQ supervision by a subdetector group
+up to
+off-line reconstruction jobs carrying out ``production validation''.
+The primary goal of the DQM system is however to guarantee the quality of physics data
+collected by the general data acquisition.
 
-The DQM organizes the information received by a number of monitoring
-producers and redirects it to monitoring-consuming clients according to their
-subscription requests (see Fig.~\ref{fig:generic_diagram} for a
-generic graphical representation of the producer-client
-relationship). On the producer side, it uses an implementation-neutral
-interface allowing direct insertion of monitoring statements in the
-reconstruction code. This interface can be accessed from standalone
-programs, or can be used from within \eg ORCA ``applications'' and
-``modules''. On the client side, an interface connects the received
-objects with a set of tools for evaluating the monitoring information,
-setting alarms and accessing a monitoring database for storing objects
-and editing log files.
-%
-\begin{figure}[hbtp]
-  \begin{center}
-  \rotatebox{90}{
-    \resizebox{17cm}{!}
-	{\includegraphics{figures/generic_diagram}} }
-\caption{DQM is a generic monitoring framework serving different customers.}
-\label{fig:generic_diagram}
-  \end{center}
-\end{figure}
-%%
+The DQM infrastructure provides a generic interface
+independent of the specific technology implementation
+for the  creation and update of monitoring objects (e.g. histograms),
+allowing direct insertion of monitoring statements in the reconstruction code.
+Producers publish a list of available information
+to be delivered to consumers upon connection. They accept subscription
+requests for delivery of regular updates of a given piece of information.
+The DQM infrastructure provides functionality to collect and organize information received
+from a number of producers, and redirect it to consumers according to their
+subscription requests. This interface can be accessed from standalone
+programs, or can be used from within reconstruction applications and
+modules. On the client side, tools are provided for evaluating the
+consistency of received information to reference information retrieved from
+a database, update these references, set thresholds, raise alarms, and
+create error messages for use by the central error logging facility.
 %
 %
 %==========================================
-\section{General} \label{sec:general}
-%\pdfbookmark[1]{General}{General}
+\section{Architecture} \label{sec:architecture}
+%\pdfbookmark[1]{Architecture}{Architecture}
 %==========================================
 %
-The DQM is designed to receive sets of objects (``monitoring elements'', or ME)
-from monitoring producers (``sources''), organize and
-redistribute them on a periodical basis. Sources are defined as
+The DQM framework is designed to deal with sets of objects (``{monitoring
+elements}'', or ME) from the creation in monitoring producers (``{sources}''),
+to the organization and
+redistribution, on a periodical basis, in the ``{collectors},'' to their final use
+by {clients}. Sources are defined as
 individual nodes that have either direct access to or can process and
 produce information we are interested in. The creation and update of
 MEs at the source can be the result of processing input event data
 (event consumers) or input monitor elements (monitor consumers).
 
 At the other end of this architecture are the monitoring information
-consumers (``clients'') that receive a list with the available monitoring
-information (``monitorable'') from all sources combined. The clients can
-subscribe to and receive periodic updates for any desired subset of the
-monitorable, in a classic implementation of the ``publish-subscribe'' service.
-
-We introduce a hierarchical system of nodes that are responsible for
-the communication between sources and clients (\eg subscription
+consumers (``{clients}''). Clients are notified of available monitoring
+information (``{monitorables}'') from all sources combined. They can
+subscribe to and receive periodic updates of any desired subset of the
+monitorables, in a classic implementation of the ``publish-subscribe'' service.
+A hierarchical system of collector nodes is responsible for
+the communication between sources and clients (e.g. subscription
 requests) and the actual monitoring transfer. These nodes serve as
-collectors for the sources and as monitoring servers for the clients,
-and will be called ``collectors'' in the rest of this document.
+collectors for the sources and as monitoring servers for the clients.
 
-For small monitoring systems, a single collector should be
-sufficient (Figure ~\ref{fig:single_collector}). For larger systems
-(\eg the HLT Farm), one could envisage different levels of merging
-and elaboration. For example, in Figure \ref{fig:multiple_collectors}
-a first level of collectors is responsible for gathering all the
-monitoring information from multiple sources, effectively sharing the
-bandwidth and the workload. A second level of collectors is used to
-sort the monitoring already gathered according to content. A client
-could connect to one or more collectors, depending on the kind of
-information it is interested in subscribing.
-%
-\begin{figure}[hbtp]
-  \begin{center}
-    \resizebox{10cm}{!}
-	{\includegraphics{figures/single_collector}} 
-\caption{A simple monitoring system with a single collector.}
-\label{fig:single_collector}
-  \end{center}
-\end{figure}
-%
-\begin{figure}[hbtp]
-  \begin{center}
-    \resizebox{13cm}{!}
-	{\includegraphics{figures/multiple_collectors}} 
-\caption{The high-level trigger farm as an example of a more complex monitoring
-system with two levels of collectors needed.}
-\label{fig:multiple_collectors}
-  \end{center}
-\end{figure}
-%
-The collector ``hierarchy'', namely the full network of nodes that connects a
-source to the client and the exact configuration of its members, is
-static. It is never modified after startup. The configuration should
-clearly define the ``coupling point'' (\ie collector) that  every
-source and client can connect to. Whereas source and clients should be
-able to disconnect and reconnect at run-time (\ie without affecting the
-stability of the rest of the system), the collector network
-must be always running if the monitoring service is meant to be uninterrupted.
+In order to minimize the interference with the ``main'' application
+running in the source process (e.g. analysis, calibration/alignment, trigger
+algorithm, etc), DQM operations at the source are reduced to a
+minimum. All CPU-intensive tasks (e.g.
+comparison to reference monitoring element, display, database storage,
+etc.) are to be carried out at the client's side.
 
-A decision has been made that the DQM process should do the minimum
-necessary work at the source level. This is simply an attempt to minimize the
-interference with the ``main'' application running at the source
-node (\eg analysis, calibration/alignment, trigger algorithm,
-etc). To that end, sources are connected to only one collector each
-(but a collector can connect to multiple sources). Clients do not have
-direct access to the sources. All source-client communication is done
-through the collector (or collectors). 
-
-All CPU-intensive tasks (\eg comparison to reference monitoring
-element, display, database storage, etc.) should be attached at the client's
-side. 
-
-This designs aims at
-%
+The above design aims at
 \begin{itemize}
 \item{shielding the sources from connecting clients
 that could slow down the main application or threaten the stability of
-the source, and}
-\item{facilitating the quick transfer of the monitoring
-information from the sources to the collectors.} 
+the source}
+\item{facilitating the quick
+transfer of the monitoring information from the sources to the collectors.}
 \end{itemize}
-%
-The production of the monitoring information is clearly separated from
-the collection and the processing. The collectors act as the ``middle
-man'': they are responsible for advertising the monitorable to
-different clients and serve monitoring requests.
+To this end, sources are connected to only 1 collector each
+(but a collector can connect to multiple sources). Clients do not have
+direct access to the sources. All source-client communication is carried out
+through the collector (or collectors).
 
-In normal running mode, sources and clients are in an infinite
-monitoring loop:
-%
-\begin{itemize}
-\item{
-The source task list consists of 
-\begin{itemize}
-\item{sending the full monitorable to the collector once (and updates,
-when necessary)}
-\item{receiving (un)subscription requests (if any), and}
-\item{sending the udpdated monitoring information to the collector}
-\end{itemize}
-}
-\item{
-The client task list consists of 
-\begin{itemize}
-\item{receiving the monitorable from all sources when connecting
-(including updates, when necessary)}
-\item{(un)subscribing to a(ny) subset of the available monitoring
-information}
-\item{receiving the updated monitoring information, and}
-\item{performing operations on MEs, setting alarms,
-accessing the monitoring database (see below)}
-\end{itemize}
-}
-\end{itemize}
-%
-%
-%==========================================
-\section{Limitations}\label{sec:limitations}
-%\pdfbookmark[1]{Limitations}{Limitations}
-%==========================================
-%
+In this design, the production of the monitoring information is clearly
+separated from the collection and the processing. The collectors act as
+the ``middle man'': they are responsible for advertising the monitorables
+to different clients and serve monitoring requests.
 The nature of the collection and processing of the monitoring
-information is statistical by construction. In particular, the DQM 
+information is statistical by construction. In particular, the DQM
 \begin{itemize}
-\item{is meant to help the experts identify problems that occur (and monitored)
-\emph{over a period of time}. }
-{\item does \emph{not} give access to particular events.}
-%types footnote{Insofar as the
-%sources do not have access to ??? event types. Sources can work off a
-%specific DAQ live on hot buffer, which is fed by selected particular events
-%out of a miselected(?) stream.}
-{\item does \emph{not} guarantee that two clients will receive identical
-monitoring information.}
+\item{is meant to help the experts identify problems that occur (and are monitored)
+\emph{over a period of time} and is not expected to be capable of spotting
+punctual problems}
+\item{does \emph{not} give
+access to particular events}
+\item{does \emph{not} guarantee that two clients
+will receive identical monitoring information}
 \end{itemize}
 %
-The monitoring cycle\footnote{Defined as the time between two consecutive
-shipments of the updated MEs from the source to the
-collector (for the source), or from the collector to the client (for
-the client).} may not be constant in time, especially for monitoring
-configurations in which the shipping time is comparable to the requested
-update period. Furthermore, the DQM should have the flexibility to
-dynamically adjust the monitoring rate, or even skip monitoring
-cycles, in order to minimize deadtime. The skipped monitoring packages
-are not considered lost information, as long as the exact fraction of
-the monitoring cycles received by the client is known.
 %
 %==========================================
-\section{Requirements}\label{sec:requirements}
-%\pdfbookmark[1]{Requirements}{Requirements}
+\subsection{Components and Data Flow}\label{sec:dataflow}
+%\pdfbookmark[1]{DataFlow}{DataFlow}
 %==========================================
 %
-\subsection{General}
 \label{sec:req_general}
-The DQM provides support for 
-\begin{itemize}
-\item{storing monitoring information into 1D-, 2D- and 3D-histograms,
-profiles, scalars (integer and real numbers) and string messages. It
-does \emph{not} provide support for full events, raw data or other
-objects\footnote{This is provided by an independent mechanism, not
-discussed here.} that cannot be accomodated in one of the above formats.} 
-\item{abstract interfaces for booking, filling and accessing MEs (see
-Appendix, Sec.~\ref{app:neutral_interface} for the rationale of this
-choice).} 
-\item{directory structures, \ie unix-like directories with
-virtually unlimited depth, from which the monitoring client can ``pick
-and choose'' (Fig.~\ref{fig:dir_structure_support}). }
-\item{creation of root-tuples with the monitoring structure ``on demand''.}
-\item{\emph{dynamic} lists of sources and clients: individual sources and
-clients can be added or removed at run-time.} 
-\end{itemize}
-%
-\begin{figure}[hbtp]
-  \begin{center}
-    \resizebox{10cm}{!}
-	{\includegraphics{figures/dir_structure_support}} 
-\caption{DQM support for directory structures and subscription ``\`a
-la carte''.}
-\label{fig:dir_structure_support}
-  \end{center}
-\end{figure}
-%
-%
-\subsection{Sources}
+The DQM infrastructure supports various monitorable types.
+1D-, 2D- and 3D-histograms,
+1D- and 2D-profiles, scalars (integer and real numbers) and string messages
+can be booked and filled/updated anywhere in the
+context of reconstruction and analysis code.
+The infrastructure takes
+care of publishing, tracking updates, and transporting these updates to
+subscriber processes. The
+DQM infrastructure does \emph{not} provide support for publishing/transport of individual event
+data. Distribution of data to ``event consumers'' is provided by a separate
+system ({\it refer to section on EventServer/EventProxy} ).
+Access to booking, filling and modifying MEs is provided via abstract
+interfaces in every component. MEs are organized in
+%UNIX-like
+directory
+structures with
+virtually unlimited depth, from which monitor consumers can ``pick
+and choose''.
+In every component, it is possible at any point in time to create
+root-tuples with ``snapshots''
+of the monitoring structure for debugging and reference.
+
+\subsubsection{Sources}
 \label{sec:req_sources}
-\begin{itemize}
-\item{Support for \emph{static} monitorables (\ie monitorables defined
-at start-up).}
-\item{Support for \emph{dynamic} monitorables: the sources should be able to
-update the list of available monitoring information at run-time and
-advertise it to the monitoring clients (through the collectors).}
-\item{The sources need not do more than booking and filling (and potentially
-deleting) MEs. The framework takes care of
-communicating this information to the client.}
-\item{Stability: the main application should not be affected if the connection
-with the collector is lost (\eg the collector has crashed).}
-\item{Support for a ``reset'' switch specifying whether monitoring
-contents should be reset at the end of monitoring cycle. This flag (defined per
-ME) should be {\tt true} for MEs that describe dynamic content (\eg hit
-occupancy of a subdetector) and {\tt false} for MEs that describe
-accumulating quantities (\eg \# of events processed, \# of fatal
-errors caught, or rare counters).}
-\end{itemize}
-%
-%
-\subsection{Clients}
-\label{sec:req_clients}
-\begin{itemize}
-\item{The clients should be able to receive monitoring information
-from multiple sources.} 
-\item{Support for reception of static and dynamic monitorables from all
-sources (\ie ``initial'' list of MEs at startup, and
-subsequent updates if necessary).}
-\item{Support for static monitoring subscription lists (\ie automatic
-loading and transmission of a subscription list, as well as ``edit''
-and ``save'' functionality).}
-\item{Support for dynamic monitoring subscription lists: the clients
-should be able to subscribe and unsubcribe at run-time ``\`a la carte''.}
-\item{The clients should be able to request additional monitoring
-information (not listed in the initial monitorable). This would be
-equivalent to a ``debug'' command that requests the creation of an
-extra (temporary) set of MEs from one or more
-sources. At some subsequent time, the client is expected to issue
-another command cancelling the request (instructing the sources to
-cease producing the extra monitoring information, and therefore, lower
-the monitoring load).} 
-\item{Support for a user interface that provides access to a set of
-tools (discussed in Sec.~\ref{sec:tools}).}
-\item{Stability: the main application should not be affected if the connection
-with the collector is lost (\eg the collector has crashed).}
-\end{itemize}
-%
-%
-\subsection{Collectors}
+
+Data Quality Monitoring services available to the source not only keep track of updates to
+existing monitor elements, they also enable dynamic modifications to the
+monitoring structure. The list of available monitoring information
+can be modified at run-time by booking or deleting MEs via the public
+DQM service interface.
+Updated information from an individual source is distributed to all
+consumers (through the collector) by an update
+task (MonitorDaemon) running periodically is a separate thread of the source
+process.
+The interval between 2 MonitorDaemon updates,
+which defines a monitoring cycle, can be configured
+for each individual source process.
+A ``reset'' switch can be used to specify for each ME
+whether monitoring contents
+should be reset at the end of a cycle\footnote{This option should be
+turned on for MEs that describe dynamic content (e.g. hit
+occupancy of a subdetector) and off for MEs that describe
+accumulating quantities (e.g. number of events processed, number of
+errors, or counters of rare events).}.
+
+The MonitorDaemon maintains the connection with the collector and uses
+the DQM service to collect updates to be transmitted to it.
+The main application (which could be a critical one, like a HLT process),
+is not affected by the failure of a downstream component in the DQM system
+As an example, the source can continue to run even if the connection to the
+collector is lost (e.g. the collector has crashed).
+
+
+
+\subsubsection{Collectors}
 \label{sec:req_collectors}
-\begin{itemize}
-\item{Support for dynamic lists of sources and clients: A collector
-should be able to handle 
-\begin{itemize}
-\item{disconnecting or dying nodes (sources and
-clients), as well as}
-\item{new connections at run-time.}
-\end{itemize}
-Every time the number of active nodes changes, the collector must
-modify monitorable and subscription requests accordingly.}
-\end{itemize}
-%
-%
-\subsection{Client tools}
-\label{sec:tools}
-%
-As discussed in Sec.~\ref{sec:general}, the majority of the operations
-or tasks involving MEs takes place on the client side. Here we define
-a set of tools used for these tasks, accessible only by clients.
-%
-\subsubsection{Analysis tools for monitoring element operations}
-\label{sec:analysis_tools}
-%
-\begin{itemize}
-\item{``Soft'' reset: operation that resets the contents of a ME 
-for $t < t_0$ (the user should still have access to both $t < t_0$ and
-$t > t_0$ intervals). This functionality is useful only for MEs
-with the ``reset'' switch set to {\tt false} (specified at the source, see
-Sec.~\ref{sec:req_sources}).}
 
-\item{``Accumulate'': operation that sums the contents of a ME
- over many monitoring cycles. This functionality is useful only
-for MEs with the reset switch set to {\tt true} (specified at
-the source)}.
+Collectors serve as dispatch points between sources and clients.
+Unlike sources and clients, collectors are completely standardized and do not
+need any customization.
+A collector accepts network connections from sources and clients. A source
+can post messages to the collector advertising available monitor contents.
+All connected clients are dispatched with the entire published content available
+at the collector. The collector receives subscription messages from clients
+that are relayed to the appropriate sources. When a source sends an update message
+containing new data, this is relayed to all subscribed clients.
+Individual sources and clients can be added or removed at run-time. The collector
+is responsible of keeping track of active connections.
 
-\item{Collation: sum up MEs at client's side: 
-$$C \equiv \sum_i h_i $$
-where $h_i$ is the $i^{\rm th}$ ME and $C$ the sum of all MEs.
 
-It is the client's responsibility to make sure that the resulting ``summary''
-ME makes sense (\ie collation of identical-in-form
-MEs).}
+%
+%
+\subsubsection{Clients}
+\label{sec:req_clients}
 
-\item{``Hard'' reset: In addition to the ``soft'' reset functionality, the
-user has the option of permanently erasing the contents of ME that has
-been defined locally (and is therefore invisible to other nodes), \eg
-an ``accumulation''- or ``collation''-type ME.}
+A generic DQM client application is distinct from a source in that
+it normally only deals with monitor data, and not with event data. Client input
+comes in the form of updates of subscribed information from one or more collector
+instances the client is connected to. As mentioned above, connections can be dropped
+without affecting the overall functionality of the DQM system and its sources.
+Standard components are provided that allow the client to:
+\begin{itemize}
+\item{start and configure itself, making connections to the relevant collector(s)}
+\item{load an initial subscription list at configuration; this list can be
+later edited and saved}
+\item{be notified of the data taking configuration (DAQ configuration, trigger tables)
+and of run start and stop}
+\item{subscribe to selected subsets of data available from the connected sources}
+\item{add or remove available items from the subscription list at runtime}
+\item{receive and keep track of periodic updates of monitoring information from
+multiple sources}
+\item{collate information from different sources}
+\item{maintain a local list of available data; this includes all input data, results
+of collation, and all other monitor data created in the client itself}
+\item{create groups of monitor elements for analysis or display}
+\item{create and attach rules to monitor elements: these rules are evaluated for
+each update and used for diagnostic reports}
+\end{itemize}
+Client applications must be customized for the use by an individual subsystem.
 
-\item{Comparison to reference ME: \eg Kolmogorov's test (giving the ``\% C.L.''
-that a histogram and its reference are consistent with each other),
-``\# of sigmas away from expected value'', etc.}
+%
+%
+%
+\subsubsection{Client customization}
+\label{sec:dqm:tools}
+%
+As discussed in Section~\ref{sec:architecture}, the majority of the operations
+involving MEs takes place on the client side. Here we list
+a set of tools used to customize these tasks, accessible only by
+clients.
+\begin{itemize}
+\item{Analysis tools for monitoring element operations:
+``reset'', ``accumulate'', ``collate'', ``compare to reference''.}
+\item{Status flags to summarize with a single discrete parameter the status of hierarchical
+components of a subsystem. This is convenient for
+summary pages on a GUI that can give the overall status of components
+subdetector e.g. through a colour-coded system. Problem flags
+can be set according to rules, alarms raised or masked.}
+%
+\item{Archival facility to store (and retrieve) custom sets of MEs to be
+``played back'', used as reference, or for historical analysis}
+%
+\item{Graphical User Interface to give interactive access to
+the custom operations discussed in this section via a standard set of
+graphical interface widgets, and to provide visual feedback to the user (overall and
+hierarchical status display, representative plots)}
+
+\item{Display of arbitrary sets of monitor elements}
 
 \end{itemize}
+Generic graphic clients are also provided that can be connected to a
+given application, 
+allowing the standard DQM interface to be visualized as complex live displays of monitor
+information.
 %
 %
-\subsubsection{Alarm class}
-\label{sec:alarm_class}
-The overall ``status'' of a ME can, for display purposes, be
-summarized by a single discrete parameter. This is convenient for
-summary pages on a GUI that can give the overall status of a
-subdetector with a color-coded system. For example, the list of
-warning types (and associated color on the display) could include
-\begin{itemize}
-\item{``New'': a new alarm has appeared (red).}
-\item{``Acknowledged'': an alarm has been acknowledged; action still pending
-(orange).}
-\item{``Addressed'': the problem still remains, but experts have been
-notified or a plan has been made (yellow).}
-\item{``No warning'': no problem exists (green).}
-\end{itemize}
 %
-The user is able to set, raise or lower alarms according to
-information extracted with the tools described in
-Sec.~\ref{sec:analysis_tools}. The alarm setting can be manual,
-automatic or hybrid. This aims at accomodating different situations,
-such as commissioning periods, routine problem-checking and cases
-where either a program or the user can make the call.
-%
-%
-\subsubsection{Monitoring database and archiving capabilities}
-\label{sec:monitoring_database}
-Users should be able to store (and retrieve) custom sets of MEs. The
-user interface should provide
-\begin{itemize}
-\item{Support for various sets of MEs: ``current'' (\eg last
-hour, day, week) or ``older'' (\eg last run, month or year).} 
-\item{Option for storing objects on a server (``official'') or
-locally.}
-\item{Access to ``reference'' sets (determined by trigger configuration:
-\ie. luminosity, trigger streams, prescales, etc).}
-\item{Support for configuration lists for DQM clients (\eg. default
-subscription lists, update frequencies, etc).}
-\item{Access to a ``problem and solution'' history. Quering flexibility is
-desired (\eg per subdetector and/or per run, week or with
-any other ``keyword'').}
-\end{itemize}
+\subsection{Control flow}
+
+DQM applications that are part of the online systems are controlled as a
+whole by a ``DQM Supervisor'' which runs under the general Run Control.
+The DQM Supervisor is responsible for the central initiation of all relevant processes and the
+transmission of common configuration information to them. All DQM clients implement a standardized
+state machine and states are constantly reported to the supervisor
+to give feedback to the shift crew in case problems are detected.
+Run Control also uses the Supervisor to notify all clients when a run is started or
+ended.
+
+During the lifetime of a DQM client, interaction with the user happens through individual
+application control interfaces based on the web protocol.
+
+
+
+%==========================================
+\subsection{Subdetector monitoring}\label{sec:subdetMonitoring}
+
+Implementation of DQM tools is under active development by
+the different
+subdetector groups.
+The current focus has been on addressing the short-term operational
+needs of the Cosmic Challenge. For example,
+a Drift Tubes DQM histogram browser with
+a GUI based on IGUANA [insert reference here] has been used to
+monitor the drift tubes as part of the commissioning effort at SX5
+(Fig.~\ref{iguana-dqm}). This development will continue
+on to the development of
+monitoring programs
+for the long-term needs of the subdetectors. A discussion of
+the amount of information and resources which are necessary to monitor the operation
+and performance of each subsystem is given in the subsequent subdetector chapters.
 %
 %
-\subsubsection{Control structure and configuration}
-\label{sec:control_structure}
-\begin{itemize}
-\item{The infrastructure supports the concept of a DQM configuration
-containing the list of DQM processes that must be configured  for normal
-data taking.}
-\item{Each application can be started centrally and constantly
-reports its status to a supervising entity.}
-\item{Each application exposes a control interface similar to one used to
-control the DAQ system. This interface is used  by the DAQ supervisor(s) to
-control the operation of the various processes. The interface can be
-customized to allow direct interaction with an individual DQM process to
-perform specific  operation via a UI.}
-\end{itemize}
+
 %
-A hypothetical task list here could include
-\begin{itemize}
-\item{configuring and starting a DQM process.}
-\item{displaying a report on the DQM process status.}
-\item{an interface \`a la ``run control'' for automated actions
-(\eg stop- and start-run, reset, reconfigure).}
-\end{itemize}
-%
-%
-\subsubsection{Display and Graphical User Interface}
-A GUI gives users a quick way of accessing the UI methods discussed in
-this section. A non-exhaustive list includes
-\begin{itemize}
-\item{Global display with individual tabs per group (giving a ``one button''
-access to the state of all subdetectors: warnings, \# of processed
-events, rates, etc).}
-\item{Option for static display or cycling through subscription list.}
-\item{Navigation capability: browse though monitoring structure and click
-on desired ME.}
-\item{Web-based display client.}
-\end{itemize}
-%
-The GUI would ideally be easily customizable, to allow different
-groups to tailor it to their needs. An investigation of different
-software packages is currently underway for selecting a
-suitable application development framework.
+\begin{figure}[!htbp]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{iguana-dqm}
+\caption{Screen shot of the Drift Tubes DQM browser of online data
+sources: occupancy and time boxes subscription,
+            using the interactive IGUANA  GUI and tree controller to display
+            several embedded ROOT canvas components. The data sources are the cosmics muons taken at SX5
+during commissioning of the installed DT.\label{iguana-dqm}}
+\end{center}
+\end{figure}
+
 %
 %
 %================
