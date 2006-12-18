@@ -5,7 +5,7 @@
 % Use latex or pdflatex to compile.
 %
 % Author: C.Leonidopoulos, E. Meschi (parts stolen from N. Amapane)
-% $Date: 2006/12/18 14:48:22 $  $Revision: 1.6 $
+% $Date: 2006/12/18 15:16:20 $  $Revision: 1.7 $
 %
 %======================================================================
 \documentclass[a4paper]{cmspaper}
@@ -355,6 +355,31 @@ information.
 %
 %
 %
+\subsubsection{Graphical User Interface}
+\label{sec:gui_client}
+A graphical user interface (GUI) to look at the monitor elements has been developed to ease the shift and casual user duties. 
+While a simple histogram browser cannot be generally considered a difficult task, in the case of the CMS DQM  the challenge comes from the possibly large amount of information that might be in the system at a given point which could starve the resources of the machine rendering the application unresponsive. 
+For this reason, to leverage the load due to the monitor element updates and to minimize the interference of the backend DQM operations with the actual operations of the GUI, the application had to be implemented around and event based, asynchronous design.
+This way the user could always profit from a highly responsive GUI when looking at the data, no matter what was the load on the machine because of the communication with the DQM server.
+The application is composed of two concurrent threads, one responsible of the communication with the DQM, the other for updating the GUI. 
+The update workflow is such that whenever the first thread receives an update from the DQM infrastructure, it pushes a message with information about the update at the end of an queue that is than processed by the second thread once in a while. The second thread pops the messages from the queue and updates the application view.
+A similar, but inverse, process also applies for the case in which it is the user who wants to pose some action to be executed by the DQM infrastructure, for example subscription to new monitorables or soft-resetting an histogram.
+The actual implementation of the application was done using IGUANA, CMS toolkit for graphical applications, QT and ROOT.
+Some additional features where added to the initial design to make the application more useful in a real world environment:
+
+\begin{itemize}
+\item{The ability to specify and store a user defined layout for the histograms on screen.}
+\item{The ability to decorate the monitor elements using plugins.}
+\end{itemize}
+
+The former was implemented because it became obvious that different monitoring or debugging needs lead to different way of organizing the detector DQM data. For example while in a detailed, debugging, view it is important to fit in one single page as many histograms as possible, in monitoring mode a few key one would suffice, and nevertheless you want the ability to switch from one view to the other. In the GUI this was solved by the ability of specifying, via an XML description file, groups of histograms which had to be displayed together, no matter what their position in the original DQM layout was. This can be seen in picture [insert fig] where the different histograms in a row are actually picked up from different dqm directories.
+The second addition cames instead from the need, expressed in particular by ECAL and Tracker developers, to modify the appearance of some specific histograms in a specific way. To do so a plugin based mechanism has been put in place so that whenever a monitor element matches a given criteria, the associated decoration action is executed to modify non essential properties of the display. This allowed subdetector developers to heavily customize the appearance of their plots without having to directly modify the core of the GUI application and with zero knowledge of the inner workings of IGUANA but just by implementing a single class and using only their ROOT knowledge.
+
+
+%
+%
+%
+
 \subsection{Control flow}
 
 DQM applications that are part of the online systems are controlled as a
