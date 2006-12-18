@@ -5,7 +5,7 @@
 % Use latex or pdflatex to compile.
 %
 % Author: C.Leonidopoulos, E. Meschi (parts stolen from N. Amapane)
-% $Date: 2005/05/24 12:55:47 $  $Revision: 1.5 $
+% $Date: 2006/12/18 14:48:22 $  $Revision: 1.6 $
 %
 %======================================================================
 \documentclass[a4paper]{cmspaper}
@@ -402,6 +402,118 @@ sources: occupancy and time boxes subscription,
 during commissioning of the installed DT.\label{iguana-dqm}}
 \end{center}
 \end{figure}
+
+
+\section{DQM Commissioning at the Magnet Test and Cosmic Challenge} \label{sec:dqmcommissioning}
+
+While the CMS detector is under construction in the LHC interaction point 5 surface hall, a comprehensive 
+programme for commissioning and mapping the coil and operating all subsystems with central trigger and global 
+data acquisition has been carried out during fall 2006. These operations are called Magnet Test and Cosmic 
+Challenge (MTCC)[MTCC reference]. After having been tested during the preparation for MTCC by individual 
+subdetector groups, the DQM has been commissioned and used during the MTCC in a more global setup,
+both on-line and quasi on-line in the MTCC control room, and off-line at the Remote Operation Centre at Tier0 (CERN). 
+
+
+\subsection{Offline DQM at MTCC} \label{sec:dqmcommissioningoffline}
+The scope of the offline installation was to create DQM snapshots (in form of root files containing all the available MonitorElement's)
+to be stored permanently. The snapshots were created by a DQM Producer which included all the available DQM 
+modules relevant to the sub-detectors participating in the final phase of MTCC, i.e. the DQM for HCAL, CSC, DT, RPC, 
+for the central trigger board (CTC), a generic module for monitoring the data size of all 
+FEDs, and a module for monitoring Muon reconstruction. For all detectors involved the relevant raw data
+unpacking code was included. The DQM Producer was the only DQM component run for the off-line application and it was
+run in an automated way on all the MTCC data stored in CASTOR[castor reference]. In order to allow users at all CMS sites to view the
+snapshots contents through a web browser, a designated AFS area at CERN was used for storage. Fig.~\ref{fig:web_browser_plot} shows an example of
+visualizing the DQM snapshots with a web browser.
+%
+\begin{figure}[hbtp]
+  \begin{center}
+  \rotatebox{0}{
+    \resizebox{12cm}{!}
+      {\includegraphics{figures/RPCOfflineIllumination}} 
+      }
+\caption{DQM snapshots produced off-line at the CERN ROC and visualized with a web browser. The example shows the RPC Chamber illumination plot. On
+the left it is visible the directory structure of the root file which can be browsed to select the MonitorElement to view.}
+\label{fig:web_browser_plot}
+ \end{center}
+\end{figure}
+%%
+%
+\begin{figure}[hbtp]
+  \begin{center}
+  \rotatebox{0}{
+    \resizebox{12cm}{!}
+      {\includegraphics{figures/DTSummaryOccupancy}} }
+\caption{DT Integrity check plots (occupancy in time intervals) produced on-line in the Filter Farm and visualized with the Iguana GUI Client.}
+\label{fig:dtlayout}
+ \end{center}
+\end{figure}
+%%
+
+
+\subsection{Online and quasi online DQM at MTCC}
+
+The DQM was used and commissioned in the MTCC control room in an on-line and a quasi on-line setup.
+The on-line application included a Producer running in the Filter Farm and one Collector running within the local area network. 
+The Producer included the modules for DT, CTC and generic FED monitoring. Clients would be run independently by the groups interested 
+in monitoring the data. Fig.~\ref{fig:dtlayout} shows an example of a DT data integrity check MonitorElement collection 
+produced in the Filter Farm and visualized with the Iguana GUI by the DT group.
+
+A centralized effort was established for monitoring the data with a quasi-online application. This included a general Producer 
+(identical to the one run in the off-line mode, described in subsection~\ref{sec:dqmcommissioningoffline}) consuming events in a 
+parasitic way from the StorageManager in parallel to the Event Display[ED reference]. 
+For the final two weeks of the MTCC, the Producer was launched by a Run Control Function Manager at the beginning of each run.
+One Collector run at all times on a machine visible both
+from the control room LAN and from the outside network, this allowed to include some monitoring shifts run from the Remote Operation Centre 
+at Fermilab (with the Client run locally at the ROC) in addition to the regular local shifts. 
+For these centralized shifts the Iguana GUI Client was used to visualize plots by the users. 
+A standard configuration for the monitorable layouts 
+was established to accommodate the sub-detector needs and the general interest in visualizing muon reconstruction distributions.
+The MonitorElement layouts to be visualized by the shifter included monitorables for DT and RPC data integrity and detector 
+functioning checks (with configurations provided by the sub-detector groups), CTC, generic FED's and Muon Reconstruction plots 
+(with configurations established within the DQM group). Figure~\ref{fig:muonrecolayout} shows an example of Muon Reconstruction MonitorElements
+visualized in the quasi online application.
+
+%
+\begin{figure}[hbtp]
+  \begin{center}
+  \rotatebox{0}{
+    \resizebox{12cm}{!}
+      {\includegraphics{figures/MuonReco_run4406}} }
+\caption{Trigger, FED and Muon Reconstruction MonitorElements produced quasi-online consuming events from Storage Manager and visualized 
+with IGUANA GUI. 
+The four upper left plots show the Trigger bits distribution, the trigger overlaps, FED size profile and bunch crossing number; 
+the four upper right plots show the reconstructed Muon momentum components; 
+the two lower left plots show the reconstructed Muon charge and total Momentum; 
+the five lower right plots show the number of muons per event reconstructed after level one trigger, the overall (DT and CSC) number 
+of hits used in the reconstruction, the number of DT hits used, the number of CSC hits used and the number of DT versus the number of CSC 
+hits used.}
+\label{fig:muonrecolayout}
+ \end{center}
+\end{figure}
+%%
+
+
+\subsection{Conclusions on operations}
+
+
+The DQM was commissioned and used during the fall 2006 CMS Magnet Test and Cosmic Challenge. The main objectives set for DQM in MTCC were met:
+a global DQM application was established both for quasi-online and offline operations, DQM (combined with Event Display) shifts were run,
+DQM snapshots were saved in permanent storage and some DQM modules were included in the Filter Farm for on-line monitoring. While the overall 
+DQM functioning was satisfactory, valuable feedback was achieved from this experience on selected issues that will be addressed. 
+In particular, the need of optimizing the efficiency of the individual DQM production modules emerged.
+Once shifts for individual sub-detectors will be established in future commissioning programmes and at the LHC startup, 
+the inclusion of detector specific information in the centralized shift might become somewhat redundant. 
+The centralized DQM installation could then be used for monitoring higher level physical quantities besides the Muon reconstruction
+distributions, as for instance  missing energy and invariant masses.
+
+
+
+\section{Acknowledgments}
+
+We would like to thank the ROC centre at Fermilab for the remote shifts, the wealth of feedback provided and the web
+browsing tools for the DQM snapshots; Martijn Mulders and Frederic Ronga for including the off-line DQM application 
+in the automated analysis of the MTCC data; Ianna Osborne for helping in the coordination of the combined DQM and Event Display shifts.
+
 
 %
 %
