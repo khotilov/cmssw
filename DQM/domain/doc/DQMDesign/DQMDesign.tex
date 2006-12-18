@@ -5,7 +5,7 @@
 % Use latex or pdflatex to compile.
 %
 % Author: C.Leonidopoulos, E. Meschi (parts stolen from N. Amapane)
-% $Date: 2006/12/18 15:16:20 $  $Revision: 1.7 $
+% $Date: 2006/12/18 15:49:34 $  $Revision: 1.8 $
 %
 %======================================================================
 \documentclass[a4paper]{cmspaper}
@@ -375,10 +375,23 @@ Some additional features where added to the initial design to make the applicati
 The former was implemented because it became obvious that different monitoring or debugging needs lead to different way of organizing the detector DQM data. For example while in a detailed, debugging, view it is important to fit in one single page as many histograms as possible, in monitoring mode a few key one would suffice, and nevertheless you want the ability to switch from one view to the other. In the GUI this was solved by the ability of specifying, via an XML description file, groups of histograms which had to be displayed together, no matter what their position in the original DQM layout was. This can be seen in picture [insert fig] where the different histograms in a row are actually picked up from different dqm directories.
 The second addition cames instead from the need, expressed in particular by ECAL and Tracker developers, to modify the appearance of some specific histograms in a specific way. To do so a plugin based mechanism has been put in place so that whenever a monitor element matches a given criteria, the associated decoration action is executed to modify non essential properties of the display. This allowed subdetector developers to heavily customize the appearance of their plots without having to directly modify the core of the GUI application and with zero knowledge of the inner workings of IGUANA but just by implementing a single class and using only their ROOT knowledge.
 
-
+\subsubsection{Web Interface}
+XDAQ [reference] is a C++ framework for writing data acquisition software. Making a DQM client a XDAQ application and running it in the context of a XDAQ executive provides 
+it with web interactivity. More specifically, a XDAQ application can listen for HTTP requests and react to them by executing predefined callback functions. If a DQM client 
+is to have a web interface and respond to such requests, it needs to have its regular interaction with the collectors handled by a separate thread. Software tools are 
+provided to facilitate the development of such clients so as to make this complication as transparent as possible. The use of these tools automatically provides the client 
+with a web page from which to control the state of the client i.e. start and stop the updating cycles etc.
 %
+Moreover, the DQM infrastructure builds on the web capabilities of XDAQ applications and offers the software tools needed to easily include a number of HTML elements (web 
+widgets) in the client web pages. Examples include menus specifically suited to navigating the monitoring structure as well as display windows for the graphic 
+representation of histograms in the content. A small Javascript library handles the interaction of the browser with the client, issuing the HTTP requests based on the user 
+input. It is thus easy to define e.g. custom callback functions for the client and connect them to clickable HTML buttons appearing on the browser window. 
 %
-%
+There is nothing to prevent client developers to expand in this direction and extend the list of available HTML widgets. The code is structured so as to make such a 
+development as easy as possible. Adding an HTML widget comprises two steps. The first is to create a class for the widget on the client side, inheriting from a base class 
+created for this purpose. The second is to include the Javascript code that will create the HTTP request that the use of this widget will trigger. A noteable example client 
+is the one developed by the silicon tracker group. A screenshot of the web page of this client can be seen in figure [figure].
+ % % %
 
 \subsection{Control flow}
 
