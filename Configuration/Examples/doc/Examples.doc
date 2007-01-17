@@ -14,10 +14,11 @@
 
 
 \section desc  Standard Examples
+This page contains an explanation for the available .CFG examples. This are the examples you should refer to if you want to prepare "standard" configurations files ( == no too fancy options).
 
 \subsection files Examples
 
-- \b SimExample.cfg:
+- \b SimExample.cfg (to be done):
 - \b RecoExample.cfg: Example config file for Reconstruction. The only options available are
  - Input file: edit filenames to match the input file
  - Output file: edit filename to match the wanted output file
