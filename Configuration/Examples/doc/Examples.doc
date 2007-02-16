@@ -109,6 +109,13 @@ source = PythiaSource
 </pre>
 \endhtmlonly
 
+- An include to clarify which calibration option to choose. At the moment, the only one available is FakeConditions, using MC mode for all the quantities
+\htmlonly
+<pre>
+include "Configuration/StandardSequences/data/FakeConditions.cff"
+</pre>
+\endhtmlonly
+
 - From this point on, you have simply to include and slightly modify lines. 
  - If you want to run \b reconstruction in the .cfg, you need to include the relevant sequence:
 \htmlonly
