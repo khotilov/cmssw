@@ -23,12 +23,30 @@ This page contains an explanation for the available .CFG examples. This are the 
  - Input file: edit filenames to match the input file
  - Output file: edit filename to match the wanted output file
  - path: use one of the paths explained in the Reconstruction.cff fragment.
+ - calibrations: choose the calibration sources.
  - Data Tier: choose between FEVT, RECO, AOD, FEVTSIM, RECOSIM, AODSIM.	
 
 - \b FullChainExample.cfg: Example config file for a full chain processing (from 0 to reconstructed sample). It has the same options as the RecoExample.cfg, plus these simulation related
  - vertex smearing option: see \ref Software_StandardSequences
  - mixing option: see \ref Software_StandardSequences
- 
+
+ - \b DigiRecoExample.cfg: Example config file to run/re-run Digitization and Reconstruction. The only options available are
+ - mixing option: see \ref Software_StandardSequences
+ - Input file: edit filenames to match the input file
+ - Output file: edit filename to match the wanted output file
+ - path: use one of the paths explained in the Reconstruction.cff fragment.
+ - calibrations: choose the calibration sources.
+ - Data Tier: choose between FEVT, RECO, AOD, FEVTSIM, RECOSIM, AODSIM.	
+
+ - \b DigiRecoExample_123.cfg: Example config file to run/re-run Digitization and Reconstruction with 130 on 123 data. The only options available are
+ - mixing option: see \ref Software_StandardSequences
+ - Input file: edit filenames to match the input file
+ - Output file: edit filename to match the wanted output file
+ - path: use one of the paths explained in the Reconstruction.cff fragment.
+ - calibrations: choose the calibration sources.
+ - Data Tier: choose between FEVT, RECO, AOD, FEVTSIM, RECOSIM, AODSIM.	
+
+
 \subsection General Structure
 
 The general structure of a .cfg file is explained here, for the Full Chain case.
