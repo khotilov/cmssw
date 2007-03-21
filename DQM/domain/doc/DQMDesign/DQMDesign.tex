@@ -5,7 +5,7 @@
 % Use latex or pdflatex to compile.
 %
 % Author: C.Leonidopoulos, E. Meschi (parts stolen from N. Amapane)
-% $Date: 2006/12/18 23:35:00 $  $Revision: 1.9 $
+% $Date: 2006/12/21 18:08:11 $  $Revision: 1.10 $
 %
 %======================================================================
 \documentclass[a4paper]{cmspaper}
@@ -380,7 +380,7 @@ XDAQ [reference/link to xdaq webpage?] is a C++ framework for writing data acqui
 %
 Moreover, the DQM infrastructure builds on the web capabilities of XDAQ applications and offers the software tools needed to easily include a number of HTML elements (web widgets) in the client web pages. Examples include menus specifically suited to navigating the monitoring structure as well as display windows for the graphic representation of histograms in the content. A small Javascript library handles the interaction of the browser with the client, issuing the HTTP requests based on the user input. It is thus easy to define e.g. custom callback functions for the client and connect them to clickable HTML buttons appearing on the browser window. 
 %
-There is nothing to prevent client developers to expand in this direction and add their own HTML to appear in the client webpage. The code is structured so as to make such a development as easy as possible. The developer has to define a callback function on the client side and bind it to a custom HTTP request. It is then trivial to add new code to the Javascript library to get the browser to send the request, but there are also other possibilities. For example, Java applets can be used to develop very complex user interfaces. An example client which includes additional HTML is the one developed by the tracker group. A screenshot of the web page of this client can be seen in figure [a screenshot like for example: https://twiki.cern.ch/twiki/pub/CMS/DQMInfrastructure/SiStrip_ModuleView.PNG].
+There is nothing to prevent client developers to expand in this direction and add their own HTML to appear in the client webpage. The code is structured so as to make such a development as easy as possible. The developer has to define a callback function on the client side and bind it to a custom HTTP request. It is then trivial to add new code to the Javascript library to get the browser to send the request, but there are also other possibilities. For example, Java applets can be used to develop very complex user interfaces. An example client which includes additional HTML is the one developed by the tracker group. A screenshot of the web page of this client can be seen in figure [a screenshot like for example: https://twiki.cern.ch/twiki/pub/CMS/DQMInfrastructure/SiStrip\_ModuleView.PNG].
 
 \subsection{Control flow}
 
