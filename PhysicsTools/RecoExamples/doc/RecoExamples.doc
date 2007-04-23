@@ -8,22 +8,12 @@
 </center>
 
 \section desc Description
-Examples of access to \ref RecoPackages "Reco" data.
+Examples of analysis and manupulation of RECO/AOD objects. 
 
-\subsection interface Public interface
-None.
+For more details, refer to the
+<a href="https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePhysicsTools">Analysis Tools</a>
+TWiki on the Software Guide.
 
-\subsection modules Modules
-- TrackPointsProducer: example that saves track outermost and innermost points
-- TrackPlotsExample: simple example of track plots
-	
-\subsection tests Unit tests and examples
-
-- <b>testBatchRoot.cpp</b>: sample executable to produce root plots. It uses
-  the Root API's, but crashes with Root versions until 5.08. Should replace
-  testBatchPool.cpp as soon as CMSSW migrates to a new Root version.
-
-\endhtmlonly
 
 <hr>
 Last updated: @DATE@ L. Lista

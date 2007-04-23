@@ -8,47 +8,12 @@
 </center>
 
 \section desc Description
-Common algorihtm specific for \ref DataFormats_Candidate "Candidate" types
-with \ref RecoPackages "Reco" components.
+Common framework modules for particle Candidates and RECO/AOD objects.
 
-\subsection interface Public interface
-None.
-\subsection modules Modules
-- ChargedCandidateProducer: produces a collection of reco::Candidate with a reco::Track component.
-The default configuration file <tt>AllTracks.cfi</tt> is the following:
-<pre>
-\htmlinclude allTracks.cfi
-</pre>
-- EcalCandidateProducer: produces a collection of reco::Candidate with a reco::SuperCluster component.
-The default configuration file <tt>AllSuperClusters.cfi</tt> is the following:
-<pre>
-\htmlinclude allSuperClusters.cfi
-</pre>
+For more details, refer to the
+<a href="https://twiki.cern.ch/twiki/bin/view/CMS/SWGuidePhysicsTools">Analysis Tools</a>
+TWiki on the Software Guide.
 
-For the above producers one (and only one) of the following parameters must
-be specified in order to set the particle mass hypothesis:
-\htmlonly
-<pre>
-  string particleType = "pi+"
-</pre>
-\endhtmlonly
-or:
-\htmlonly
-<pre>
-  int32 particleId = 211
-</pre>
-\endhtmlonly
-or:
-\htmlonly
-<pre>
-  double particleMass = 0.13957
-</pre>
-\endhtmlonly
-If a particle type or paricle ID is specified to determine the mass value,
-a PDT service must be loaded in the configuration file.
-
-\subsection othermodules Modules from other packages
-- CaloTowerCandidateCreator (from \ref RecoLocalCalo_CaloTowersCreator "RecoLocalCalo/CaloTowersCreator"): produces a collection of reco::Candidate with CaloTower component.
 
 <hr>
 Last updated: @DATE@ L. Lista
