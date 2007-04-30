@@ -1,33 +1,30 @@
 
 /*!
 
-\page Validation_GlobalHits Package Validation/GlobalHits
+\page SimDataFormats_GlobalValidation Package SimDataFormats/GlobalValidation
 
 <center>
 <small>
 
 <!-- @CVS_TAG@ will be substituted at build time, no need to touch -->
-<a href=http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/Validation/GlobalHits/?cvsroot=CMSSW&only_with_tag=@CVS_TAG@>Source code (CVS tag: @CVS_TAG@)</a> - 
-<a href=http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/Validation/GlobalHits/.admin/developers?rev=HEAD&cvsroot=CMSSW&content-type=text/vnd.viewcvs-markup>Administrative privileges</a>
+<a href=http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/SimDataFormats/GlobalValidation/?cvsroot=CMSSW&only_with_tag=@CVS_TAG@>Source code (CVS tag: @CVS_TAG@)</a> - 
+<a href=http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/SimDataFormats/GlobalValidation/.admin/developers?rev=HEAD&cvsroot=CMSSW&content-type=text/vnd.viewcvs-markup>Administrative privileges</a>
 </small>
 </center>
 
 \section desc Description
 <!-- Short description of what this package is supposed to provide -->
 
-Producer to fill PGlobalSimHit object to be inserted into data stream 
-containing information about various sub-systems in global coordinates 
-with full geometry.
+DataFormat class to hold the information for the Global Hit Validation
 
 \subsection interface Public interface
 <!-- List the classes that are provided for use in other packages (if any) -->
 
-- GlobalHitsProducer
+- PGlobalSimHit
 
 \subsection modules Modules
 <!-- Describe modules implemented in this package and their parameter set -->
 
-- GlobalHitsProducer
 
 \subsection tests Unit tests and examples
 <!-- Describe cppunit tests and example configuration files -->
