@@ -18,9 +18,11 @@ This page contains an explanation for the available .CFG examples. This are the 
 
 \subsection files Examples
 
+- \b GenExample.cfg:Example config file for event generation. The options are
+ - PGunParameters: gun configuration. 
+ - Output file: edit filename to match the wanted output file.
 - \b SimExample.cfg:Example config file for Simulation. The options are
- - PGunParameters: choose what to fire in the ParticleGun.
- - mixing option: see \ref Software_StandardSequences.
+ - Input file: edit filename to match the wanted intput file. 
  - Output file: edit filename to match the wanted output file.
  - vertex smearing option: see \ref Software_StandardSequences.
  - Conditions: at the moment, the only available is FakeConditions.
@@ -65,6 +67,17 @@ A .cfg \b needs the following pieces
          untracked uint32 VtxSmeared = 98765432
 	 untracked uint32 g4SimHits  = 11
 	 untracked uint32 mix        = 12345   
+
+         untracked uint32 siPixelDigis =1234567
+         untracked uint32 siStripDigis =1234567
+
+         untracked uint32 ecalUnsuppressedDigis = 1234567
+
+         untracked uint32 hcalDigis  = 11223344
+
+         untracked uint32 muonCSCDigis  = 11223344
+         untracked uint32 muonDTDigis = 1234567
+         untracked uint32 muonRPCDigis = 1234567
       }
    }
 </pre>
