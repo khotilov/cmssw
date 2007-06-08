@@ -50,7 +50,10 @@ This page contains an explanation for the available .CFG examples. This are the 
  - path: use one of the paths explained in the Reconstruction.cff fragment.
  - calibrations: choose the calibration sources.
  - Data Tier: choose between FEVT, RECO, AOD, FEVTSIM, RECOSIM, AODSIM.	
-
+- \b AlCaReco.cfg: Example config file to generate ALCaReco samples
+ - Input File: edit filenames to match input file
+ - Output Files: multiple AlCaReco streams
+ - path and endpath must be (de)selected according to the wanted AlCaReco stream
 
 \subsection General Structure
 
