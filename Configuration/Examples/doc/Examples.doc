@@ -54,6 +54,9 @@ This page contains an explanation for the available .CFG examples. This are the 
  - Input File: edit filenames to match input file
  - Output Files: multiple AlCaReco streams
  - path and endpath must be (de)selected according to the wanted AlCaReco stream
+- \b copy.cfg: Example config file to copy a fraction of a data set locally 
+ - Input File: edit filenames to match input file
+ - Output File: local file mycopy.root
 
 \subsection General Structure
 
