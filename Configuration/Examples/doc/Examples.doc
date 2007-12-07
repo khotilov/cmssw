@@ -151,8 +151,8 @@ source = PythiaSource
 
 - An include to clarify which calibration option to choose. 
 At the moment you have many options:
-  - FakeConditions.cff, which does not connect to DB but uses some "reasonable" numbers - nothing is miscalibrated or misaligned, hence it represents a perfectly know detector
-  - FrontierConditions.cff: the condition payloads are the same as those from FakeConditions.cff, but this is fetched from Frontier
+  - FakeConditions.cff, which does not connect to DB but uses some "reasonable" numbers - nothing is miscalibrated or misaligned, hence it represents a perfectly known detector
+  - FrontierConditions.cff: the condition payloads are the same as those from FakeConditions.cff, but are fetched from Frontier
   - Frontier10pbConditions: uses Frontier to simulate a detector miscalibrated and misaligned at the level we expect it to be after 10pb of data
   - Frontier100pbConditions: uses Frontier to simulate a detector miscalibrated and misaligned at the level we expect it to be after 100pb of data
 \htmlonly
