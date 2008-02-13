@@ -57,6 +57,25 @@ This page contains an explanation for the available .CFG examples. This are the 
 - \b copy.cfg: Example config file to copy a fraction of a data set locally 
  - Input File: edit filenames to match input file
  - Output File: local file mycopy.root
+- \b GenPythiaGunJpsiExample.cfg: Example config file to run PythiaSource in the
+     "particle gun" mode; generates J/psi and runs Pythia6 to decay them into ee 
+     or mumu (random decays turned off")
+ - Input: PythiaSource configuration
+ - Output: local file gen_jspi.root"
+- \b GenH190ZZ4muExample.cfg: Example cfg to generate H(190)->ZZ->4mu (no UE)
+ - Input: PythiaSource configuration
+ - Output: local file pythiaH190ZZ4mu.root
+- \b SimDigiStoreRndmExample.cfg: Example cfg to processes H(190)->ZZ->4mu generator 
+     particles through Geant4-based detector simulation and detector electronics 
+     modeling (digitization); stores state of random engine for each involved module
+ - Input: local file pythiaH190ZZ4mu.root
+ - Output: local file H190ZZ4mu_detsim_digi.root
+- \b RestoreRndmSimDigiExample.cfg: Example cfg to read pre-simulated sample, skip
+     certain number of events at the beginning, start from specific event, restore 
+     random engine states for all modules in the chain, on the event-by-event basis,
+     and re-processes detector simulation and digitization 
+ - Input: local file H190ZZ4mu_detsim_digi.root
+ - Output: restore_rndm_H190ZZ4mu_detsim_digi.root
 
 \subsection General Structure
 
@@ -88,9 +107,10 @@ A .cfg \b needs the following pieces
    }
 </pre>
 \endhtmlonly
-\b sourceSeed serves for general purposes use cases, VtxSmeared for vertex smearing, g4SimHits is used for in Geant, and mix is used in the MixingModule
+\b sourceSeed serves for general purposes use cases, VtxSmeared for vertex smearing, g4SimHits is used for in Geant4 
+detector simulation, and mix is used in the MixingModule
 
-- A \b source. In most cases, it is either a \b PythiaSource or a \b ParticleGunSource
+- A \b source. In these example cases, it is either a \b PythiaSource or a \b ParticleGunSource
  - A PythiaSource contains the parameters passed to Pythia and used to generate the sample. See an example below:
 \htmlonly
 <pre>
@@ -182,6 +202,9 @@ include "Configuration/StandardSequences/data/Simulation.cff"
 include "Configuration/StandardSequences/data/VtxSmearedFlat.cff"
 include "Configuration/StandardSequences/data/VtxSmearedGauss.cff"
 include "Configuration/StandardSequences/data/VtxSmearedNoSmear.cff"
+include "Configuration/StandardSequences/data/VtxSmearedBeamProfile.cff"
+include "Configuration/StandardSequences/data/VtxSmearedBetafuncNominalCollision.cff"
+include "Configuration/StandardSequences/data/VtxSmearedBetafuncEarlyCollision.cff"
 </pre>
 \endhtmlonly
 please refer to \ref Software_StandardSequences for a more detailed explanation.
@@ -235,7 +258,7 @@ The different options usable for the EventContent are explained in \ref Configur
 
 
 
-Last updated: @DATE@ Tommaso Boccali
+Last updated: @DATE@ Julia Yarba
 
 
 */
