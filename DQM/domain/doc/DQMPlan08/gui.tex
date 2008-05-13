@@ -54,7 +54,7 @@ Each online DQM sub-system will provide three pieces of DQM summary information:
 \begin{itemize}
 \item the reportSummary ME (type: float) containing a global summary of the detector state
 \item the reportSummaryMap ME (type: TH2F) containing a 2d histogram with report information as function of eta - phi.
-\item the reportSummarySegments folder, containing a collection of MonitorElements of type float which are used to describe the behavior of sub-sub-system components. This collection of floats allows the sub-system to provide useful information about their inner/low-level state.
+\item the reportSummaryContents folder, containing a collection of MonitorElements of type float which are used to describe the behavior of sub-sub-system components. This collection of floats allows the sub-system to provide useful information about their inner/low-level state.
 \end{itemize}
 All three kinds of objects are under the sub-system responsibility, both booking and filling (the DQMEventInfo will be cleaned up).
 
@@ -64,7 +64,7 @@ This information is displayed in the following way:
 \item by clicking on the 'sub-system' name in the table (in on/off fashion), the empty space below the table will show:
 \begin{itemize}
 \item on the left side the EventInfo/reportSummaryMap TH2D MEs
-\item on the right side, a table (two columns, several rows) showing the list of the float MEs contained in EventInfo/reportSummarySegments, with their names and values (in the future we expect the names to change according to the sub-sytem needs, without changes in the GUI).
+\item on the right side, a table (two columns, several rows) showing the list of the float MEs contained in EventInfo/reportSummaryContents, with their names and values (in the future we expect the names to change according to the sub-sytem needs, without changes in the GUI).
 \end{itemize}
 \end{itemize}
 
