@@ -18,7 +18,11 @@ How to make PDF files from AI files for inclusion into documents:
     - Security: No passwords or permissions set
     - Save PDF
 
-How to convert Excel charts to PDF:
+How to convert Office documents to PDF in general:
+  - Open file in Office 2008 on a Mac
+  - File / Print... / Save as PDF
+
+How to convert individual Excel charts to PDF:
   - Open file in Office 2008 on a Mac
   - Select chart you want to save
   - Right click, Save as Picture...
@@ -28,7 +32,7 @@ How to convert Excel charts to PDF:
   PDF which can only be shown in Mac's Preview.  Always
   check the PDF displays correctly in Acrobat Reader.
 
-How to convert PDF slide to a high-resolution transparent PNG:
+How to convert PPTX slide to a high-resolution transparent PNG:
   - Open PowerPoint 2008 on a Mac
   - PowerPoint / Preferences... / Save / Save slides as graphics files:
      - Save current slide only
@@ -42,8 +46,8 @@ How to convert PDF slide to a high-resolution transparent PNG:
      - Crop image if necessary
      - Select magic wand tool, tolerance zero, select contiguous
      - Click on background, and all other background areas such as
-       closed loops in text
-     - Select / Modify / Contract... by 2 pixels
+       closed loops in text such as those in letters "P" and "d"
+     - Select / Modify / Contract... by 1 pixel
      - Edit / Cut
      - Save
 
@@ -54,12 +58,13 @@ How to convert PowerPoint, Excel graphics to AI:
   - Open existing or new document in Illustrator CS3
   - Edit / Paste
 
-  You may need to edit graphics. Text frequently gets broken down to typeset
+  You need to edit the graphics. Text frequently gets broken down to typeset
   sequences, and needs to be merged back to full text boxes, including multi-
   line text.  Replace shadows and gradients with Illustrator's native ones,
   the ones from Office will import as special objects and will look bad.  You
   need to re-group and re-align everything. You get better quality PDFs if
-  you first convert the Office graphics to Illustrator, save as PDF in AI.
+  you convert the Office graphics to Illustrator, then save as PDF in AI,
+  than if you ask Office to produce the PDF.
 
 How to extract original bitmap images from PDF, AI files without ripping:
   - Open PDF or AI document in Photoshop CS3
