@@ -1,0 +1,109 @@
+\documentclass[a4paper]{jpconf}
+\usepackage[dvipdfm]{graphicx}
+\usepackage[dvipdfm]{hyperref}
+\usepackage{subfigure}
+\usepackage{mediabb}
+\begin{document}
+\title{CMS data quality monitoring web service}
+\author{L Tuura$^1$, A Meyer$^{2,3}$, I Segoni$^3$, G Della Ricca$^{4,5}$}
+\address{$^1$ Northeastern University, Boston, MA, USA}
+\address{$^2$ DESY, Hamburg, Germany}
+\address{$^3$ CERN, Geneva, Switzerland}
+\address{$^4$ INFN Sezione di Trieste, Trieste, Italy}
+\address{$^5$ Universit\'a di Trieste, Trieste, Italy}
+\ead{lat@cern.ch, andreas.meyer@cern.ch, ilaria.segoni@cern.ch, giuseppe.della-ricca@ts.infn.it}
+
+\begin{abstract}
+In the last two years the CMS experiment has commissioned a full end
+to end data quality monitoring system in tandem with progress in the
+detector commissioning.  We present the data quality monitoring and
+certification systems in place, from online data taking to delivering
+certified data sets for physics analyses, release validation and
+offline re-reconstruction activities at Tier-1s.  We discuss the main
+results and lessons learnt so far in the commissioning and early
+detector operation.  We outline our practical operations arrangements
+and the key technical implementation aspects.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Overview}
+CMS~\cite{cms_tp}  (Fig.~\ref{fig:overview}).  (Fig.~\ref{fig:systems}).
+
+\begin{figure}[!tbp]
+\begin{center}
+\includegraphics[width=.90\textwidth]{Snippets/DQM_end_to_end}
+\end{center}
+\caption{\label{fig:overview}DQM system overview.}
+\end{figure}
+
+\begin{figure}[!tbp]
+\begin{center}
+\subfigure[Online DQM system.]{\label{fig:online}%
+  \includegraphics[width=.47\textwidth]{Snippets/DQM_online}}\hfill
+\subfigure[Offline DQM system.]{\label{fig:offline}%
+  \includegraphics[width=.47\textwidth]{Snippets/DQM_offline}}\hfill
+\end{center}
+\caption{\label{fig:systems}Major DQM system components.}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Online DQM system}
+\subsection{Data processing}
+X.
+
+\subsection{Visualisation}
+X.
+
+\subsection{Operation}
+X.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Offline DQM systems}
+\subsection{Data processing}
+X.
+
+\subsection{Visualisation}
+X.
+
+\subsection{Operation}
+X.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Certification and sign-off workflow}
+X.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Operation and experience}
+X.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ack
+
+The authors thank the numerous members of CMS collaboration who
+have contributed the development and operation of the DQM system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{References}
+\begin{thebibliography}{9}
+
+\bibitem{cms_tp}
+  CMS Collaboration,
+  1994, {\it CERN/LHCC 94-38},
+  ``Technical proposal''
+  (Geneva, Switzerland)
+
+\bibitem{dqm_gui_09}
+  Tuura L, Eulisse G, Meyer A,
+  2009, {\it Proc. CHEP09, Computing in High Energy Physics},
+  ``CMS data quality monitoring web service''
+  (Prague, Czech Republic)
+
+\end{thebibliography}
+\end{document}
