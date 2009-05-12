@@ -62,7 +62,7 @@ efficiency.  Toward this end, standardised high-level views distill the body
 of quality information into summaries with significant explaining power.
 Operationally CMS partitions the DQM activities in online and offline to {\em
   data processing,} {\em visualisation,} {\em certification} and {\em
-  signoff,} as illustrated in Fig.~\ref{fig:systems} and described further in
+  signoff,} as illustrated in Fig.~\ref{fig:overview} and described further in
 subsequent sections.  The CMS DQM supports mostly automated processes, but use
 of the tools is also foreseen for the interactive and semi-automated data
 processing at the CAF analysis facility~\cite{cms_caf_09}.
@@ -158,13 +158,13 @@ control.  The file management on the DQM GUI server is increasingly automated.
 \section{Offline DQM systems}
 \subsection{Data processing}
 
-As illustrated in Fig.~\ref{fig:offline}, numerous offline workflows in CMS
+As illustrated in Fig.~\ref{fig:overview}, numerous offline workflows in CMS
 involve data quality monitoring: Tier-0 prompt reconstruction,
 re-reconstruction at the Tier-1s and the validation of the alignment and
 calibration results, the software releases and all the simulated data.  These
 systems vary considerably in location, data content and timing, but as far as
 DQM is concerned, CMS has standardised on one standard two-step process for
-all these activities.
+all these activities, shown in Fig.~\ref{fig:offline}.
 
 In the first step the histogram monitor elements are created and filled with
 event information, and stored as {\em run products} along with the processed
@@ -198,8 +198,8 @@ alignment and calibration quantities varies from hours to days.  The
 validation cycle of simulated data reflects the sample production times, and
 varies anywhere from hours for release validation to weeks on large samples.
 The validation of simulated data differs from detector data in that entire
-datasets are validated at once, rather than runs, and that it checks for a
-large number of simulation-specific quantities.
+datasets are validated at once, rather than runs, and that the validation
+applies to a large number of additional simulation-specific quantities.
 
 \subsection{Visualisation}
 
@@ -219,7 +219,7 @@ to give the entire worldwide collaboration access to inspect and analyse all
 the DQM data at one central location.  While the GUI will offer in its final
 form all the capabilities needed for shift and expert use for all the DQM
 activities, we emphasise it is custom-built for the purpose of efficient
-interactive visualisation and navigation DQM results; it is not a general
+interactive visualisation and navigation of DQM results; it is not a general
 physics analysis tool.
 
 \subsection{Operation}
@@ -230,9 +230,9 @@ execution sequence, using components from standard software releases.  The
 harvesting step implementation currently varies by the activity.  The Tier-0
 processing systems has fully integrated automated harvest step and upload to
 the DQM GUI.  For other data we currently submit analysis jobs with the CMS
-CRAB tool\~cite{crab} to perform the harvest step; the histogram result file
-is returned in the job sandbox which the operator then uploads to the GUI.
-This is currently a largely manual operation.
+CRAB tool~\cite{cms_crab_07} to perform the harvest step; the histogram
+result file is returned in the job sandbox which the operator then uploads
+to the GUI.  This is largely a manual operation at present.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -283,7 +283,7 @@ quality evaluation, and correlation with other variables such as temperature
 data.  In the DBS the quality flags are used to define convenience {\em
   analysis datasets.}  The flags are also accessible in the CMS data discovery
 interface~\cite{cms_dbs_discovery_07}, a web interface to browse and select
-data in the DBS.
+data in the DBS (Fig.~\ref{fig:dbsqflags}).
 
 Some time trivial trend plots of the key monitor element metrics have recently
 been generated automatically.  We plan to extend this to more comprehensive
@@ -303,10 +303,11 @@ on common design for convenient access and presentation of trends over time.
 
 Online shifts take place 24/7 during detector operation at the CMS Point-5 in
 Cessy, with remote assistance from the remote CMS
-centres~\cite{cms_centres_09}.  Offline shifts are currently operated from
-three CMS centres: in daytime at the CERN Meyrin site, two shifts per day at
-Fermilab and one shift per day at DESY.  Standard shift instructions, as
-illustrated in Fig.~\ref{fig:shiftdoc}, have been fully exercised.
+centres~\cite{cms_centres_09,collaboration_at_distance_09}.  Offline shifts
+are currently operated from three CMS centres: in daytime at the CERN Meyrin
+site, two shifts per day at Fermilab and one shift per day at DESY.  Standard
+shift instructions, as illustrated in Fig.~\ref{fig:shiftdoc}, have been
+fully exercised.
 
 \begin{figure}[!tbp]
 \begin{center}
@@ -397,7 +398,7 @@ physics software, production tools, operators, and so on.
   ``CMS Online Web-Based Monitoring and Remote Operations''
   (Victoria B.C., Canada)
 
-\bibitem{crab}
+\bibitem{cms_crab_07}
   Spiga D,
   2007, {\it Proc. CHEP07, Computing in High Energy Physics},
   ``CRAB (CMS Remote Anaysis Builder)'',
