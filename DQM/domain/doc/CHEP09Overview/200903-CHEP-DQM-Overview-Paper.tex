@@ -44,7 +44,7 @@ Collider~\cite{cms_tp} has standardised on a single end-to-end DQM chain
     data;
   \item visualisation of the monitoring results;
   \item certification of datasets and subsets thereof for physics analyses;
-  \item retrieval of DQM quantities from the conditions database; %FIXME: historic dqm
+  \item retrieval of DQM quantities from the conditions database;
   \item standardisation and integration of DQM components in CMS software releases;
   \item organisation and operation of the activities, including shifts and tutorials.
 \end{itemize}
@@ -56,15 +56,16 @@ Collider~\cite{cms_tp} has standardised on a single end-to-end DQM chain
 \caption{\label{fig:overview}DQM system overview.}
 \end{figure}
 
-The high-level goal of the system is to discover and pin-point errors early,
+The high-level goal of the system is to discover and pin-point errors---%
+problems occurring in detector hardware or reconstruction software---early,
 with sufficient accuracy and clarity to reach good detector and operation
 efficiency.  Toward this end, standardised high-level views distill the body
 of quality information into summaries with significant explaining power.
 Operationally CMS partitions the DQM activities in online and offline to {\em
   data processing,} {\em visualisation,} {\em certification} and {\em
-  signoff,} as illustrated in Fig.~\ref{fig:overview} and described further in
-subsequent sections.  The CMS DQM supports mostly automated processes, but use
-of the tools is also foreseen for the interactive and semi-automated data
+  sign-off,} as illustrated in Fig.~\ref{fig:overview} and described further
+in subsequent sections.  The CMS DQM supports mostly automated processes, but
+use of the tools is also foreseen for the interactive and semi-automated data
 processing at the CAF analysis facility~\cite{cms_caf_09}.
 
 \begin{figure}[!b]
@@ -83,25 +84,26 @@ processing at the CAF analysis facility~\cite{cms_caf_09}.
 \section{Online DQM system}
 \subsection{Data processing}
 
-As illustrated in Fig.~\ref{fig:online}, the DQM applications are operated in
-the online as an integral part of the rest of the event data processing at the
+As illustrated in Fig.~\ref{fig:online}, the online DQM applications in the
+online are an integral part of the rest of the event data processing at the
 cluster at CMS Point-5.  DQM distributions are created at two different
 levels, {\em high-level trigger filter units} and {\em data quality monitoring
   applications.}
 
-The high-level trigger filter units produce a limited number of histograms at
-up to 100~kHz.  The histogram monitor elements are delivered from the filter
-units to the storage managers at the end of each luminosity section.
-Identical histograms across different filter units are summed together and
-sent to a storage manager proxy server, which saves the histograms to files
-and serves them to DQM consumer applications along with the events.
+The high-level trigger filter units process events at up to 100~kHz and
+produce a limited number of histograms.  The histogram monitor elements are
+delivered from the filter units to the storage managers at the end of each
+luminosity section.  Identical histograms across different filter units are
+summed together and sent to a storage manager proxy server, which saves the
+histograms to files and serves them to DQM consumer applications along with
+the events.
 
 The data quality monitoring applications receive event data and trigger
 histograms from a DQM monitoring event stream from the storage manager proxy
 at the rate of about 10-15~Hz, usually one application per subsystem.  Events
 are filtered for the stream by applying trigger path selections specified by
 the DQM group.  Each DQM application requests data specifying a subset of
-those paths as a further filter.  There is no special special event sorting or
+those paths as a further filter.  There is no special event sorting or
 handling, nor any guarantee to deliver different events to parallel DQM
 applications.  The DQM stream provides raw data products only, and on explicit
 request additional high level trigger information.
@@ -121,12 +123,12 @@ All the result monitor element data including alarm states based on quality
 test results is made available to a central DQM GUI for visualisation in real
 time~\cite{dqm_gui_09}, and stored to a ROOT file~\cite{root} from time to
 time during the run.  At the end of the run the final archived results are
-uploaded to a large disk spool on the central GUI.  There the files are merged
+uploaded to a large disk pool on the central GUI.  There the files are merged
 to larger size and backed up to tape.  The automatic certification summary
 from the online DQM step is extracted and uploaded to the run registry and on
 to the condition database (see section~\ref{certification}), where it can be
 analysed using another web-based monitoring tool, WBM~\cite{wbm}.  Several
-months of recent DQM data is kept on disk availabe for archive web browsing.
+months of recent DQM data is kept on disk available for archive web browsing.
 
 \subsection{Operation}
 
@@ -163,14 +165,14 @@ involve data quality monitoring: Tier-0 prompt reconstruction,
 re-reconstruction at the Tier-1s and the validation of the alignment and
 calibration results, the software releases and all the simulated data.  These
 systems vary considerably in location, data content and timing, but as far as
-DQM is concerned, CMS has standardised on one standard two-step process for
-all these activities, shown in Fig.~\ref{fig:offline}.
+DQM is concerned, CMS has standardised on a single two-step process for all
+these activities, shown in Fig.~\ref{fig:offline}.
 
 In the first step the histogram monitor elements are created and filled with
-event information, and stored as {\em run products} along with the processed
-events to the normal output event data files.  When the CMS data processing
-systems merge output files together, the histograms are automatically summed
-together to form the first partial result.
+information from the CMS event data.  The histograms are stored as {\em run
+  products} along with the processed events to the normal output event data
+files.  When the CMS data processing systems merge output files together, the
+histograms are automatically summed together to form the first partial result.
 
 In a second {\em harvesting step,} run at least once at the end of the data
 processing and sometimes periodically during it, the histograms are extracted
@@ -181,8 +183,8 @@ acquisition (DAQ) status information from the offline condition database,
 analyses these using detector-specific algorithms, and may create new
 histograms such as high-level detector or physics object summaries.
 
-The final histograms are used to {\em calculate efficiencies} and {\em checked
-  for quality,} in particular compared against reference distributions.  The
+The final histograms are used to calculate efficiencies and checked for
+quality, in particular compared against reference distributions.  The
 harvesting algorithms also compute the preliminary automatic {\em data
   certification decision.}  The histograms, certification results and quality
 test results along with any alarms are output to a ROOT file, which is then
@@ -204,7 +206,7 @@ applies to a large number of additional simulation-specific quantities.
 \subsection{Visualisation}
 
 As in the case of online, the DQM results from offline processing are uploaded
-to the central DQM GUI server with a large disk spool.  There the result files
+to the central DQM GUI server with a large disk pool.  There the result files
 are merged to larger size and backed up to the tape; recent data is kept
 cached on disk for several months.  The automatic certification results from
 the harvesting, called {\em quality flags,} are extracted and uploaded to the
@@ -245,25 +247,25 @@ to the GUI.  This is largely a manual operation at present.
 
 \section{Certification and sign-off workflow}\label{certification}
 
-CMS uses a {\em run registry} as a central workflow tool to manage the
-creation of the final physics dataset certification result.  The run registry
-is both a user interface managing the workflow (Fig.~\ref{fig:runregistry}),
-and a persistent store of the information; technically speaking it is part of
-the online condition database and the web service is hosted as a part of the
-WBM system.
+CMS uses a {\em run registry} database with a front-end web application as the
+central workflow tracking and bookkeeping tool to manage the creation of the
+final physics dataset certification result.  The run registry is both a user
+interface managing the workflow (Fig.~\ref{fig:runregistry}), and a persistent
+store of the information; technically speaking it is part of the online
+condition database and the web service is hosted as a part of the WBM system.
 
 The certification process begins with the physicists on online and offline
-shift filling in the run registry with basic run information once the run
-control system has created the run, and adding any pertitent observations on
-the run during the shift.  This information is then augmented with the
-automatic data certification results from the online, Tier-0 and Tier-1 data
-processing as described in the previous sections.  This results in basic major
-detector segment level certification which accounts for DCS, DAQ and DQM
-online and offline metrics, and in future may also include power and cooling
-status.  For each detector segment and input one single boolean flag or a
-floating point value describes the final quality result.  For the latter we
-apply appropriate thresholds which yield binary ``good'' or ``bad'' results.
-We label the result ``unknown'' if no quality flag was calculated.
+shift filling in the run registry with basic run information, and adding any
+pertinent observations on the run during the shift.  This information is then
+augmented with the automatic data certification results from the online,
+Tier-0 and Tier-1 data processing as described in the previous sections.  This
+results in basic major detector segment level certification which accounts for
+DCS, DAQ and DQM online and offline metrics, and in future may also include
+power and cooling status.  For each detector segment and input one single
+boolean flag or a floating point value describes the final quality result.
+For the latter we apply appropriate thresholds which yield binary ``good'' or
+``bad'' results.  We label the result ``unknown'' if no quality flag was
+calculated.
 
 Once the automatic certification results are known and uploaded to the run
 registry, the person on shift evaluates the detector and physics object
@@ -285,7 +287,7 @@ data.  In the DBS the quality flags are used to define convenience {\em
 interface~\cite{cms_dbs_discovery_07}, a web interface to browse and select
 data in the DBS (Fig.~\ref{fig:dbsqflags}).
 
-Some time trivial trend plots of the key monitor element metrics have recently
+Some trivial trend plots of the key monitor element metrics have recently
 been generated automatically.  We plan to extend this to more comprehensive
 interactive trend plotting of any selected histogram metric, and are working
 on common design for convenient access and presentation of trends over time.
@@ -340,7 +342,7 @@ promote sharing and use of common code against natural divergence in a
 collaboration as large as CMS.
 
 CMS has so far focused on commissioning a common first order DQM system
-through-out the entire experiment, with the aim of having an effective basic
+throughout the entire experiment, with the aim of having an effective basic
 system ready for the first beam.  We believe we have successfully achieved
 this goal and will address second order features in due course.
 
