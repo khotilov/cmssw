@@ -1,5 +1,0 @@
-<lcgdict>
-  <class name="CommonProcessing"/>
-  <class name="EnergyProcessing"/>
-  <class name="pftools::TreeCopy" />
-</lcgdict>
