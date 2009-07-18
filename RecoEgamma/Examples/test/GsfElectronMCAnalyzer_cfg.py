@@ -63,13 +63,7 @@ process.gsfElectronAnalysis = cms.EDAnalyzer("GsfElectronMCAnalyzer",
     Nbinpt = cms.int32(50),
     Nbindphimatch2D = cms.int32(50),
     Nbindphi = cms.int32(100),
-    Nbineop = cms.int32(50),
-    Nbinpoptrue = cms.int32(75),
-    Poptruemin = cms.double(0.0),
-    Poptruemax = cms.double(1.5),
-    Nbinmee = cms.int32(100),
-    Meemin = cms.double(0.0),
-    Meemax = cms.double(150.)
+    Nbineop = cms.int32(50)
 )
 
 process.p = cms.Path(process.gsfElectronAnalysis)

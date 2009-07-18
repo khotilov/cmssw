@@ -272,16 +272,6 @@ PixelPortCardConfig::PixelPortCardConfig(vector < vector< string> >  &tableMat):
 	  setDataBaseAOHGain(settingName, i2c_values);
 	  //cout << __LINE__ << "]\t" << mthn << "Setting " << settingName << "\tto value " << std::hex << i2c_values << std::dec << std::endl ;
 	}
-      // FIXMR
-       else if ( settingName == k_PLL_CTR4 || settingName == k_PLL_CTR5 ) // special handling
-       {
-    	  unsigned int last_CTR2 = 0x0;
-    	  if ( containsSetting(k_PLL_CTR2) ) last_CTR2 = getdeviceValuesForSetting( k_PLL_CTR2 );
-    	
-    	  device_.push_back( make_pair(getdeviceAddressForSetting(k_PLL_CTR2), new_PLL_CTR2_value(settingName, last_CTR2)) );
-    	  device_.push_back( make_pair(getdeviceAddressForSetting(k_PLL_CTR4or5), i2c_values) );
-       }
-      // FIXMR
       else // no special handling for this name
 	{
 	  if(type_ != "fpix" || (settingName.find("DELAY25_") != std::string::npos) || (settingName.find("AOH_BIAS") != std::string::npos))
@@ -778,8 +768,7 @@ void PixelPortCardConfig::fillDBToFileAddress()
       nameDBtoFileConversion_["PLL_CTR1"                 ] = k_PLL_CTR1 ;
       nameDBtoFileConversion_["PLL_CTR2"                 ] = k_PLL_CTR2 ;
       nameDBtoFileConversion_["PLL_CTR3"                 ] = k_PLL_CTR3 ;
-      nameDBtoFileConversion_["PLL_CTR4"                 ] = k_PLL_CTR4 ;
-      nameDBtoFileConversion_["PLL_CTR5"                 ] = k_PLL_CTR5 ;
+      nameDBtoFileConversion_["PLL_CTR4_5"               ] = k_PLL_CTR4 ;
       //   nameDBtoFileConversion_["PLL3_CTR1"             ] = ;
       //   nameDBtoFileConversion_["PLL3_CTR2"             ] = ;
       //   nameDBtoFileConversion_["PLL3_CTR3"             ] = ;
@@ -895,8 +884,7 @@ void PixelPortCardConfig::fillDBToFileAddress()
       nameDBtoFileConversion_["PLL_CTR1"             ] = k_PLL_CTR1 ;
       nameDBtoFileConversion_["PLL_CTR2"             ] = k_PLL_CTR2 ;
       nameDBtoFileConversion_["PLL_CTR3"             ] = k_PLL_CTR3 ;
-      nameDBtoFileConversion_["PLL_CTR4"             ] = k_PLL_CTR4 ;
-      nameDBtoFileConversion_["PLL_CTR5"             ] = k_PLL_CTR5 ;
+      nameDBtoFileConversion_["PLL_CTR4_5"           ] = k_PLL_CTR4 ;
       //   nameDBtoFileConversion_["PLL3_CTR1"             ] = ;
       //   nameDBtoFileConversion_["PLL3_CTR2"             ] = ;
       //   nameDBtoFileConversion_["PLL3_CTR3"             ] = ;
@@ -1305,7 +1293,9 @@ void PixelPortCardConfig::writeXMLHeader(pos::PixelConfigKey key,
   *outstream << "   <RUN_TYPE>Pixel Port Card Settings</RUN_TYPE>" 		                             << std::endl ;
   *outstream << "   <RUN_NUMBER>1</RUN_NUMBER>"					         	             << std::endl ;
   *outstream << "   <RUN_BEGIN_TIMESTAMP>" << pos::PixelTimeFormatter::getTime() << "</RUN_BEGIN_TIMESTAMP>" << std::endl ;
-  *outstream << "   <LOCATION>CERN P5</LOCATION>"                                                            << std::endl ; 
+  *outstream << "   <COMMENT_DESCRIPTION>Pixel Port Card Settings</COMMENT_DESCRIPTION>"      	             << std::endl ;
+  *outstream << "   <LOCATION>CERN TAC</LOCATION>"					         	     << std::endl ;
+  *outstream << "   <INITIATED_BY_USER>Dario Menasce</INITIATED_BY_USER>"			 	     << std::endl ;
   *outstream << "  </RUN>"								         	     << std::endl ;
   *outstream << " </HEADER>"								         	     << std::endl ;
   *outstream << ""										 	     << std::endl ;
@@ -1314,10 +1304,7 @@ void PixelPortCardConfig::writeXMLHeader(pos::PixelConfigKey key,
   *outstream << "   <NAME_LABEL>CMS-PIXEL-ROOT</NAME_LABEL>"                                                 << std::endl ;
   *outstream << "   <KIND_OF_PART>Detector ROOT</KIND_OF_PART>"                                              << std::endl ;
   *outstream << "  </PART>"                                                                                  << std::endl ;
-  *outstream << "  <VERSION>"             << version      << "</VERSION>"				     << std::endl ;
-  *outstream << "  <COMMENT_DESCRIPTION>" << getComment() << "</COMMENT_DESCRIPTION>"			     << std::endl ;
-  *outstream << "  <INITIATED_BY_USER>"   << getAuthor()  << "</INITIATED_BY_USER>"			     << std::endl ;
-  *outstream << ""										 	     << std::endl ;
+  *outstream << "  <VERSION>" << version << "</VERSION>"				         	     << std::endl ;
 }
 
 //=============================================================================================

@@ -7,8 +7,7 @@ Instruction about how to install and run a simple HDQM test
 
 #*** Version currently used: CMSSW_3_1_0
 
-#*** needed tags
-cvs co -r V03-00-00      DQM/SiPixelHistoricInfoClient                    
+#*** No tag needed
 
 
 #****************
@@ -31,9 +30,7 @@ cmsRun test_SiStripHistoryDQMService_cfg_70416.py
 #*** This is to check that an already uploaded run will be not uploaded anymore
 cmsRun test_SiStripHistoryDQMService_cfg_69572.py
 
-#*** Upload summaries for pixels
-cmsRun test_SiPixelpHistoryDQMService_cfg_69912.py
- 
+
 #****************
 #Create Trends
 #***************

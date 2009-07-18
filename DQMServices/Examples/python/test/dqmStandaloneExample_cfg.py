@@ -6,7 +6,7 @@ process.source = cms.Source("EmptySource")
 
 ### set number of events
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(10000)
+    input = cms.untracked.int32(-1)
     )
 
 ### include to get DQM histogramming services
@@ -20,7 +20,7 @@ process.DQMStore.verbose = 0
 
 ###  DQM Source program (in DQMServices/Examples/src/DQMSourceExample.cc)
 process.dqmSource   = cms.EDFilter("DQMSourceExample",
-        monitorName = cms.untracked.string('YourSubsystemName'),
+        monitorName = cms.untracked.string('YourSubsystemName1'),
         prescaleEvt = cms.untracked.int32(1),
         prescaleLS  =  cms.untracked.int32(1)                    
 )
@@ -40,7 +40,7 @@ process.load("DQMServices.Components.DQMStoreStats_cfi")
 ### DQM Client program (in DQMServices/Examples/src/DQMClientExample.cc)
 ### by default: the client runs at the end of each lumisection
 process.dqmClient = cms.EDFilter("DQMClientExample",
-    monitorName   = cms.untracked.string('YourSubsystemName'),
+    monitorName   = cms.untracked.string('YourSubsystemName2'),
     QTestName     = cms.untracked.string('YRange'),                     
     prescaleEvt   = cms.untracked.int32(1),
     prescaleLS    =  cms.untracked.int32(1),                   
