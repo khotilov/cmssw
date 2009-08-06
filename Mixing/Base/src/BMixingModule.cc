@@ -6,7 +6,7 @@
 
 #include "Mixing/Base/interface/BMixingModule.h"
 #include "FWCore/Utilities/interface/GetPassID.h"
-#include "FWCore/Utilities/interface/GetReleaseVersion.h"
+#include "FWCore/Version/interface/GetReleaseVersion.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -109,7 +109,7 @@ namespace edm {
     
     // Check if the signal is present in the root file 
     // for all the objects we want to mix
-    //checkSignal(e);
+    checkSignal(e);
     
     // Create EDProduct
     createnewEDProduct();

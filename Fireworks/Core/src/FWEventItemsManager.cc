@@ -8,7 +8,7 @@
 //
 // Original Author:
 //         Created:  Fri Jan  4 10:38:18 EST 2008
-// $Id: FWEventItemsManager.cc,v 1.18 2009/04/07 14:03:50 chrjones Exp $
+// $Id: FWEventItemsManager.cc,v 1.20 2009/07/24 16:33:49 dmytro Exp $
 //
 
 // system include files
@@ -236,7 +236,7 @@ FWEventItemsManager::setFrom(const FWConfiguration& iFrom)
                                disp,
                                moduleLabel,
                                productInstanceLabel,
-                               processName,
+			       processName,
                                filterExpression,
                                layer);
       add(desc);

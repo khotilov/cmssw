@@ -18,6 +18,8 @@ mixData = cms.EDFilter("DataMixingModule",
     minBunch = cms.int32(0),
     checktof = cms.bool(False), 
     #
+    mixProdStep1 = cms.bool(False),
+    mixProdStep2 = cms.bool(False),
     IsThisFastSim = cms.string('NO'),  # kludge for fast simulation flag...
     # Use digis?               
     EcalMergeType = cms.string('Digis'),  # set to "Digis" to merge digis
@@ -31,7 +33,7 @@ mixData = cms.EDFilter("DataMixingModule",
                    #
     pixeldigiCollectionSig = cms.InputTag("simSiPixelDigis"),
     #
-    SiStripPileInputTag = cms.InputTag("ZeroSuppressed","simSiStripDigis"),
+    SiStripPileInputTag = cms.InputTag("simSiStripDigis","ZeroSuppressed"),
                    #
     pixeldigiCollectionPile = cms.InputTag("simSiPixelDigis"),
                    #

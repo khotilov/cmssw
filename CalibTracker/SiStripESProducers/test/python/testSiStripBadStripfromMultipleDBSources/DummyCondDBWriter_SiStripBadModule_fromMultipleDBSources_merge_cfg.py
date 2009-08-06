@@ -13,10 +13,7 @@ process.MessageLogger = cms.Service("MessageLogger",
     QualityReader = cms.untracked.PSet(
         threshold = cms.untracked.string('INFO')
     ),
-    cout = cms.untracked.PSet(
-        threshold = cms.untracked.string('INFO')
-    ),
-    destinations = cms.untracked.vstring('QualityReader.log')
+    destinations = cms.untracked.vstring('QualityReader')
 )
 
 process.maxEvents = cms.untracked.PSet(
@@ -42,6 +39,7 @@ process.poolDBESSource = cms.ESSource("PoolDBESSource",
 )
 
 process.load("CalibTracker.SiStripESProducers.SiStripQualityESProducer_cfi")
+process.siStripQualityESProducer.ReduceGranularity = cms.bool(False)
 process.siStripQualityESProducer.ListOfRecordToMerge = cms.VPSet(
      cms.PSet( record = cms.string("SiStripBadChannelRcd"), tag    = cms.string("") ),
      cms.PSet( record = cms.string("SiStripBadFiberRcd"),   tag    = cms.string("") )
@@ -72,6 +70,7 @@ process.reader = cms.EDAnalyzer("SiStripQualityStatistics",
                               TkMapFileName = cms.untracked.string("")
                               )
 
+process.siStripBadStripFromQualityDummyDBWriter.record=process.PoolDBOutputService.toPut[0].record
 process.p1 = cms.Path(process.reader*process.siStripBadStripFromQualityDummyDBWriter)
 
 

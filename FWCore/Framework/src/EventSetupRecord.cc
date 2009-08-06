@@ -142,7 +142,16 @@ bool
 EventSetupRecord::doGet(const DataKey& aKey) const {
    const DataProxy* proxy = find(aKey);
    if(0 != proxy) {
-      proxy->doGet(*this, aKey);
+      try {
+         proxy->doGet(*this, aKey);
+      } catch( cms::Exception& e) {
+         addTraceInfoToCmsException(e,aKey.name().value(),proxy->providerDescription(), aKey);
+         //NOTE: the above function can't do the 'throw' since it causes the C++ class type
+         // of the throw to be changed, a 'rethrow' does not have that problem
+         throw;
+      } catch(std::exception& e){
+         changeStdExceptionToCmsException(e.what(),aKey.name().value(),proxy->providerDescription(),aKey);
+      }
    }
    return 0 != proxy;
 }
@@ -194,7 +203,7 @@ EventSetupRecord::validate(const ComponentDescription* iDesc, const ESInputTag& 
 void 
 EventSetupRecord::addTraceInfoToCmsException(cms::Exception& iException, const char* iName, const ComponentDescription* iDescription, const DataKey& iKey) const
 {
-   iException<<"cms::Exception going through EventSetup component "
+   iException<<"\ncms::Exception going through EventSetup component "
    <<iDescription->type_
    <<"/\""<<iDescription->label_<<"\"\n"
    <<"  while making data "<< iKey.type().name()<<"/\""<<iName
