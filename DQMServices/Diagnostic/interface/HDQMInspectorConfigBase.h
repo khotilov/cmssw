@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-#include <map>
 
 /**
  * @author: M. De Mattia
@@ -40,18 +39,7 @@ class HDQMInspectorConfigBase
   /// fills a vector<pair<string, string> > associating values with the corresponding errors
   virtual bool valueErrorMap(std::vector<std::pair<std::string, std::string> > & valueErrorVector) const {return false;}
   /// fills the list of names of quantities for which a summation over the runs is required
-  virtual bool computeIntegralList(std::vector<std::string> & computeIntegralVector)
-  {
-    fComputeIntegral = computeIntegralVector;
-    return true;
-  }
-  bool computeIntegral(std::string const& in)
-  {
-    if (std::find(fComputeIntegral.begin(), fComputeIntegral.end(), in) != fComputeIntegral.end()) {
-      return true;
-    }
-    return false;
-  }
+  virtual bool computeIntegralList(std::vector<std::string> & computeIntegralVector) const {return false;}
 
   std::string getErrorForQuantity(std::string const& QuantityName)
   {
@@ -69,7 +57,6 @@ class HDQMInspectorConfigBase
 
  private:
   std::map<std::string, std::string> fErrorMap;
-  std::vector<std::string> fComputeIntegral;
 };
 
 

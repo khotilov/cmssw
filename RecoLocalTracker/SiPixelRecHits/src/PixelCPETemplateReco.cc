@@ -56,30 +56,34 @@ PixelCPETemplateReco::PixelCPETemplateReco(edm::ParameterSet const & conf,
   
   DoCosmics_ = conf.getParameter<bool>("DoCosmics");
   LoadTemplatesFromDB_ = conf.getParameter<bool>("LoadTemplatesFromDB");
- 
+
+  /*
+    ID  BPix V  FPix V  Temp B-field Angle Coverage  Vers
+     1   150V    150V   263K   3.8T  Collision-only  11,12
+     4   150V    150V   263K   4.0T  Collision-only  11,12
+    11   100V    300V   293K   3.8T  Coll+Cosmic     11,12
+    12   150V    150V   263K   0.0T  Coll+Cosmic     11,12
+  */
+
   if ( field_magnitude > 3.9 ) 
     {
       templID_ = 4;
     } 
-      else 
+  else 
+    {
+      if ( field_magnitude > 1.0 ) 
 	{
-	  if ( field_magnitude > 1.0 ) 
-	    {
-	      // old cosmic simulation 
-	      //templID_ = 15;
-	      
-	      // CRAFT 08
-	      //templID_ = 11;
-	      
-	      // this is for CRAFT09 and collisions
-	      templID_ = 13;
-	    } 
+	  if ( DoCosmics_ )
+	    templID_ = 11;
 	  else 
-	    {	 
-	      // CRAFT 09, B = 0 Tesla
-	      templID_ = 14;
-	    }
+	    templID_ = 1;
+	} 
+      else 
+	{	 
+	  //--- allow for zero field operation with new template ID=12
+	  templID_ = 12;
 	}
+    }
   
   //cout << "(int)DoCosmics_ = " << (int)DoCosmics_ << endl;
   //cout << "(int)LoadTemplatesFromDB_ = " << (int)LoadTemplatesFromDB_ << endl;
@@ -257,23 +261,14 @@ PixelCPETemplateReco::localPosition(const SiPixelCluster& cluster, const GeomDet
   // ******************************************************************
   // Do it! Use cotalpha_ and cotbeta_ calculated in PixelCPEBase
 
-  GlobalVector bfield = magfield_->inTesla( theDet->surface().position() ); 
-  
-  Frame detFrame( theDet->surface().position(), theDet->surface().rotation() );
-  LocalVector Bfield = detFrame.toLocal( bfield );
-  float locBz = Bfield.z();
-  //cout << "locBz = " << locBz << endl;
-    
   ierr =
     PixelTempReco2D( ID, fpix, cotalpha_, cotbeta_,
-		     locBz, 
 		     clust_array_2d, ydouble, xdouble,
 		     templ_,
 		     templYrec_, templSigmaY_, templProbY_,
 		     templXrec_, templSigmaX_, templProbX_, 
 		     templQbin_, 
 		     speed_ );
-
   // ******************************************************************
 
   // Check exit status

@@ -8,7 +8,7 @@ process = cms.Process("PWRITE")
 
 process.MessageLogger = cms.Service("MessageLogger",
                                     destinations = cms.untracked.vstring('readFromFile_69912'),
-#                                    readFromFile_69912 = cms.untracked.PSet(threshold = cms.untracked.string('DEBUG')),
+                                    readFromFile_69912 = cms.untracked.PSet(threshold = cms.untracked.string('DEBUG')),
                                     debugModules = cms.untracked.vstring('*')
                                     )
 
@@ -73,7 +73,7 @@ process.siStripDQMHistoryPopCon = cms.EDAnalyzer("SiStripDQMHistoryPopCon",
 process.SiStripHistoryDQMService = cms.Service("SiStripHistoryDQMService",
                                                RunNb = cms.uint32(69912),
                                                accessDQMFile = cms.bool(True),
-                                               FILE_NAME = cms.untracked.string("/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Cosmics__Commissioning08_CRAFT_ALL_V11_227_Tosca090216_ReReco_FromTrackerPointing_v2__RAW-RECO/69912/DQM_V0001_R000069912__Cosmics__Commissioning08_CRAFT_ALL_V11_227_Tosca090216_ReReco_FromTrackerPointing_v2__RAW-RECO_1.root"),
+                                               FILE_NAME = cms.untracked.string("/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/data/Cosmics__Commissioning08_CRAFT_ALL_V9_225-v2__RECO/69912/DQM_V0001_R000069912__Cosmics__Commissioning08_CRAFT_ALL_V9_225-v2__RECO_1.root"),
                                                ME_DIR = cms.untracked.string("Run 69912/SiStrip"),
                                                histoList = cms.VPSet(
     
@@ -95,6 +95,8 @@ process.SiStripHistoryDQMService = cms.Service("SiStripHistoryDQMService",
     # Summary Cluster Properties
     ,
     cms.PSet( keyName = cms.untracked.string("Summary_TotalNumberOfClusters_OnTrack"),  quantitiesToExtract = cms.untracked.vstring("stat"))
+    ,
+    cms.PSet( keyName = cms.untracked.string("Summary_ClusterChargeCorr_OnTrack"), quantitiesToExtract = cms.untracked.vstring("stat","landau","user"))
 
     # Summary Cluster properties @ layer level
     ,

@@ -8,7 +8,7 @@ process = cms.Process("PWRITE")
 
 process.MessageLogger = cms.Service("MessageLogger",
                                     destinations = cms.untracked.vstring('cout'),
-#readFromFile_RUNNUMBER = cms.untracked.PSet(threshold = cms.untracked.string('DEBUG')),
+                                    readFromFile_RUNNUMBER = cms.untracked.PSet(threshold = cms.untracked.string('DEBUG')),
                                     debugModules = cms.untracked.vstring('*')
                                     )
 
@@ -48,7 +48,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
                                           connect = cms.string('sqlite_file:dbfile.db'),
                                           toPut = cms.VPSet(cms.PSet(
     record = cms.string("HDQMSummary"),
-    tag = cms.string("TAGNAME")
+    tag = cms.string("HDQM_SiPixel")
     )),
                                           logconnect = cms.untracked.string("sqlite_file:log.db") 
                                           )
@@ -83,17 +83,22 @@ process.SiPixelHistoryDQMService = cms.Service("SiPixelHistoryDQMService",
 
 
 # CKFTk
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_adc"), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_charge_OffTrack"), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_charge_OnTrack" ), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_nRecHits"), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_nclusters_OffTrack"), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_nclusters_OnTrack" ), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_ndigis"), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_size_OffTrack"), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("SUMOFF_size_OnTrack" ), quantitiesToExtract = cms.untracked.vstring("user_ymean") ),
-      cms.PSet( keyName = cms.untracked.string("ntracks_rsWithMaterialTracksP5" ), quantitiesToExtract = cms.untracked.vstring("user_A") ),
-      cms.PSet( keyName = cms.untracked.string("ntracks_rsWithMaterialTracksP5" ), quantitiesToExtract = cms.untracked.vstring("user_B") )
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_ClustX"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_ClustY"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_adc"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_charge"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_nRecHits"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_nclusters"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_ndigis"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_sizeX"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_sizeY"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_size"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_x"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_y"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_maxrow"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_minrow"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_maxcol"), quantitiesToExtract = cms.untracked.vstring("user") ),
+      cms.PSet( keyName = cms.untracked.string("SUMOFF_mincol"), quantitiesToExtract = cms.untracked.vstring("user") )
       )
     )
 

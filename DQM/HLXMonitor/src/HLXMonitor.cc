@@ -59,7 +59,7 @@ HLXMonitor::HLXMonitor(const edm::ParameterSet& iConfig)
    set2AboveIndex   = 5;
 
    runNumLength     = 9;
-   secNumLength     = 8;
+   secNumLength     = 6;
 
    if(NUM_HLX > 36)       
      NUM_HLX = 36;
@@ -577,10 +577,6 @@ HLXMonitor::SetupHists()
    RecentIntegratedLumiOccSet2->setAxisTitle( RecentHistXTitle, 1 );
    RecentIntegratedLumiOccSet2->setAxisTitle( HistLumiYTitle, 2 );
 
-   std::vector<std::string> systems = (dbe_->cd(), dbe_->getSubdirs());
-   for( size_t i=0, e = systems.size(); i<e; ++i ){
-      std::cout << "Systems " << systems[i] << std::endl;
-   }
  
    dbe_->showDirStructure();
 }
@@ -652,7 +648,6 @@ HLXMonitor::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       FillHistograms(lumiSection);
       FillHistoHFCompare(lumiSection);
       FillEventInfo(lumiSection);
-      FillReportSummary();
       
       cout << "Run: " << lumiSection.hdr.runNumber 
 	   << " Section: " << lumiSection.hdr.sectionNumber 
@@ -697,19 +692,11 @@ void HLXMonitor::SaveDQMFile(){
   std::ostringstream tempStreamer;
   tempStreamer << OutputDir << "/" << OutputFilePrefix << "_" << subSystemName_
 	       << "_R" << std::setfill('0') << std::setw(runNumLength) 
-	       << runNumber_ << "_T00000001.root";
-
-  std::vector<std::string> systems = (dbe_->cd(), dbe_->getSubdirs());
-  char rewrite[64]; sprintf(rewrite, "\\1Run %d/\\2/Run summary", runNumber_);
-  int saveReference_ = DQMStore::SaveWithoutReference;
-  int saveReferenceQMin_ = dqm::qstatus::STATUS_OK;
-
-  for( size_t i = 0, e = systems.size(); i != e; ++i )
-     if (systems[i] != "Reference")
-         dbe_->save( tempStreamer.str(), systems[i], "^(Reference/)?([^/]+)", rewrite,
-		     (DQMStore::SaveReferenceTag)saveReference_, saveReferenceQMin_);
-
-  //dbe_->save(tempStreamer.str());
+	       << runNumber_ 
+// 	       << "_" << std::setfill('0') << std::setw(secNumLength) 
+// 	       << lumiSection.hdr.sectionNumber
+ 	       << ".root";
+  dbe_->save(tempStreamer.str());
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -770,10 +757,25 @@ void HLXMonitor::endJob()
 
 void HLXMonitor::EndRun( bool saveFile )
 {
-   FillReportSummary();
+   // Run summary - Loop over the HLX's and fill the map, 
+   // also calculate the overall quality.
+   float overall = 0.0;
+   for( unsigned int iHLX = 0; iHLX < NUM_HLX; ++iHLX ){
+      unsigned int iWedge = HLXHFMap[iHLX] + 1;
+      unsigned int iEta = 2;
+      if( iWedge >= 19 ){ iEta = 1; iWedge -= 18; }
+      float frac = (float)totalNibbles_[iWedge-1]/(float)expectedNibbles_; 
+      reportSummaryMap_->setBinContent(iWedge,iEta,frac);
+      overall += frac;
+   }   
+      
+   overall /= (float)NUM_HLX;
+   if( overall > 1.0 ) overall = 0.0;
+   //std::cout << "Filling report summary! Main. " << overall << std::endl;
+   reportSummary_->Fill(overall);
    
    // Do some things that should be done at the end of the run ...
-   if( saveFile && runNumber_ != 0 ) SaveDQMFile();  
+   if( saveFile ) SaveDQMFile();  
    expectedNibbles_ = 0;
    for( unsigned int iHLX = 0; iHLX < NUM_HLX; ++iHLX ) totalNibbles_[iHLX] = 0;
    
@@ -1110,25 +1112,6 @@ void HLXMonitor::FillEventInfo(const LUMI_SECTION & section)
       totalNibbles_[iWedge-1] += section.occupancy[iHLX].hdr.numNibbles; 
    }   
 
-}
-
-void HLXMonitor::FillReportSummary(){
-   // Run summary - Loop over the HLX's and fill the map, 
-   // also calculate the overall quality.
-   float overall = 0.0;
-   for( unsigned int iHLX = 0; iHLX < NUM_HLX; ++iHLX ){
-      unsigned int iWedge = HLXHFMap[iHLX] + 1;
-      unsigned int iEta = 2;
-      if( iWedge >= 19 ){ iEta = 1; iWedge -= 18; }
-      float frac = (float)totalNibbles_[iWedge-1]/(float)expectedNibbles_; 
-      reportSummaryMap_->setBinContent(iWedge,iEta,frac);
-      overall += frac;
-   }   
-      
-   overall /= (float)NUM_HLX;
-   if( overall > 1.0 ) overall = 0.0;
-   //std::cout << "Filling report summary! Main. " << overall << std::endl;
-   reportSummary_->Fill(overall);
 }
 
 void HLXMonitor::ResetAll()

@@ -394,12 +394,11 @@ double HCalSD::getEnergyDeposit(G4Step* aStep) {
     if (isItScintillator(mat))
       weight *= getAttenuation(aStep, birk1, birk2, birk3);
   }
-  double wt1    = getResponseWt(theTrack);
 #ifdef DebugLog
   LogDebug("HcalSim") << "HCalSD: Detector " << det+3 << " Depth " << depth
-		      << " weight " << weight0 << " " << weight << " " << wt1; 
+		      << " weight " << weight0 << " " << weight;
 #endif
-  return weight*wt1*destep;
+  return weight*destep;
 }
 
 uint32_t HCalSD::setDetUnitId(G4Step * aStep) { 

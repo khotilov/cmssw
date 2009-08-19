@@ -1,7 +1,7 @@
 /*
  * \file EcalBarrelRecHitsValidation.cc
  *
- * $Date: 2009/07/02 11:17:47 $
+ * $Date: 2008/02/29 20:48:32 $
  * \author C. Rovelli
  *
  */
@@ -81,7 +81,7 @@ EcalBarrelRecHitsValidation::EcalBarrelRecHitsValidation(const ParameterSet& ps)
       meEBUncalibRecHitsJitter_ = dbe_->book1D(histo, histo, 100, 0., 100.);
       
       sprintf (histo, "EB Chi2" );
-      meEBUncalibRecHitsChi2_ = dbe_->book1D(histo, histo, 100, 18000., 22000.);
+      meEBUncalibRecHitsChi2_ = dbe_->book1D(histo, histo, 100, 0., 100.);
 
       sprintf (histo, "EB RecHit Max Sample Ratio"); 
       meEBUncalibRecHitMaxSampleRatio_ = dbe_->book1D(histo, histo, 120, 0.90, 1.05);
@@ -99,7 +99,7 @@ EcalBarrelRecHitsValidation::EcalBarrelRecHitsValidation(const ParameterSet& ps)
       meEBUncalibRecHitsJitterGt100adc_ = dbe_->book1D(histo, histo, 100, 0., 100.);
 
       sprintf (histo, "EB Chi2 gt 100 adc counts" );
-      meEBUncalibRecHitsChi2Gt100adc_ = dbe_->book1D(histo, histo, 100, 18000., 22000.);
+      meEBUncalibRecHitsChi2Gt100adc_ = dbe_->book1D(histo, histo, 100, 0., 100.);
     
       sprintf (histo, "EB RecHit Max Sample Ratio gt 100 adc counts"); 
       meEBUncalibRecHitMaxSampleRatioGt100adc_ = dbe_->book1D(histo, histo, 120, 0.90, 1.05);
@@ -190,8 +190,8 @@ void EcalBarrelRecHitsValidation::analyze(const Event& e, const EventSetup& c){
       int ism = EBid.ism();
       float xie = ie - 0.5;
       float xip = ip - 0.5;      
-      if( meEBUncalibRecHitPedMap_[ism-1] ) meEBUncalibRecHitPedMap_[ism-1]->Fill(xie, xip, uncalibRecHit->pedestal());
-      if( meEBUncalibRecHitAmplMap_[ism-1] ) meEBUncalibRecHitAmplMap_[ism-1]->Fill(xie, xip, uncalibRecHit->amplitude());
+      meEBUncalibRecHitPedMap_[ism-1] ->Fill(xie, xip, uncalibRecHit->pedestal());
+      meEBUncalibRecHitAmplMap_[ism-1]->Fill(xie, xip, uncalibRecHit->amplitude());
       
       if ( ! skipDigis ) { 
         // find the rechit corresponding digi and the max sample
@@ -216,7 +216,7 @@ void EcalBarrelRecHitsValidation::analyze(const Event& e, const EventSetup& c){
         EcalPedestalsMap::const_iterator it=myped->getMap().find( EBid );
         if( it != myped->getMap().end() ){
           
-          if (eMax > (*it).mean_x1 + 5 * (*it).rms_x1 && eMax != 0 ) {//only real signal RecHit
+          if (eMax > (*it).mean_x1 + 5 * (*it).rms_x1 ) {//only real signal RecHit
             
             if ( meEBUncalibRecHitMaxSampleRatio_ ) meEBUncalibRecHitMaxSampleRatio_->Fill( (uncalibRecHit->amplitude()+uncalibRecHit->pedestal())/eMax);
             if ( meEBUncalibRecHitMaxSampleRatioGt100adc_ && (uncalibRecHit->amplitude()>100) ) meEBUncalibRecHitMaxSampleRatioGt100adc_->Fill( (uncalibRecHit->amplitude()+uncalibRecHit->pedestal())/eMax);
