@@ -12,7 +12,7 @@
 //
 // Original Author:  Piotr Traczyk, CERN
 //         Created:  Mon Mar 16 12:27:22 CET 2009
-// $Id: MuonTimingFiller.cc,v 1.2 2009/07/30 09:59:56 ptraczyk Exp $
+// $Id: MuonTimingFiller.cc,v 1.2 2009/03/26 23:56:44 ptraczyk Exp $
 //
 //
 
@@ -46,10 +46,6 @@ MuonTimingFiller::MuonTimingFiller(const edm::ParameterSet& iConfig)
    // Load parameters for the DTTimingExtractor
    edm::ParameterSet dtTimingParameters = iConfig.getParameter<edm::ParameterSet>("DTTimingParameters");
    theDTTimingExtractor_ = new DTTimingExtractor(dtTimingParameters);
-
-   // Load parameters for the CSCTimingExtractor
-   edm::ParameterSet cscTimingParameters = iConfig.getParameter<edm::ParameterSet>("CSCTimingParameters");
-   theCSCTimingExtractor_ = new CSCTimingExtractor(cscTimingParameters);
 }
 
 
@@ -66,26 +62,23 @@ MuonTimingFiller::~MuonTimingFiller()
 void 
 MuonTimingFiller::fillTiming( const reco::Muon& muon, reco::MuonTimeExtra& dtTime, reco::MuonTimeExtra& cscTime, reco::MuonTimeExtra& combinedTime, edm::Event& iEvent, const edm::EventSetup& iSetup )
 {
-  TimeMeasurementSequence dtTmSeq,cscTmSeq;
+  TimeMeasurementSequence dtTmSeq;
      
   if ( !(muon.standAloneMuon().isNull()) ) {
     theDTTimingExtractor_->fillTiming(dtTmSeq, muon.standAloneMuon(), iEvent, iSetup);
-    theCSCTimingExtractor_->fillTiming(cscTmSeq, muon.standAloneMuon(), iEvent, iSetup);
   }
      
   // Fill DT-specific timing information block     
   if (dtTmSeq.totalWeight)
     fillTimeFromMeasurements(dtTmSeq, dtTime);
-
-  // Fill CSC-specific timing information block     
-  if (cscTmSeq.totalWeight)
-    fillTimeFromMeasurements(cscTmSeq, cscTime);
        
   // TODO - combine the TimeMeasurementSequences from all subdetectors
   TimeMeasurementSequence combinedTmSeq;
           
   // Fill the master timing block
   // TEMPORARY! use DT only for now
+  // in the future there will be a CSCTimingExtractor
+  // and in the reco::Muon we will have ECAL and HCAL time stored
   if (dtTime.nDof())
     fillTimeFromMeasurements(dtTmSeq, combinedTime);
      

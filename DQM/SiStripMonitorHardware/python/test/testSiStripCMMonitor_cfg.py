@@ -96,9 +96,11 @@ process.load("DPGAnalysis.SiStripTools.apvshotsanalyzer_cfi")
 
 process.load('DQM.SiStripMonitorHardware.siStripCMMonitor_cfi')
 process.siStripCMMonitor.FillWithEventNumber = False
+process.siStripCMMonitor.FedIdVec = 100,200,400
 process.siStripCMMonitor.PrintDebugMessages = 1
 process.siStripCMMonitor.WriteDQMStore = True
 process.siStripCMMonitor.DQMStoreFileName = "DQMStore_CM_run106019.root"
+
 #process.siStripCMMonitor.TimeHistogramConfig.NBins = 100
 #process.siStripCMMonitor.TimeHistogramConfig.Min = 0
 #process.siStripCMMonitor.TimeHistogramConfig.Max = 1
@@ -109,8 +111,6 @@ process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string("Shot_run106019.root"),
                                    closeFileFast = cms.untracked.bool(True)
                                    )
-
-
 
 
 process.p = cms.Path( #process.profilerStart*
@@ -124,14 +124,13 @@ process.p = cms.Path( #process.profilerStart*
 process.saveDigis = cms.OutputModule( 
     "PoolOutputModule",
     outputCommands = cms.untracked.vstring(
-        'drop *',
+        'drop *_*_*_HLT',
+        'drop *_*_*Raw_DQMCMMonitor',
+        'drop *_*_ScopeMode_DQMCMMonitor',
         'keep *_siStripDigis_ZeroSuppressed_*',
-        'keep *_*_*_TEST',
         'keep *_source_*_*'
         ),
     fileName = cms.untracked.string('Digi_run106019.root')
     )
 
-
-
-#process.pout = cms.EndPath( process.saveDigis )
+process.pout = cms.EndPath( process.saveDigis )

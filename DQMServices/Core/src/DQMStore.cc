@@ -59,8 +59,7 @@ static std::string s_safe = "/ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx
 static DQMStore *s_instance = 0;
 
 static const lat::Regexp s_rxmeval ("^<(.*)>(i|f|s|qr)=(.*)</\\1>$");
-static const lat::Regexp s_rxmeqr1 ("^st:(\\d+):([-+e.\\d]+):(.*)$");
-static const lat::Regexp s_rxmeqr2 ("^st\\.(\\d+)\\.(.*)$");
+static const lat::Regexp s_rxmeqr  ("^st\\.(\\d+)\\.(.*)$");
 
 //////////////////////////////////////////////////////////////////////
 /// Check whether @a path is a subdirectory of @a ofdir.  Returns
@@ -609,6 +608,36 @@ DQMStore::bookProfile(const std::string &name, const std::string &title,
 {
   return bookProfile(pwd_, name, new TProfile(name.c_str(), title.c_str(),
 					      nchX, lowX, highX,
+					      lowY, highY,
+					      option));
+}
+
+/// Book variable bin profile.  Option is one of: " ", "s" (default), "i", "G" (see
+/// TProfile::BuildOptions).  The number of channels in Y is
+/// disregarded in a profile plot.
+MonitorElement *
+DQMStore::bookProfile(const std::string &name, const std::string &title,
+		      int nchX, double *xbinsize,
+		      int nchY, double lowY, double highY,
+		      const char *option /* = "s" */)
+{
+  return bookProfile(pwd_, name, new TProfile(name.c_str(), title.c_str(),
+					      nchX, xbinsize,
+					      lowY, highY,
+					      option));
+}
+
+/// Book variable bin profile.  Option is one of: " ", "s" (default), "i", "G" (see
+/// TProfile::BuildOptions).  The number of channels in Y is
+/// disregarded in a profile plot.
+MonitorElement *
+DQMStore::bookProfile(const std::string &name, const std::string &title,
+		      int nchX, double *xbinsize,
+		                double lowY, double highY,
+		      const char *option /* = "s" */)
+{
+  return bookProfile(pwd_, name, new TProfile(name.c_str(), title.c_str(),
+					      nchX, xbinsize,
 					      lowY, highY,
 					      option));
 }
@@ -1255,22 +1284,7 @@ DQMStore::extract(TObject *obj, const std::string &dir, bool overwrite)
         std::string qrname (label, dot+1, std::string::npos);
 
         m.reset();
-        DQMNet::QValue qv;
-	if (s_rxmeqr1.match(value, 0, 0, &m))
-	{
-	  qv.code = atoi(m.matchString(value, 1).c_str());
-	  qv.qtresult = strtod(m.matchString(value, 2).c_str(), 0);
-	  qv.message = m.matchString(value, 3);
-	  qv.qtname = qrname;
-	}
-	else if (s_rxmeqr2.match(value, 0, 0, &m))
-	{
-	  qv.code = atoi(m.matchString(value, 1).c_str());
-	  qv.qtresult = 0; // unavailable in old format
-	  qv.message = m.matchString(value, 2);
-	  qv.qtname = qrname;
-	}
-	else
+        if (! s_rxmeqr.match(value, 0, 0, &m))
         {
 	  std::cout << "*** DQMStore: WARNING: quality test value '"
 		    << value << "' is incorrectly formatted\n";
@@ -1286,6 +1300,10 @@ DQMStore::extract(TObject *obj, const std::string &dir, bool overwrite)
 	  return false;
         }
 
+        DQMNet::QValue qv;
+        qv.qtname = qrname;
+        qv.code = atoi(m.matchString(value, 1).c_str());
+        qv.message = m.matchString(value, 2);
         me->addQReport(qv, /* FIXME: getQTest(qv.qtname)? */ 0);
       }
     }
@@ -1373,7 +1391,7 @@ DQMStore::save(const std::string &filename,
 	       const std::string &path /* = "" */,
 	       const std::string &pattern /* = "" */,
 	       const std::string &rewrite /* = "" */,
-	       SaveReferenceTag ref /* = SaveWithReferenceForQTest */,
+	       SaveReferenceTag ref /* = SaveWithReference */,
 	       int minStatus /* = dqm::qstatus::STATUS_OK */)
 {
   std::set<std::string>::iterator di, de;
@@ -1552,11 +1570,13 @@ DQMStore::readDirectory(TFile *file,
   // directory into which we dump everything.
   std::string dirpart = curdir;
   if (dirpart.compare(0, s_monitorDirName.size(), s_monitorDirName) == 0)
+  {
     if (dirpart.size() == s_monitorDirName.size())
       dirpart.clear();
     else if (dirpart[s_monitorDirName.size()] == '/')
       dirpart.erase(0, s_monitorDirName.size()+1);
-      
+  }
+
   // See if we are going to skip this directory.
   bool skip = (! onlypath.empty() && ! isSubdirectory(onlypath, dirpart));
   

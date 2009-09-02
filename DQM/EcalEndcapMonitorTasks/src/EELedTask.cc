@@ -1,8 +1,8 @@
 /*
  * \file EELedTask.cc
  *
- * $Date: 2009/08/03 23:44:23 $
- * $Revision: 1.49 $
+ * $Date: 2009/08/23 20:59:52 $
+ * $Revision: 1.51 $
  * \author G. Della Ricca
  *
 */
@@ -26,6 +26,7 @@
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 
 #include <DQM/EcalCommon/interface/Numbers.h>
+#include <DQM/EcalCommon/interface/NumbersPn.h>
 
 #include <DQM/EcalEndcapMonitorTasks/interface/EELedTask.h>
 
@@ -128,7 +129,7 @@ void EELedTask::endRun(const Run& r, const EventSetup& c) {
     if ( find(ledWavelengths_.begin(), ledWavelengths_.end(), 2) != ledWavelengths_.end() ) {
       if ( mePnAmplMapG01L2_[i] ) mePnAmplMapG01L2_[i]->Reset();
       if ( mePnPedMapG01L2_[i] ) mePnPedMapG01L2_[i]->Reset();
-      
+
       if ( mePnAmplMapG16L2_[i] ) mePnAmplMapG16L2_[i]->Reset();
       if ( mePnPedMapG16L2_[i] ) mePnPedMapG16L2_[i]->Reset();
     }
@@ -235,7 +236,7 @@ void EELedTask::setup(void){
         sprintf(histo, "EELDT PNs pedestal %s G16 L1", Numbers::sEE(i+1).c_str());
         mePnPedMapG16L1_[i] = dqmStore_->bookProfile(histo, histo, 10, 0., 10., 4096, 0., 4096., "s");
         mePnPedMapG16L1_[i]->setAxisTitle("channel", 1);
-        mePnPedMapG16L1_[i]->setAxisTitle("pedestal", 2); 
+        mePnPedMapG16L1_[i]->setAxisTitle("pedestal", 2);
         dqmStore_->tag(mePnPedMapG16L1_[i], i+1);
       }
 
@@ -269,7 +270,7 @@ void EELedTask::setup(void){
         sprintf(histo, "EELDT PNs pedestal %s G16 L2", Numbers::sEE(i+1).c_str());
         mePnPedMapG16L2_[i] = dqmStore_->bookProfile(histo, histo, 10, 0., 10., 4096, 0., 4096., "s");
         mePnPedMapG16L2_[i]->setAxisTitle("channel", 1);
-        mePnPedMapG16L2_[i]->setAxisTitle("pedestal", 2); 
+        mePnPedMapG16L2_[i]->setAxisTitle("pedestal", 2);
         dqmStore_->tag(mePnPedMapG16L2_[i], i+1);
       }
 
@@ -483,12 +484,9 @@ void EELedTask::analyze(const Event& e, const EventSetup& c){
 
   }
 
-  float adcA[18];
-  float adcB[18];
-
-  for ( int i = 0; i < 18; i++ ) {
-    adcA[i] = 0.;
-    adcB[i] = 0.;
+  float adcPN[80];
+  for ( int i = 0; i < 80; i++ ) {
+    adcPN[i] = 0.;
   }
 
   Handle<EcalPnDiodeDigiCollection> pns;
@@ -566,8 +564,9 @@ void EELedTask::analyze(const Event& e, const EventSetup& c){
 
       if ( mePN ) mePN->Fill(num - 0.5, xvalmax);
 
-      if ( num == 1 ) adcA[ism-1] = xvalmax;
-      if ( num == 6 ) adcB[ism-1] = xvalmax;
+      int ipn = NumbersPn::ipnEE( ism, num );
+
+      adcPN[ipn] = xvalmax;
 
     }
 
@@ -649,19 +648,10 @@ void EELedTask::analyze(const Event& e, const EventSetup& c){
 
       float wval = 0.;
 
-      if ( Numbers::RtHalf(id) == 0 ) {
+      std::vector<int> PNsInLM = NumbersPn::getPNs( ism, ix, iy );
+      int refPn = PNsInLM[0];
 
-        if ( adcA[ism-1] != 0. ) wval = xval / adcA[ism-1];
-
-      } else if ( Numbers::RtHalf(id) == 1 ) {
-
-        if ( adcB[ism-1] != 0. ) wval = xval / adcB[ism-1];
-
-      } else {
-
-        LogWarning("EELedTask") << " RtHalf = " << Numbers::RtHalf(id);
-
-      }
+      if ( adcPN[refPn] != 0. ) wval = xval /  adcPN[refPn];
 
       LogDebug("EELedTask") << " hit amplitude over PN " << wval;
 

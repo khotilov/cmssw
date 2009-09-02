@@ -5,7 +5,7 @@ process = cms.Process("TEST")
 process.MessageLogger=cms.Service("MessageLogger",
                               destinations=cms.untracked.vstring("cout"),
                               cout=cms.untracked.PSet(
-                              threshold=cms.untracked.string("INFO")
+                              treshold=cms.untracked.string("INFO")
                               )
 )
 
@@ -20,7 +20,7 @@ process.source = cms.Source("EmptyIOVSource",
     interval = cms.uint64(1)
 )
 
-process.es_omds = cms.ESSource("HcalOmdsCalibrations",
+process.es_ascii = cms.ESSource("HcalOmdsCalibrations",
     input = cms.VPSet(cms.PSet(
         object = cms.string('ChannelQuality'),
         tag = cms.string('hcal-quality-test-v1'),

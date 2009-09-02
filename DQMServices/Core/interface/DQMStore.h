@@ -116,6 +116,16 @@ public:
 					      int nchX, double lowX, double highX,
 					                double lowY, double highY,
 					      const char *option = "s");
+  MonitorElement *		bookProfile  (const std::string &name,
+					      const std::string &title,
+					      int nchX, double *xbinsize,
+					      int nchY, double lowY, double highY,
+					      const char *option = "s");
+  MonitorElement *		bookProfile  (const std::string &name,
+					      const std::string &title,
+					      int nchX, double *xbinsize,
+					                double lowY, double highY,
+					      const char *option = "s");
   MonitorElement *		bookProfile  (const std::string &name, TProfile *h);
 
   MonitorElement *		bookProfile2D(const std::string &name,
@@ -151,8 +161,9 @@ public:
   std::vector<MonitorElement *> getContents(const std::string &path, unsigned int tag) const;
   void				getContents(std::vector<std::string> &into, bool showContents = true) const;
 
-  // ---------------------- temporarily public for Ecal/Hcal/ -------------
+  // ---------------------- softReset methods -------------------------------
   void				softReset(MonitorElement *me);
+  void				disableSoftReset(MonitorElement *me);
 
   // ---------------------- Public deleting ---------------------------------
   void				rmdir(const std::string &fullpath);
@@ -167,7 +178,7 @@ public:
 				     const std::string &path = "",
 				     const std::string &pattern = "",
 				     const std::string &rewrite = "",
-				     SaveReferenceTag ref = SaveWithReferenceForQTest,
+				     SaveReferenceTag ref = SaveWithReference,
                                      int minStatus = dqm::qstatus::STATUS_OK);
   void				open(const std::string &filename,
 				     bool overwrite = false,
@@ -193,9 +204,6 @@ public:
   int				getStatus(const std::string &path = "") const;
 
 private:
-  // ------------ Operations for MEs that are normally never reset ---------
-  void				disableSoftReset(MonitorElement *me);
-
   // ---------------- Navigation -----------------------
   bool				cdInto(const std::string &path) const;
 

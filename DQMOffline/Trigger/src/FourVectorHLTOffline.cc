@@ -1,4 +1,4 @@
-// $Id: FourVectorHLTOffline.cc,v 1.38 2009/07/10 01:16:38 rekovic Exp $
+// $Id: FourVectorHLTOffline.cc,v 1.41 2009/08/31 11:37:29 rekovic Exp $
 // See header file for information. 
 #include "TMath.h"
 #include "DQMOffline/Trigger/interface/FourVectorHLTOffline.h"
@@ -65,6 +65,8 @@ FourVectorHLTOffline::FourVectorHLTOffline(const edm::ParameterSet& iConfig):
     iConfig.getParameter<edm::InputTag>("triggerSummaryLabel");
   triggerResultsLabel_ = 
     iConfig.getParameter<edm::InputTag>("triggerResultsLabel");
+  muonRecoCollectionName_ = 
+	  iConfig.getUntrackedParameter("muonRecoCollectionName", std::string("muons"));
 
   electronEtaMax_ = iConfig.getUntrackedParameter<double>("electronEtaMax",2.5);
   electronEtMin_ = iConfig.getUntrackedParameter<double>("electronEtMin",3.0);
@@ -182,12 +184,31 @@ FourVectorHLTOffline::analyze(const edm::Event& iEvent, const edm::EventSetup& i
   }
 
   edm::Handle<reco::MuonCollection> muonHandle;
-  iEvent.getByLabel("muons",muonHandle);
+  //iEvent.getByLabel("muons",muonHandle);
+  iEvent.getByLabel(muonRecoCollectionName_,muonHandle);
   if(!muonHandle.isValid()) { 
     edm::LogInfo("FourVectorHLTOffline") << "muonHandle not found, ";
     //  "skipping event"; 
     //  return;
-   }
+	}
+  if(muonHandle.isValid()) { 
+    for( reco::MuonCollection::const_iterator iter = muonHandle->begin(), iend = muonHandle->end(); iter != iend; ++iter )
+   {
+
+
+    LogTrace("FourVectorHLTOffline")<< "Found a reco muon" << endl;
+    if (iter->isStandAloneMuon()) {
+		 LogTrace("FourVectorHLTOffline") << "This muon is STA" <<endl;
+		}
+		else if (iter->isGlobalMuon()){ 
+	   LogTrace("FourVectorHLTOffline") << "This muon is Global" <<endl;
+		}
+		else if (iter->isTrackerMuon()){ 
+	   LogTrace("FourVectorHLTOffline") << "This muon is Tracker" <<endl;
+		}
+
+	 } // end for
+	}
 
   edm::Handle<reco::GsfElectronCollection> gsfElectrons;
   iEvent.getByLabel("gsfElectrons",gsfElectrons); 
@@ -366,6 +387,7 @@ FourVectorHLTOffline::analyze(const edm::Event& iEvent, const edm::EventSetup& i
 { 
 
     //LogTrace("FourVectorHLTOffline") << " path " << v->getPath() << endl;
+
 	      if (v->getPath().find("BTagIP") != std::string::npos ) btagMon = btagIPMon;
 				else btagMon = btagMuMon;
 
@@ -405,9 +427,20 @@ FourVectorHLTOffline::analyze(const edm::Event& iEvent, const edm::EventSetup& i
       bool l1accept = false;
       edm::InputTag l1testTag(v->getl1Path(),"",processname_);
       const int l1index = triggerObj->filterIndex(l1testTag);
+			/*
+      int  sizeFilters = triggerObj->sizeFilters();
+
+			edm::LogTrace("FourVectorHLTOffline") << "TestTag = " << l1testTag << endl;
+			
+			for (int i=0;i<sizeFilters; i++) {
+			
+			 edm::LogTrace("FourVectorHLTOffline") << "FilterTag = " << triggerObj->filterTag(i) << endl;
+
+			}
+			*/
       if ( l1index >= triggerObj->sizeFilters() ) {
         edm::LogInfo("FourVectorHLTOffline") << "no index "<< l1index << " of that name " << v->getl1Path() << "\t" << "\t" << l1testTag;
-	continue; // not in this event
+	      continue; // not in this event
       }
 
       const trigger::Vids & idtype = triggerObj->filterIds(l1index);
