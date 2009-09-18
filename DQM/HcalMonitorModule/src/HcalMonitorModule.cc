@@ -4,8 +4,8 @@
 /*
  * \file HcalMonitorModule.cc
  * 
- * $Date: 2009/07/31 20:33:31 $
- * $Revision: 1.121 $
+ * $Date: 2009/08/13 13:52:12 $
+ * $Revision: 1.124 $
  * \author W Fisher
  * \author J Temple
  *
@@ -579,15 +579,15 @@ void HcalMonitorModule::endJob(void) {
 		} 	 
 	      // Only perform these checks if bit 0 not set?
 	      // check dead cells
-	      if ((myquality_[id]>>5)&0x1)
-		  mystatus->setBit(5);
+	      if ((myquality_[id]>>HcalChannelStatus::HcalCellDead)&0x1)
+		  mystatus->setBit(HcalChannelStatus::HcalCellDead);
 	      else
-		mystatus->unsetBit(5);
+		mystatus->unsetBit(HcalChannelStatus::HcalCellDead);
 	      // check hot cells
-	      if ((myquality_[id]>>6)&0x1)
-		mystatus->setBit(6);
+	      if ((myquality_[id]>>HcalChannelStatus::HcalCellHot)&0x1)
+		mystatus->setBit(HcalChannelStatus::HcalCellHot);
 	      else
-		mystatus->unsetBit(6);
+		mystatus->unsetBit(HcalChannelStatus::HcalCellHot);
 	    } // if (myquality_.find_...)
 	  newChanQual->addValues(*mystatus);
 	  // Clean up pointers to avoid memory leaks
@@ -706,10 +706,10 @@ void HcalMonitorModule::analyze(const edm::Event& e, const edm::EventSetup& even
       rawOK_=false;
       LogWarning("HcalMonitorModule")<<" Digi Collection "<<inputLabelDigi_<<" not available";
     }
-  if (rawOK_&&!report.isValid()) {
+  if (rawOK_ && !report.isValid()) {
     rawOK_=false;
   }
-  else 
+  if (rawOK_)
     {
       if(!fedsListed_){
 	const std::vector<int> feds =  (*report).getFedsUnpacked();    
@@ -720,7 +720,6 @@ void HcalMonitorModule::analyze(const edm::Event& e, const edm::EventSetup& even
 	fedss = feds; //Assign to a non-const holder
       }
     }
-
   if (rawOK_==true) ++ievt_rawdata_;
 
   //Orbit Gap Data Quality Monitoring
@@ -751,6 +750,7 @@ void HcalMonitorModule::analyze(const edm::Event& e, const edm::EventSetup& even
       if (CalibType == hc_Null) return;
     }
   }
+
   if (!InconsistentCalibTypes && AnalyzeOrbGapCT_) {
     // If we're doing the Orbit Gap DQM, set the right evtMask for
     // the Calibration Event Type.
@@ -1075,7 +1075,8 @@ void HcalMonitorModule::analyze(const edm::Event& e, const edm::EventSetup& even
     {
       if (lumiswitch) hotMon_->LumiBlockUpdate(ilumisec_);
       hotMon_->processEvent(*hb_hits,*ho_hits,*hf_hits, 
-			    *hbhe_digi,*ho_digi,*hf_digi,*conditions_);
+			    //*hbhe_digi,*ho_digi,*hf_digi,
+			    *conditions_);
       //hotMon_->setSubDetectors(HBpresent_,HEpresent_, HOpresent_, HFpresent_);
     }
   if (showTiming_)

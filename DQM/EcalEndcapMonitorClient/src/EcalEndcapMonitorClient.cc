@@ -1,8 +1,8 @@
 /*
  * \file EcalEndcapMonitorClient.cc
  *
- * $Date: 2009/08/02 08:09:46 $
- * $Revision: 1.209 $
+ * $Date: 2009/08/27 18:08:36 $
+ * $Revision: 1.213 $
  * \author G. Della Ricca
  * \author F. Cossutti
  *
@@ -810,7 +810,7 @@ void EcalEndcapMonitorClient::endRun(void) {
 
   if ( subrun_ != -1 ) {
 
-    this->writeDb(true);
+    this->writeDb();
 
     this->endRunDb();
 
@@ -869,6 +869,8 @@ void EcalEndcapMonitorClient::endRun(const Run& r, const EventSetup& c) {
     }
 
   }
+
+  this->softReset(false);
 
 }
 
@@ -1099,7 +1101,7 @@ void EcalEndcapMonitorClient::beginRunDb(void) {
 
 }
 
-void EcalEndcapMonitorClient::writeDb(bool flag) {
+void EcalEndcapMonitorClient::writeDb() {
 
   subrun_++;
 
@@ -1187,7 +1189,7 @@ void EcalEndcapMonitorClient::writeDb(bool flag) {
           }
         }
         bool status;
-        if ( clients_[i]->writeDb(econn, &runiov_, &moniov_, status, flag) ) {
+        if ( clients_[i]->writeDb(econn, &runiov_, &moniov_, status) ) {
           taskl |= 0x1 << clientsStatus_[clientsNames_[i]];
           if ( status ) {
             tasko |= 0x1 << clientsStatus_[clientsNames_[i]];
@@ -1207,7 +1209,7 @@ void EcalEndcapMonitorClient::writeDb(bool flag) {
   }
 
   bool status;
-  if ( summaryClient_ ) summaryClient_->writeDb(econn, &runiov_, &moniov_, status, flag);
+  if ( summaryClient_ ) summaryClient_->writeDb(econn, &runiov_, &moniov_, status);
 
   EcalLogicID ecid;
   MonRunDat md;
@@ -1514,7 +1516,8 @@ void EcalEndcapMonitorClient::analyze(void) {
                runType_ == EcalDCCHeaderBlock::COSMICS_LOCAL ||
                runType_ == EcalDCCHeaderBlock::PHYSICS_LOCAL ||
                runType_ == EcalDCCHeaderBlock::BEAMH2 ||
-               runType_ == EcalDCCHeaderBlock::BEAMH4 ) this->writeDb(false);
+               runType_ == EcalDCCHeaderBlock::BEAMH4 ) this->writeDb();
+          //          this->softReset(true);
           last_time_db_ = current_time_;
         }
       }
@@ -1664,17 +1667,17 @@ void EcalEndcapMonitorClient::analyze(const Event &e, const EventSetup &c) {
 
 void EcalEndcapMonitorClient::softReset(bool flag) {
 
-   for ( int i=0; i<int(clients_.size()); i++ ) {
-     bool done = false;
-     for ( multimap<EEClient*,int>::iterator j = clientsRuns_.lower_bound(clients_[i]); j != clientsRuns_.upper_bound(clients_[i]); j++ ) {
-       if ( runType_ != -1 && runType_ == (*j).second && !done ) {
-         done = true;
-         clients_[i]->softReset(flag);
-       }
-     }
-   }
-
-   summaryClient_->softReset(flag);
+  vector<MonitorElement*> mes = dqmStore_->getAllContents("EcalEndcap");
+  vector<MonitorElement*>::const_iterator meitr;
+  for ( meitr=mes.begin(); meitr!=mes.end(); meitr++ ) {
+    if ( !strncmp((*meitr)->getName().c_str(), "EE", 2) ) {
+      if ( flag ) {
+        dqmStore_->softReset(*meitr);
+      } else {
+         dqmStore_->disableSoftReset(*meitr);
+      }
+    }
+  }
 
 }
 

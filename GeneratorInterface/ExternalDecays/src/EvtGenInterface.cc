@@ -58,8 +58,6 @@ EvtGenInterface::EvtGenInterface( const ParameterSet& pset )
   edm::FileInPath decay_table = pset.getParameter<edm::FileInPath>("decay_table");
   edm::FileInPath pdt = pset.getParameter<edm::FileInPath>("particle_property_file");
   bool useDefault = pset.getUntrackedParameter<bool>("use_default_decay",true);
-  usePythia = pset.getUntrackedParameter<bool>("use_internal_pythia",true);
-
   edm::FileInPath user_decay = pset.getParameter<edm::FileInPath>("user_decay_file");
   std::string decay_table_s = decay_table.fullPath();
   std::string pdt_s = pdt.fullPath();
@@ -286,7 +284,7 @@ void EvtGenInterface::init()
    Pythia6Service::InstanceWrapper guard(m_Py6Service);	// grab Py6 instance
    
    // Do here initialization of EvtPythia then restore original settings
-   if (usePythia) EvtPythia::pythiaInit(0);
+   EvtPythia::pythiaInit(0);
    
 // no need - will be done via Pythia6Hadronizer::declareStableParticles
 //
@@ -355,7 +353,7 @@ HepMC::GenEvent* EvtGenInterface::decay( HepMC::GenEvent* evt )
   
 	  for(int k=0;k < nlist; k++)
 	    {
-	      if(k == which || !usePythia) {		
+	      if(k == which) {		
 		addToHepMC(listp[k],forced_Evt[index[k]],evt,false);  // decay as alias
 	      }	
 	      else
@@ -425,14 +423,14 @@ void EvtGenInterface::addToHepMC(HepMC::GenParticle* partHep, EvtId idEvt, HepMC
     evtstdhep.init();
     partEvt->makeStdHep(evtstdhep);
 
-    /* if (ntotal < 1000 && ntotal%10 == 0) {     // DEBUG
+    if (ntotal < 1000 && ntotal%10 == 0) {     // DEBUG
     // if (evtstdhep.getStdHepID(0) == 521 || evtstdhep.getStdHepID(0) == 523) {     // DEBUG
    
       partEvt->printParticle();                
       partEvt->printTree();
       std::cout << evtstdhep << "\n"  <<
       "--------------------------------------------" << std::endl;
-      } */
+    } 
 
     ntotal++;
     partEvt->deleteTree();

@@ -1,140 +1,133 @@
-#include "DQMServices/Diagnostic/test/HDQMInspector.h"
+#include "DQMServices/Diagnostic/interface/HDQMInspector.h"
 #include "DQM/SiStripHistoricInfoClient/test/HDQMInspectorConfigSiStrip.h"
+#include "DQMServices/Diagnostic/interface/DQMHistoryTrendsConfig.h"
+#include "DQMServices/Diagnostic/interface/DQMHistoryCreateTrend.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
 #include <string>
 #include <vector>
 
-std::string const Condition = "369098752@Summary_TotalNumberOfClusters_OffTrack@entries > 10000";
+using namespace std;
 
-void SiStripHDQMInspector (const std::string & tagName, std::string const& Password, int const NRuns) {
-/////////////////////////////////////////////////////////////////
-//
-// Extraction of the summary information using 
-// DQMServices/Diagnostic/test/HDQMInspector.
-// The sqlite database should have been filled using the new
-// SiStripHistoryDQMService.   
-//
-/////////////////////////////////////////////////////////////////
-
-
-  //std::map<int, std::string> pixelTranslator = sipixelsummary::GetMap();
-
-  //pixelTranslator Translator;
-
-  //AutoLibraryLoader::enable();
-
-
-
-
-  HDQMInspectorConfigSiStrip StripConfig;
-  HDQMInspector A(&StripConfig);
-  //HDQMInspector A;
-  //A.setDB("sqlite_file:dbfile.db",tagName,"cms_cond_strip","w3807dev","");
-  A.setDB("oracle://cms_orcoff_prep/CMS_DQM_31X_OFFLINE",tagName,"cms_dqm_31x_offline", Password,"");
-
-
-  A.setDebug(1);
-  A.setDoStat(1);
-
-  //std::vector<std::string> ItemsForIntegration;
-  //ItemsForIntegration.push_back();
-
-  //A.setBlackList("68286");
-
-  A.createTrendLastRuns("369098752@Summary_TotalNumberOfClusters_OnTrack@mean,436207616@Summary_TotalNumberOfClusters_OnTrack@mean,402653184@Summary_TotalNumberOfClusters_OnTrack@mean,469762048@Summary_TotalNumberOfClusters_OnTrack@mean", "OnTrackClusters.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_TotalNumberOfClusters_OffTrack@mean,436207616@Summary_TotalNumberOfClusters_OffTrack@mean,402653184@Summary_TotalNumberOfClusters_OffTrack@mean,469762048@Summary_TotalNumberOfClusters_OffTrack@mean", "TotalNumberOfClusters_OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterChargeCorr_OnTrack@mean,436207616@Summary_ClusterChargeCorr_OnTrack@mean,402653184@Summary_ClusterChargeCorr_OnTrack@mean,469762048@Summary_ClusterChargeCorr_OnTrack@mean", "ClusterChargeCorr_OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterCharge_OffTrack@mean,436207616@Summary_ClusterCharge_OffTrack@mean,402653184@Summary_ClusterCharge_OffTrack@mean,469762048@Summary_ClusterCharge_OffTrack@mean", "ClusterCharge_OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterNoise_OnTrack@mean,436207616@Summary_ClusterNoise_OnTrack@mean,402653184@Summary_ClusterNoise_OnTrack@mean,469762048@Summary_ClusterNoise_OnTrack@mean", "ClusterNoise_OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterNoise_OffTrack@mean,436207616@Summary_ClusterNoise_OffTrack@mean,402653184@Summary_ClusterNoise_OffTrack@mean,469762048@Summary_ClusterNoise_OffTrack@mean", "ClusterNoise_OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterStoNCorr_OnTrack@mean,436207616@Summary_ClusterStoNCorr_OnTrack@mean,402653184@Summary_ClusterStoNCorr_OnTrack@mean,469762048@Summary_ClusterStoNCorr_OnTrack@mean", "ClusterStoNCorr_OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterStoN_OffTrack@mean,436207616@Summary_ClusterStoN_OffTrack@mean,402653184@Summary_ClusterStoN_OffTrack@mean,469762048@Summary_ClusterStoN_OffTrack@mean", "ClusterStoN_OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterWidth_OnTrack@mean,436207616@Summary_ClusterWidth_OnTrack@mean,402653184@Summary_ClusterWidth_OnTrack@mean,469762048@Summary_ClusterWidth_OnTrack@mean", "ClusterWidth_OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterWidth_OffTrack@mean,436207616@Summary_ClusterWidth_OffTrack@mean,402653184@Summary_ClusterWidth_OffTrack@mean,469762048@Summary_ClusterWidth_OffTrack@mean", "ClusterWidth_OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_TotalNumberOfDigis@mean,436207616@Summary_TotalNumberOfDigis@mean,402653184@Summary_TotalNumberOfDigis@mean,469762048@Summary_TotalNumberOfDigis@mean", "TotalNumberOfDigis.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterChargeCorr__OnTrack@mean,436207616@Summary_ClusterChargeCorr__OnTrack@mean,402653184@Summary_ClusterChargeCorr__OnTrack@mean,469762048@Summary_ClusterChargeCorr__OnTrack@mean", "_ClusterChargeCorr__OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterCharge__OffTrack@mean,436207616@Summary_ClusterCharge__OffTrack@mean,402653184@Summary_ClusterCharge__OffTrack@mean,469762048@Summary_ClusterCharge__OffTrack@mean", "ClusterCharge__OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterNoise__OnTrack@mean,436207616@Summary_ClusterNoise__OnTrack@mean,402653184@Summary_ClusterNoise__OnTrack@mean,469762048@Summary_ClusterNoise__OnTrack@mean", "ClusterNoise__OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterNoise__OffTrack@mean,436207616@Summary_ClusterNoise__OffTrack@mean,402653184@Summary_ClusterNoise__OffTrack@mean,469762048@Summary_ClusterNoise__OffTrack@mean", "ClusterNoise__OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterStoNCorr__OnTrack@mean,436207616@Summary_ClusterStoNCorr__OnTrack@mean,402653184@Summary_ClusterStoNCorr__OnTrack@mean,469762048@Summary_ClusterStoNCorr__OnTrack@mean", "ClusterStoNCorr__OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterStoN__OffTrack@mean,436207616@Summary_ClusterStoN__OffTrack@mean,402653184@Summary_ClusterStoN__OffTrack@mean,469762048@Summary_ClusterStoN__OffTrack@mean", "ClusterStoN__OffTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterWidth__OnTrack@mean,436207616@Summary_ClusterWidth__OnTrack@mean,402653184@Summary_ClusterWidth__OnTrack@mean,469762048@Summary_ClusterWidth__OnTrack@mean", "ClusterWidth__OnTrack.gif", 0, Condition, NRuns);
-  A.createTrendLastRuns("369098752@Summary_ClusterWidth__OffTrack@mean,436207616@Summary_ClusterWidth__OffTrack@mean,402653184@Summary_ClusterWidth__OffTrack@mean,469762048@Summary_ClusterWidth__OffTrack@mean", "ClusterWidth__OffTrack.gif", 0, Condition, NRuns);
-
-  A.closeFile();
-
-
-  return;
-
-
+/// Simple helper function for building the string for TIB,TOB,TEC,TID items
+string multiItems(const vector<string> & subDetectors, const string & item)
+{
+  string multiItems;
+  if( !subDetectors.empty() ) {
+    // Fill the first and then the others, prepending the rest with a ","
+    vector<string>::const_iterator subDet = subDetectors.begin();
+    multiItems.append(*subDet+"@"+item);
+    ++subDet;
+    for( ; subDet != subDetectors.end(); ++subDet ) {
+      multiItems.append(","+*subDet+"@"+item);
+    }
+  }
+  return multiItems;
 }
 
+/**
+ * Extraction of the summary information using DQMServices/Diagnostic/test/HDQMInspector. <br>
+ * The sqlite database should have been filled using the new SiPixelHistoryDQMService.   
+ */
+void runTrackingInspector( const string &tagName, const string & Password, const int Start, const int End, const int nRuns )
+{
+  // IMPORTANT SETTINGS:
+  string condition = "369098752@Summary_TotalNumberOfClusters_OffTrack@entries > 10000";
+  string blackList = "109468";
 
-void SiStripHDQMInspector (const std::string &tagName, std::string const& Password, int const Start, int const End) {
-/////////////////////////////////////////////////////////////////
-//
-// Extraction of the summary information using 
-// DQMServices/Diagnostic/test/HDQMInspector.
-// The sqlite database should have been filled using the new
-// SiStripHistoryDQMService.   
-//
-/////////////////////////////////////////////////////////////////
+  // string siStripTracker = "268435456";
+  vector<string> subDetectors;
+  subDetectors.push_back("369098752"); // TIB (check)
+  subDetectors.push_back("436207616"); // TOB (check)
+  subDetectors.push_back("402653184"); // TID (check)
+  subDetectors.push_back("469762048"); // TEC (check)
+  // -------------------
+
+  HDQMInspectorConfigSiStrip siStripConfig;
+  vector<string> ItemsForIntegration;
+  ItemsForIntegration.push_back("TotalNumberOfClusters_OnTrack_entries");
+  siStripConfig.computeIntegralList(ItemsForIntegration);
+  DQMHistoryCreateTrend makeTrend(&siStripConfig);
+
+  // Database and output configuration
+  makeTrend.setDB("oracle://cms_orcoff_prep/CMS_DQM_31X_OFFLINE",tagName,"cms_dqm_31x_offline", Password,"");
+  makeTrend.setDebug(1);
+  makeTrend.setDoStat(1);
+  makeTrend.setBlackList(blackList);
+
+  // Definition of trends
+  typedef DQMHistoryTrendsConfig Trend;
+  vector<Trend> config;
+  config.push_back(Trend( multiItems(subDetectors, "Summary_TotalNumberOfClusters_OnTrack@mean"), "OnTrackClusters.gif", 0,
+                          condition+"&& 369098752@Summary_TotalNumberOfClusters_OnTrack@mean > 0", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_TotalNumberOfClusters_OnTrack@entries"), "OnTrackClusters_entries.gif", 0,
+                          condition+"&& 369098752@Summary_TotalNumberOfClusters_OnTrack@entries > 0", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_TotalNumberOfClusters_OffTrack@mean"), "TotalNumberOfClusters_OffTrack.gif", 0,
+                          condition+"&& 369098752@Summary_TotalNumberOfClusters_OffTrack@mean > 0", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_TotalNumberOfClusters_OffTrack@entries"), "TotalNumberOfClusters_OffTrack_entries.gif", 0,
+                          condition+"&& 369098752@Summary_TotalNumberOfClusters_OffTrack@entries > 0", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterChargeCorr_OnTrack@landauPeak"), "ClusterChargeCorr_OnTrack_landau.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterChargeCorr_OnTrack@entries > 10000", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterCharge_OffTrack@landauPeak"), "ClusterCharge_OffTrack_landau.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterCharge_OffTrack@entries > 10000", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterNoise_OnTrack@gaussMean"), "ClusterNoise_OnTrack_gauss.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterNoise_OnTrack@entries > 10000", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterNoise_OffTrack@gaussMean"), "ClusterNoise_OffTrack_gauss.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterNoise_OffTrack@entries > 10000", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterStoNCorr_OnTrack@mean"), "ClusterStoNCorr_OnTrack.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterStoNCorr_OnTrack@mean > 0", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterStoNCorr_OnTrack@landauPeak"), "ClusterStoNCorr_OnTrack_landau.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterStoNCorr_OnTrack@entries > 10000", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterStoN_OffTrack@landauPeak"), "ClusterStoN_OffTrack_landau.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterStoN_OffTrack@entries > 10000", Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "Summary_ClusterWidth_OnTrack@mean"), "ClusterWidth_OnTrack.gif", 0,
+                          condition+"&& 369098752@Summary_ClusterWidth_OnTrack@mean > 0", Start, End, nRuns ));
+
+  // FED errors entries
+  config.push_back(Trend( multiItems(subDetectors, "nFEDErrors@entries"), "nFEDErrors.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nBadActiveChannelStatusBits@entries"), "nBadActiveChannelStatusBits.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nBadChannelStatusBits@entries"), "nBadChannelStatusBits.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nAPVAddressError@entries"), "nAPVAddressError.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nUnlocked@entries"), "nUnlocked.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nOutOfSync@entries"), "nOutOfSync.gif", 0,
+                          condition, Start, End, nRuns ));
+
+  // FED errors means
+  config.push_back(Trend( multiItems(subDetectors, "nFEDErrors@mean"), "nFEDErrors.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nBadActiveChannelStatusBits@mean"), "nBadActiveChannelStatusBits.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nBadChannelStatusBits@mean"), "nBadChannelStatusBits.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nAPVAddressError@mean"), "nAPVAddressError.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nUnlocked@mean"), "nUnlocked.gif", 0,
+                          condition, Start, End, nRuns ));
+  config.push_back(Trend( multiItems(subDetectors, "nOutOfSync@mean"), "nOutOfSync.gif", 0,
+                          condition, Start, End, nRuns ));
 
 
-  //std::map<int, std::string> pixelTranslator = sipixelsummary::GetMap();
+  // Creation of trends
+  for_each(config.begin(), config.end(), makeTrend);
 
-  //pixelTranslator Translator;
-
-  //AutoLibraryLoader::enable();
-
-  HDQMInspectorConfigSiStrip StripConfig;
-  //HDQMInspector A(&StripConfig);
-  HDQMInspector A(&StripConfig);
-  //A.setDB("sqlite_file:dbfile.db",tagName,"cms_cond_strip","w3807dev","");
-  A.setDB("oracle://cms_orcoff_prep/CMS_DQM_31X_OFFLINE",tagName,"cms_dqm_31x_offline", Password,"");
-
-  A.createTrend("369098752@Summary_TotalNumberOfClusters_OnTrack@mean,436207616@Summary_TotalNumberOfClusters_OnTrack@mean,402653184@Summary_TotalNumberOfClusters_OnTrack@mean,469762048@Summary_TotalNumberOfClusters_OnTrack@mean", "OnTrackClusters.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_TotalNumberOfClusters_OffTrack@mean,436207616@Summary_TotalNumberOfClusters_OffTrack@mean,402653184@Summary_TotalNumberOfClusters_OffTrack@mean,469762048@Summary_TotalNumberOfClusters_OffTrack@mean", "TotalNumberOfClusters_OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterChargeCorr_OnTrack@mean,436207616@Summary_ClusterChargeCorr_OnTrack@mean,402653184@Summary_ClusterChargeCorr_OnTrack@mean,469762048@Summary_ClusterChargeCorr_OnTrack@mean", "ClusterChargeCorr_OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterCharge_OffTrack@mean,436207616@Summary_ClusterCharge_OffTrack@mean,402653184@Summary_ClusterCharge_OffTrack@mean,469762048@Summary_ClusterCharge_OffTrack@mean", "ClusterCharge_OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterNoise_OnTrack@mean,436207616@Summary_ClusterNoise_OnTrack@mean,402653184@Summary_ClusterNoise_OnTrack@mean,469762048@Summary_ClusterNoise_OnTrack@mean", "ClusterNoise_OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterNoise_OffTrack@mean,436207616@Summary_ClusterNoise_OffTrack@mean,402653184@Summary_ClusterNoise_OffTrack@mean,469762048@Summary_ClusterNoise_OffTrack@mean", "ClusterNoise_OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterStoNCorr_OnTrack@mean,436207616@Summary_ClusterStoNCorr_OnTrack@mean,402653184@Summary_ClusterStoNCorr_OnTrack@mean,469762048@Summary_ClusterStoNCorr_OnTrack@mean", "ClusterStoNCorr_OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterStoN_OffTrack@mean,436207616@Summary_ClusterStoN_OffTrack@mean,402653184@Summary_ClusterStoN_OffTrack@mean,469762048@Summary_ClusterStoN_OffTrack@mean", "ClusterStoN_OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterWidth_OnTrack@mean,436207616@Summary_ClusterWidth_OnTrack@mean,402653184@Summary_ClusterWidth_OnTrack@mean,469762048@Summary_ClusterWidth_OnTrack@mean", "ClusterWidth_OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterWidth_OffTrack@mean,436207616@Summary_ClusterWidth_OffTrack@mean,402653184@Summary_ClusterWidth_OffTrack@mean,469762048@Summary_ClusterWidth_OffTrack@mean", "ClusterWidth_OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_TotalNumberOfDigis@mean,436207616@Summary_TotalNumberOfDigis@mean,402653184@Summary_TotalNumberOfDigis@mean,469762048@Summary_TotalNumberOfDigis@mean", "TotalNumberOfDigis.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterChargeCorr__OnTrack@mean,436207616@Summary_ClusterChargeCorr__OnTrack@mean,402653184@Summary_ClusterChargeCorr__OnTrack@mean,469762048@Summary_ClusterChargeCorr__OnTrack@mean", "_ClusterChargeCorr__OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterCharge__OffTrack@mean,436207616@Summary_ClusterCharge__OffTrack@mean,402653184@Summary_ClusterCharge__OffTrack@mean,469762048@Summary_ClusterCharge__OffTrack@mean", "ClusterCharge__OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterNoise__OnTrack@mean,436207616@Summary_ClusterNoise__OnTrack@mean,402653184@Summary_ClusterNoise__OnTrack@mean,469762048@Summary_ClusterNoise__OnTrack@mean", "ClusterNoise__OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterNoise__OffTrack@mean,436207616@Summary_ClusterNoise__OffTrack@mean,402653184@Summary_ClusterNoise__OffTrack@mean,469762048@Summary_ClusterNoise__OffTrack@mean", "ClusterNoise__OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterStoNCorr__OnTrack@mean,436207616@Summary_ClusterStoNCorr__OnTrack@mean,402653184@Summary_ClusterStoNCorr__OnTrack@mean,469762048@Summary_ClusterStoNCorr__OnTrack@mean", "ClusterStoNCorr__OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterStoN__OffTrack@mean,436207616@Summary_ClusterStoN__OffTrack@mean,402653184@Summary_ClusterStoN__OffTrack@mean,469762048@Summary_ClusterStoN__OffTrack@mean", "ClusterStoN__OffTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterWidth__OnTrack@mean,436207616@Summary_ClusterWidth__OnTrack@mean,402653184@Summary_ClusterWidth__OnTrack@mean,469762048@Summary_ClusterWidth__OnTrack@mean", "ClusterWidth__OnTrack.gif", 0, Condition, Start, End);
-  A.createTrend("369098752@Summary_ClusterWidth__OffTrack@mean,436207616@Summary_ClusterWidth__OffTrack@mean,402653184@Summary_ClusterWidth__OffTrack@mean,469762048@Summary_ClusterWidth__OffTrack@mean", "ClusterWidth__OffTrack.gif", 0, Condition, Start, End);
-
-
-  A.setDebug(1);
-  A.setDoStat(1);
-
-  //A.setBlackList("68286");
-
-
-
-
-  A.closeFile();
-
-
-  return;
-
-
+  // Close the output file
+  makeTrend.closeFile();
 }
 
+void SiStripHDQMInspector( const string & tagName, const string & password, const int start, const int end )
+{
+  runTrackingInspector(tagName, password, start, end, 0);
+}
 
-
-
-
+void SiStripHDQMInspector( const string & tagName, const string & password, const int nRuns )
+{
+  runTrackingInspector(tagName, password, 0, 0, nRuns);
+}
 
 int main (int argc, char* argv[])
 {

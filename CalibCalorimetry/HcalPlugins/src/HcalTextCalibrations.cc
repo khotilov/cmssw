@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // Original Author:  Fedor Ratnikov
-// $Id: HcalTextCalibrations.cc,v 1.13 2009/05/20 15:54:22 rofierzy Exp $
+// $Id: HcalTextCalibrations.cc,v 1.12 2009/05/19 16:06:03 rofierzy Exp $
 //
 //
 
@@ -86,15 +86,11 @@ HcalTextCalibrations::HcalTextCalibrations ( const edm::ParameterSet& iConfig )
       setWhatProduced (this, &HcalTextCalibrations::produceElectronicsMap);
       findingRecord <HcalElectronicsMapRcd> ();
     }
-    else if (objectName == "ValidationCorrs") {
-      setWhatProduced (this, &HcalTextCalibrations::produceValidationCorrs);
-      findingRecord <HcalValidationCorrsRcd> ();
-    }
     else {
       std::cerr << "HcalTextCalibrations-> Unknown object name '" << objectName 
 		<< "', known names are: "
 		<< "Pedestals PedestalWidths Gains GainWidths QIEData ChannelQuality ElectronicsMap "
-		<< "ZSThresholds RespCorrs LUTCorrs PFCorrs TimeCorrs L1TriggerObjects ValidationCorrs"
+		<< "ZSThresholds RespCorrs LUTCorrs PFCorrs TimeCorrs L1TriggerObjects"
 		<< std::endl;
     }
   }
@@ -184,9 +180,5 @@ std::auto_ptr<HcalL1TriggerObjects> HcalTextCalibrations::produceL1TriggerObject
 
 std::auto_ptr<HcalElectronicsMap> HcalTextCalibrations::produceElectronicsMap (const HcalElectronicsMapRcd& rcd) {
   return produce_impl<HcalElectronicsMap> (mInputs ["ElectronicsMap"]);
-}
-
-std::auto_ptr<HcalValidationCorrs> HcalTextCalibrations::produceValidationCorrs (const HcalValidationCorrsRcd& rcd) {
-  return produce_impl<HcalValidationCorrs> (mInputs ["ValidationCorrs"]);
 }
 

@@ -2,7 +2,7 @@
 //
 // Original Author:  Gena Kukartsev Mar 11, 2009
 // Adapted from HcalDbOmds.h
-// $Id: HcalDbOmds.h,v 1.5 2009/03/27 09:02:13 kukartse Exp $
+// $Id: HcalDbOmds.h,v 1.4 2009/03/25 23:41:44 kukartse Exp $
 //
 //
 #ifndef HcalDbOmds_h
@@ -25,7 +25,7 @@ using namespace oracle::occi;
    \class HcalDbOmds
    \brief IO for OMDS instances of Hcal Calibrations
    \author Gena Kukartsev March 11, 2009
-   $Id: HcalDbOmds.h,v 1.5 2009/03/27 09:02:13 kukartse Exp $
+   $Id: HcalDbOmds.h,v 1.4 2009/03/25 23:41:44 kukartse Exp $
    
 Text file formats for different data types is as following:
 - # in first column comments the line
@@ -51,7 +51,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalPedestals* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalPedestals& fObject);
@@ -59,7 +58,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalPedestalWidths* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalPedestalWidths& fObject);
@@ -67,7 +65,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalGains* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalGains& fObject);
@@ -75,7 +72,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalGainWidths* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalGainWidths& fObject);
@@ -83,7 +79,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalQIEData* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalQIEData& fObject);
@@ -91,7 +86,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalCalibrationQIEData* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalCalibrationQIEData& fObject);
@@ -99,7 +93,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalElectronicsMap* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalElectronicsMap& fObject);
@@ -107,7 +100,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalChannelQuality* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalChannelQuality& fObject);
@@ -115,7 +107,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalRespCorrs* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalRespCorrs& fObject);
@@ -123,7 +114,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalZSThresholds* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalZSThresholds& fObject);
@@ -131,7 +121,6 @@ namespace HcalDbOmds {
 		  const std::string & fTag, 
 		  const std::string & fVersion,
 		  const int fSubversion,
-		  const int fIOVBegin,
 		  const std::string & fQuery,
 		  HcalL1TriggerObjects* fObject);
   bool dumpObject (std::ostream& fOutput, const HcalL1TriggerObjects& fObject);
