@@ -310,7 +310,7 @@ TrackCandidateProducer::produce(edm::Event& e, const edm::EventSetup& es) {
       TrackerRecHit theCurrentRecHit, thePreviousRecHit;
 
       TrackerRecHit theFirstHitComp, theSecondHitComp;
-
+      
       for ( iterRecHit = theRecHitRangeIteratorBegin; 
 	    iterRecHit != theRecHitRangeIteratorEnd; 
 	    ++iterRecHit) {
@@ -319,9 +319,18 @@ TrackCandidateProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	if ( theNumberOfCrossedLayers >= maxNumberOfCrossedLayers ) continue;
 	
 	// Get current and previous rechits
-	thePreviousRecHit = theCurrentRecHit;
+	if(!firstRecHit) thePreviousRecHit = theCurrentRecHit;
 	theCurrentRecHit = TrackerRecHit(&(*iterRecHit),theGeometry);
 	
+	//	counthits++;
+	//	if(!firstRecHit) std::cout << " HIT " << counthits 
+	//			   << "\tCurrent det & layer number " << theCurrentRecHit.subDetId() <<"\t"<< theCurrentRecHit.layerNumber() 
+	//			   << "\t" << theCurrentRecHit.localError() 
+	//			   << "\tPrevious layer number " << thePreviousRecHit.subDetId() <<"\t"<< thePreviousRecHit.layerNumber()  
+	//			   << "\t" << thePreviousRecHit.localError() 
+	//			   << std::endl;
+      
+      
 	// Check that the first rechit is indeed the first seeding hit
 	if ( firstRecHit && theCurrentRecHit != theFirstSeedingTrackerRecHit ) continue;
 	
@@ -389,7 +398,11 @@ TrackCandidateProducer::produce(edm::Event& e, const edm::EventSetup& es) {
 	    }
 
 	  } else { 
-	    
+
+	    //	    std::cout << "Current hit NOT better -- skip" << std::endl;
+	    //keep the older hit as a reference. Not the one that was never attached
+	    theCurrentRecHit = thePreviousRecHit;  
+
 	  }
 
 	}
