@@ -1235,9 +1235,8 @@ class PerfSuite:
                #Save the original AvailableCores list to use it as a test to break the infinite loop:
                #While in the regular RelVal use-case it makes sense to use the actual number of cores of the machines, in
                #the IB case the AvailableCores will always consist of only 1 single core..
-               OriginalAvailableCores=list(AvailableCores) #Tricky list copy bug! without the list() OriginalAvalaibleCores would point to AvailableCores!
-               #Print this out in the log for debugging reasons
-               print "Original available cores list:", AvailableCores
+               OriginalAvailableCores=AvailableCores
+               print AvailableCores
 
                #Create a dictionaty to keep track of running threads on the various cores:
                activePerfTestThreads={}
@@ -1279,18 +1278,10 @@ class PerfSuite:
                         print "%s test, in thread %s is done running on core %s"%(activePerfTestThreads[cpu].simpleGenReportArgs['Name'],activePerfTestThreads[cpu],cpu) 
                         print "About to append cpu %s to AvailableCores list"%cpu
                         AvailableCores.append(cpu)
-                  #Buggy if... it seems we don't wait for the running thread to be finished...
-                  #We should request:
-                  #-All OriginalAvailableCores should be actually available.
-                  if not AvailableCores==[] and (set(AvailableCores)==set(range(cmsCpuInfo.get_NumOfCores())) or set(AvailableCores)==set(OriginalAvailableCores)) and not TestsToDo:
-                     print "PHEW! We're done... all TestsToDo are done..."
-                     #Debug printouts:
-                     #print "AvailableCores",AvailableCores
-                     #print "set(AvailableCores)",set(AvailableCores)
-                     #print "set(range(cmsCpuInfo.get_NumOfCores())",set(range(cmsCpuInfo.get_NumOfCores()))
-                     #print "OriginalAvailableCores",OriginalAvailableCores
-                     #print "set(OriginalAvailableCores)",set(OriginalAvailableCores)                                   
-                     #print "TestsToDo",TestsToDo
+                  if (set(AvailableCores)==set(range(cmsCpuInfo.get_NumOfCores())) or set(AvailableCores)==set(OriginalAvailableCores)) and not TestsToDo:
+                     print "WHEW! We're done... all TestsToDo are done..."
+                     print AvailableCores
+                     print TestsToDo
                      break
                   else:
                      #Putting the sleep statement first to avoid writing Waiting... before the output of the started thread reaches the log... 
@@ -1338,16 +1329,14 @@ class PerfSuite:
     
             #Archive it on CASTOR
             #Before archiving check if it already exist if it does print a message, but do not overwrite, so do not delete it from local dir:
-            fullcastorpathfile=os.path.join(castordir,TarFile)
-            checkcastor="nsls  %s" % fullcastorpathfile
-            checkcastorout=os.popen3(checkcastor)[1].read()
-            if checkcastorout.rstrip()==fullcastorpathfile:
-               castorcmdstderr="File %s is already on CASTOR! Will NOT OVERWRITE!!!"%fullcastorpathfile
-            else:
-               castorcmd="rfcp %s %s" % (AbsTarFile,fullcastorpathfile)
+            checkcastor="nsls  %s" % (os.path.join(castordir,TarFile))
+            checkcastorerr=os.popen3(checkcastor)[2].read()
+            if not checkcastorerr:
+               castorcmd="rfcp %s %s" % (AbsTarFile,os.path.join(castordir,TarFile))
                self.printFlush(castorcmd)
                castorcmdstderr=os.popen3(castorcmd)[2].read()
-               
+            else:
+               castorcmdstderr="File already on CASTOR! Will NOT OVERWRITE!!!"
             #Checking the stderr of the rfcp command to copy the tarball (.tgz) on CASTOR:
             if castorcmdstderr:
                 #If it failed print the stderr message to the log and tell the user the tarball (.tgz) is kept in the working directory

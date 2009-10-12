@@ -6,27 +6,15 @@
  *  Virtual interface for a field provider that is based on interpolation
  *  on a regular grid.
  *
- *  $Date: 2008/04/09 19:37:23 $
- *  $Revision: 1.4 $
+ *  $Date: $
+ *  $Revision: $
  *  \author T. Todorov
  */
 
 #include "DataFormats/GeometrySurface/interface/GloballyPositioned.h"
 #include "MagneticField/Interpolation/interface/MagProviderInterpol.h"
 
-struct Dimensions 
-{
-  int w;
-  int h;
-  int d;
-};
-
-struct Indexes
-{
-  int i;
-  int j;
-  int k;
-};
+#include <vector>
 
 class MFGrid : public MagProviderInterpol {
 public:
@@ -51,7 +39,7 @@ public:
   /// find grid coordinates for point. For debugging and validation only.
   virtual LocalPoint fromGridFrame( double a, double b, double c) const = 0;
 
-  virtual Dimensions dimensions() const = 0;
+  virtual std::vector<int> dimensions() const = 0;
 
   /// Position of node in local frame
   virtual LocalPoint  nodePosition( int i, int j, int k) const = 0;
@@ -59,7 +47,7 @@ public:
   /// Field value at node
   virtual LocalVector nodeValue( int i, int j, int k) const = 0;
 
-  virtual Indexes index( const LocalPoint& p) const {return Indexes();}
+  virtual std::vector<int> index( const LocalPoint& p) const {return std::vector<int>();}
 
   /// Local reference frame
   const GloballyPositioned<float>& frame() const { return frame_;}

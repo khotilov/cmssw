@@ -1,6 +1,6 @@
 /** \class HLTEgammaGenericFilter
  *
- * $Id: HLTEgammaGenericFilter.cc,v 1.1 2009/01/28 15:06:02 covarell Exp $
+ * $Id: HLTEgammaGenericFilter.cc,v 1.9 2009/01/20 11:30:38 covarell Exp $
  *
  *  \author Roberto Covarelli (CERN)
  *
@@ -30,7 +30,6 @@ HLTEgammaGenericFilter::HLTEgammaGenericFilter(const edm::ParameterSet& iConfig)
   nonIsoTag_ = iConfig.getParameter< edm::InputTag > ("nonIsoTag");
 
   lessThan_ = iConfig.getParameter<bool> ("lessThan");
-  useEt_ = iConfig.getUntrackedParameter<bool> ("useEt",false);
   thrRegularEB_ = iConfig.getParameter<double> ("thrRegularEB");
   thrRegularEE_ = iConfig.getParameter<double> ("thrRegularEE");
   thrOverEEB_ = iConfig.getUntrackedParameter<double> ("thrOverEEB",-1.0);
@@ -94,39 +93,38 @@ HLTEgammaGenericFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup
    
     float vali = mapi->val;
     float energy = ref->superCluster()->energy();
-    float EtaSC = ref->eta();
-    if (useEt_) energy = energy * sin (2*atan(exp(-EtaSC)));   
+    float EtaSC = fabs(ref->eta());
     
     if ( lessThan_ ) {
-      if ( (fabs(EtaSC) < 1.479 && vali <= thrRegularEB_) || (fabs(EtaSC) >= 1.479 && vali <= thrRegularEE_) ) {
+      if ( (EtaSC < 1.479 && vali <= thrRegularEB_) || (EtaSC >= 1.479 && vali <= thrRegularEE_) ) {
 	n++;
 	filterproduct->addObject(trigger_type, ref);
 	continue;
       }
       if (energy > 0. && (thrOverEEB_ > 0. || thrOverEEE_ > 0. || thrOverE2EB_ > 0. || thrOverE2EE_ > 0.) ) {
-	if ((fabs(EtaSC) < 1.479 && vali/energy <= thrOverEEB_) || (fabs(EtaSC) >= 1.479 && vali/energy <= thrOverEEE_) ) {
+	if ((EtaSC < 1.479 && vali/energy <= thrOverEEB_) || (EtaSC >= 1.479 && vali/energy <= thrOverEEE_) ) {
 	  n++;
 	  filterproduct->addObject(trigger_type, ref);
 	  continue;
 	}
-	if ((fabs(EtaSC) < 1.479 && vali/(energy*energy) <= thrOverE2EB_) || (fabs(EtaSC) >= 1.479 && vali/(energy*energy) <= thrOverE2EE_) ) {
+	if ((EtaSC < 1.479 && vali/(energy*energy) <= thrOverE2EB_) || (EtaSC >= 1.479 && vali/(energy*energy) <= thrOverE2EE_) ) {
 	  n++;
 	  filterproduct->addObject(trigger_type, ref);
 	}
       }
     } else {
-      if ( (fabs(EtaSC) < 1.479 && vali >= thrRegularEB_) || (fabs(EtaSC) >= 1.479 && vali >= thrRegularEE_) ) {
+      if ( (EtaSC < 1.479 && vali >= thrRegularEB_) || (EtaSC >= 1.479 && vali >= thrRegularEE_) ) {
 	n++;
 	filterproduct->addObject(trigger_type, ref);
 	continue;
       }
       if (energy > 0. && (thrOverEEB_ > 0. || thrOverEEE_ > 0. || thrOverE2EB_ > 0. || thrOverE2EE_ > 0.) ) {
-	if ((fabs(EtaSC) < 1.479 && vali/energy >= thrOverEEB_) || (fabs(EtaSC) >= 1.479 && vali/energy >= thrOverEEE_) ) {
+	if ((EtaSC < 1.479 && vali/energy >= thrOverEEB_) || (EtaSC >= 1.479 && vali/energy >= thrOverEEE_) ) {
 	  n++;
 	  filterproduct->addObject(trigger_type, ref);
 	  continue;
 	}
-	if ((fabs(EtaSC) < 1.479 && vali/(energy*energy) >= thrOverE2EB_) || (fabs(EtaSC) >= 1.479 && vali/(energy*energy) >= thrOverE2EE_) ) {
+	if ((EtaSC < 1.479 && vali/(energy*energy) >= thrOverE2EB_) || (EtaSC >= 1.479 && vali/(energy*energy) >= thrOverE2EE_) ) {
 	  n++;
 	  filterproduct->addObject(trigger_type, ref);
 	}

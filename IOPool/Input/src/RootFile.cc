@@ -410,6 +410,8 @@ namespace edm {
     setIfFastClonable(remainingEvents, remainingLumis);
 
     setRefCoreStreamer(true);  // backward compatibility
+
+    reportOpened();
   }
 
   RootFile::~RootFile() {
@@ -679,7 +681,7 @@ namespace edm {
   }
 
   void
-  RootFile::reportOpened(std::string const& inputType) {
+  RootFile::reportOpened() {
     // Report file opened.
     std::string const label = "source";
     std::string moduleName = "PoolSource";
@@ -687,7 +689,6 @@ namespace edm {
     reportToken_ = reportSvc->inputFileOpened(file_,
                logicalFile_,
                catalog_,
-               inputType,
                moduleName,
                label,
 	       fid_.fid(),
@@ -856,6 +857,9 @@ namespace edm {
     assert(eventAux_.luminosityBlock() == fileIndexIter_->lumi_);
     assert(eventAux_.event() == fileIndexIter_->event_);
 
+    // report event read from file
+    Service<JobReport> reportSvc;
+    reportSvc->eventReadFromFile(reportToken_, eventID().run(), eventID().event());
     ++fileIndexIter_;
     return ep;
   }
@@ -883,10 +887,6 @@ namespace edm {
 
     // Create a group in the event for each product
     eventTree_.fillGroups(*thisEvent);
-
-    // report event read from file
-    Service<JobReport> reportSvc;
-    reportSvc->eventReadFromFile(reportToken_, eventID().run(), eventID().event());
     return thisEvent;
   }
 

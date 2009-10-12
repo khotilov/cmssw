@@ -16,7 +16,7 @@
 //
 // Original Author:  Gena Kukartsev
 //         Created:  Sun Sep 23 16:57:06 CEST 2007
-// $Id: XMLProcessor.h,v 1.3 2009/07/31 13:09:51 kukartse Exp $
+// $Id: XMLProcessor.h,v 1.1 2009/04/14 22:49:05 kukartse Exp $
 //
 
 // system include files
@@ -156,7 +156,6 @@ class XMLProcessor
 
   inline static XMLCh * _toXMLCh( std::string temp );
   inline static XMLCh * _toXMLCh( int temp );
-  inline static XMLCh * _toXMLCh( double temp );
   inline static XMLCh * _toXMLCh( time_t temp );
   virtual ~XMLProcessor();
   
@@ -193,22 +192,6 @@ inline XMLCh* XMLProcessor::_toXMLCh( int temp )
 {
   char buf[100];
   int status = snprintf( buf, 100, "%d", temp );
-  if ( status >= 100 )
-    {
-      cout << "XMLProcessor::_toXMLCh(int temp): buffer overflow, the string will be truncated!" << endl;
-    }
-  else if ( status <0 )
-    {
-      cout << "XMLProcessor::_toXMLCh(int temp): output error" << endl;
-    }
-  XMLCh* buff = XMLString::transcode( buf );    
-  return  buff;
-}
-
-inline XMLCh* XMLProcessor::_toXMLCh( double temp )
-{
-  char buf[100];
-  int status = snprintf( buf, 100, "%e", temp );
   if ( status >= 100 )
     {
       cout << "XMLProcessor::_toXMLCh(int temp): buffer overflow, the string will be truncated!" << endl;

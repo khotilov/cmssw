@@ -28,8 +28,8 @@ pointer to a Group, when queried.
 #include "DataFormats/Provenance/interface/ProvenanceFwd.h"
 #include "DataFormats/Provenance/interface/BranchID.h"
 #include "DataFormats/Provenance/interface/ProductTransientIndex.h"
-#include "DataFormats/Provenance/interface/ProductID.h"
 #include "DataFormats/Provenance/interface/BranchMapper.h"
+#include "DataFormats/Provenance/interface/ProductProvenance.h"
 #include "DataFormats/Common/interface/EDProductGetter.h"
 #include "DataFormats/Common/interface/BasicHandle.h"
 #include "DataFormats/Common/interface/OutputHandle.h"
@@ -139,16 +139,15 @@ namespace edm {
 
     void maybeFlushCache(TypeID const& tid, InputTag const& tag) const;
 
+    void adjustIndexesAfterProductRegistryAddition();
+
   protected:
     // ----- Add a new Group
     // *this takes ownership of the Group, which in turn owns its
     // data.
     void addGroup_(std::auto_ptr<Group> g);
-    void addGroupOrThrow(std::auto_ptr<Group> g);
-    void addGroupOrNoThrow(std::auto_ptr<Group> g);
-    Group* getExistingGroup(BranchID const& branchID);
     Group* getExistingGroup(Group const& g);
-    void replaceGroup(Group& g);
+    void replaceGroup(std::auto_ptr<Group> g);
 
     //deprecated
     SharedConstGroupPtr const getGroup(BranchID const& oid,
@@ -165,6 +164,9 @@ namespace edm {
     void swapBase(Principal&);
   private:
     virtual EDProduct const* getIt(ProductID const&) const;
+
+    virtual void addOrReplaceGroup(std::auto_ptr<Group> g) = 0;
+
 
     virtual ProcessHistoryID const& processHistoryID() const = 0;
 

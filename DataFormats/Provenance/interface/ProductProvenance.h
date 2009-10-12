@@ -51,7 +51,9 @@ namespace edm {
     ProductStatus const& productStatus() const {return productStatus_;}
     ParentageID const& parentageID() const {return parentageID_;}
     Parentage const& parentage() const;
-    void setStatus(ProductStatus const& status);
+    void setStatus(ProductStatus status) {productStatus_ = status;}
+    void setPresent();
+    void setNotPresent();
 
     bool & noParentage() const {return transients_.get().noParentage_;}
 

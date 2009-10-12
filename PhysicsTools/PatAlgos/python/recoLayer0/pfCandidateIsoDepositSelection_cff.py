@@ -5,10 +5,8 @@ from PhysicsTools.PFCandProducer.pfNoPileUp_cff import *
 
 
 patPFCandidateIsoDepositSelection = cms.Sequence(
-    pfNoPileUpSequence *
-    ( pfAllNeutralHadrons +
-      pfAllChargedHadrons +
-      pfAllPhotons )
+    pfNoPileUpSequence +
+    pfSortByTypeSequence
     )
 
 

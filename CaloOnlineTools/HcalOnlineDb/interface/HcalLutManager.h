@@ -16,16 +16,10 @@
 #include <boost/shared_ptr.hpp>
 #include "CalibCalorimetry/HcalTPGAlgos/interface/LutXml.h"
 #include "DataFormats/HcalDetId/interface/HcalSubdetector.h"
-#include "DataFormats/HcalDetId/interface/HcalGenericDetId.h"
-#include "CondFormats/HcalObjects/interface/HcalChannelQuality.h"
 //#include "CaloOnlineTools/HcalOnlineDb/interface/ConfigurationDatabaseImpl.hh"
 #include "CaloOnlineTools/HcalOnlineDb/interface/HCALConfigDB.h"
 #include "CaloOnlineTools/HcalOnlineDb/interface/LMap.h"
 #include "CalibFormats/HcalObjects/interface/HcalTPGCoder.h"
-#include "CalibCalorimetry/CaloTPG/src/CaloTPGTranscoderULUT.h"
-#include "CaloOnlineTools/HcalOnlineDb/interface/HcalAssistant.h"
-#include "CaloOnlineTools/HcalOnlineDb/interface/HcalChannelIterator.h"
-
 
 using namespace boost;
 //using namespace hcal;
@@ -47,8 +41,6 @@ class HcalLutManager{
  public:
   
   HcalLutManager( );
-  HcalLutManager(std::vector<HcalGenericDetId> & map);
-  HcalLutManager(const HcalElectronicsMap * _emap, const HcalChannelQuality * _cq = 0);
   ~HcalLutManager( );
 
   void init( void );
@@ -57,14 +49,12 @@ class HcalLutManager{
   // crate=-1 stands for all crates
   // legacy - use old LMAP. Use the xxxEmap method instead
   std::map<int, shared_ptr<LutXml> > getLutXmlFromAsciiMaster( string _filename, string _tag, int _crate = -1, bool split_by_crate = true );
-  std::map<int, shared_ptr<LutXml> > getLinearizationLutXmlFromAsciiMasterEmap( string _filename, string _tag, int _crate, bool split_by_crate = true );
-  std::map<int, shared_ptr<LutXml> > getLinearizationLutXmlFromAsciiMasterEmap_new( string _filename, string _tag, int _crate, bool split_by_crate = true );
-  std::map<int, shared_ptr<LutXml> > getCompressionLutXmlFromAsciiMaster( string _filename, string _tag, int _crate = -1, bool split_by_crate = true );
-
   std::map<int, shared_ptr<LutXml> > getLinearizationLutXmlFromCoder( const HcalTPGCoder & _coder, string _tag, bool split_by_crate = true );
+
+  std::map<int, shared_ptr<LutXml> > getLinearizationLutXmlFromAsciiMasterEmap( string _filename, string _tag, int _crate, bool split_by_crate = true );
+  std::map<int, shared_ptr<LutXml> > getCompressionLutXmlFromAsciiMaster( string _filename, string _tag, int _crate = -1, bool split_by_crate = true );
   std::map<int, shared_ptr<LutXml> > getLinearizationLutXmlFromCoderEmap( const HcalTPGCoder & _coder, string _tag, bool split_by_crate = true );
   std::map<int, shared_ptr<LutXml> > getCompressionLutXmlFromCoder( string _tag, bool split_by_crate = true );
-  std::map<int, shared_ptr<LutXml> > getCompressionLutXmlFromCoder( const CaloTPGTranscoderULUT & _coder, string _tag, bool split_by_crate = true );
 
   // add two std::maps with LUTs. Designed mainly for joining compression LUTs to linearization ones.
   void addLutMap(std::map<int, shared_ptr<LutXml> > & result, const std::map<int, shared_ptr<LutXml> > & other);
@@ -79,7 +69,6 @@ class HcalLutManager{
   int createAllLutXmlFiles( string _tag, string _lin_file, string _comp_file, bool split_by_crate = true );
   int createAllLutXmlFilesFromCoder( const HcalTPGCoder & _coder, string _tag, bool split_by_crate = true );
   int createLutXmlFiles_HBEFFromCoder_HOFromAscii( string _tag, const HcalTPGCoder & _coder, string _lin_file, bool split_by_crate = true );
-  int createLutXmlFiles_HBEFFromCoder_HOFromAscii( string _tag, const HcalTPGCoder & _coder, const CaloTPGTranscoderULUT & _transcoder, string _lin_file, bool split_by_crate = true );
   int createAllLutXmlFilesLinAsciiCompCoder( string _tag, string _lin_file, bool split_by_crate = true );
 
   // tests
@@ -112,8 +101,6 @@ class HcalLutManager{
   static HcalSubdetector get_subdetector( string _subdet );
   static string get_time_stamp( time_t _time );
 
-  // gives the iterator a list of channels
-  int initChannelIterator(std::vector<HcalGenericDetId> & map);
 
  protected:
   
@@ -121,10 +108,7 @@ class HcalLutManager{
   XMLDOMBlock * lut_checksums_xml;
   HCALConfigDB * db;
   LMap * lmap;
-  HcalChannelIterator _iter;
-  HcalAssistant _ass;
-  const HcalElectronicsMap * emap;
-  const HcalChannelQuality * cq;
+
 };
 
 
@@ -138,7 +122,9 @@ class HcalLutManager_test{
   static int getInt_test( string number );
 
  protected:
+  
   LutXml * lut_xml;
+
 };
 
 #endif

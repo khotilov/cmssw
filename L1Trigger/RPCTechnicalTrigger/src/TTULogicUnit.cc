@@ -1,4 +1,4 @@
-// $Id: TTULogicUnit.cc,v 1.4 2009/06/04 11:52:59 aosorio Exp $
+// $Id: $
 // Include files 
 
 
@@ -18,7 +18,6 @@
 TTULogicUnit::TTULogicUnit( ) : RPCLogicUnit () {
   
   m_logtool = new LogicTool<TTULogic>();
-  m_debug = false;
   
 }
 
@@ -26,7 +25,6 @@ TTULogicUnit::TTULogicUnit( const char * logic_type ) : RPCLogicUnit () {
 
   m_logtool = new LogicTool<TTULogic>();
   m_logtype = std::string( logic_type );
-  m_debug = false;
   
 }
 //=============================================================================
@@ -49,43 +47,27 @@ bool TTULogicUnit::initialise()
   
   status = m_logtool->initialise();
   if ( !status ) { 
-    if( m_debug ) std::cout << "TTULogicUnit> Problem initialising LogicTool \n"; 
+    std::cout << "TTULogicUnit> Problem initialising LogicTool \n"; 
     return 0; };
 
   m_logic  = dynamic_cast<TTULogic*> ( m_logtool->retrieve(m_logtype) );
   
   if ( ! m_logic ) { 
-    if( m_debug ) std::cout << "TTULogicUnit> No logic found \n"; 
+    std::cout << "TTULogicUnit> No logic found \n"; 
     return 0; };
   
   return 1;
   
 }
 
-void TTULogicUnit::setlogic( const char * logic )
+void TTULogicUnit::setlogic( const char * _logic )
 {
-
-  m_logtype = std::string( logic );
-
+  m_logtype = std::string( _logic );
 }
 
-void TTULogicUnit::setBoardSpecs( const TTUBoardSpecs::TTUBoardConfig & boardSpcs )
-{
-  
-  m_logic->setBoardSpecs ( boardSpcs );
-  
-}
-
-void TTULogicUnit::run( const TTUInput & input )
+void TTULogicUnit::run( const TTUInput & _input )
 {
  
-  m_logic->process( input );
- 
-}
-
-void TTULogicUnit::run( const TTUInput & input , int option )
-{
-  m_logic->setOption( option );
-  m_logic->process( input );
+  m_logic->process( _input );
  
 }

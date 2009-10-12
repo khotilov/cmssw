@@ -16,7 +16,7 @@
 //
 // Original Author:  Piotr Traczyk, CERN
 //         Created:  Mon Mar 16 12:27:22 CET 2009
-// $Id: MuonTimingFiller.h,v 1.1 2009/03/27 02:26:41 ptraczyk Exp $
+// $Id: MuonTimingFiller.h,v 1.1 2009/03/26 23:23:10 ptraczyk Exp $
 //
 //
 
@@ -35,7 +35,6 @@
 
 #include "DataFormats/MuonReco/interface/MuonTimeExtra.h"
 #include "RecoMuon/MuonIdentification/interface/DTTimingExtractor.h"
-#include "RecoMuon/MuonIdentification/interface/CSCTimingExtractor.h"
 
 
 //
@@ -53,7 +52,6 @@ class MuonTimingFiller {
       void rawFit(double &a, double &da, double &b, double &db, const vector<double> hitsx, const vector<double> hitsy);
       
       DTTimingExtractor* theDTTimingExtractor_;
-      CSCTimingExtractor* theCSCTimingExtractor_;
 
 };
 

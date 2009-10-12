@@ -81,10 +81,6 @@ allLayer1Electrons = cms.EDProducer("PATElectronProducer",
     # resolution configurables
     addResolutions   = cms.bool(False),
     resolutions      = cms.PSet(),
-
-    # high level selections
-    embedHighLevelSelection = cms.bool(True),
-    beamLineSrc             = cms.InputTag("offlineBeamSpot")
 )
 
 

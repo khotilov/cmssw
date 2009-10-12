@@ -5,17 +5,13 @@
 #include <ctime>
 #include <sys/time.h>
 #include <string>
-// FIXME incompatible with coral
-// #define BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG
+#define BOOST_DATE_TIME_POSIX_TIME_STD_CONFIG
 #include "boost/date_time/posix_time/posix_time.hpp"
 
 namespace cond {
 
 
   namespace time {
-
-    
-    typedef boost::date_time::subsecond_duration<boost::posix_time::time_duration,1000000000> nanoseconds;
 
 
     // valid for all representations
@@ -34,26 +30,20 @@ namespace cond {
 
     // for real time 
 
-    unsigned int itsNanoseconds(boost::posix_time::time_duration const & td) {
-      return boost::posix_time::time_duration::num_fractional_digits() == 6 ? 
-	1000*td.fractional_seconds() : td.fractional_seconds();
-    }
-
-
     const boost::posix_time::ptime time0 =
       boost::posix_time::from_time_t(0);
     
     inline boost::posix_time::ptime to_boost(Time_t iValue) {
       return time0 +  
 	boost::posix_time::seconds( iValue >> 32) + 
-	nanoseconds(kLowMask & iValue);
+	boost::posix_time::nanoseconds(kLowMask & iValue);
     }
     
     
     inline Time_t from_boost(boost::posix_time::ptime bt) {
       boost::posix_time::time_duration td = bt - time0;
       Time_t t = td.total_seconds();
-      return (t << 32) + itsNanoseconds(td);
+      return (t << 32) + td.fractional_seconds();
 
     } 
 

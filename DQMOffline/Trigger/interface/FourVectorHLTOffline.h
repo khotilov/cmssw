@@ -19,7 +19,7 @@
 // Rewritten by: Vladimir Rekovic
 //         Date:  May 2009
 //
-// $Id: FourVectorHLTOffline.h,v 1.26 2009/07/10 01:16:37 rekovic Exp $
+// $Id: FourVectorHLTOffline.h,v 1.28 2009/08/30 23:31:55 rekovic Exp $
 //
 //
 
@@ -167,6 +167,7 @@ class FourVectorHLTOffline : public edm::EDAnalyzer {
 
       std::string dirname_;
       std::string processname_;
+      std::string muonRecoCollectionName_;
       bool monitorDaemon_;
       int theHLTOutputType;
       edm::InputTag triggerSummaryLabel_;
@@ -938,6 +939,7 @@ void objMonData<T>::monitorOnline(const trigger::Vids & idtype, const trigger::K
 			v_->getNOnHisto()->Fill(NOn);
 			v_->getNOnOffUMHisto()->Fill(NOnOffUM);
 			v_->getNL1OnUMHisto()->Fill(NOnL1UM);
+      LogTrace("FourVectorHLTOffline") << "NOn = " << NOn << endl;
 
 }
 
@@ -947,8 +949,12 @@ void objMonData<T>::fillL1OffMatch(FourVectorHLTOffline* fv)
 
   float NL1Off=0;
 
-  if(L1OffDRMatchSet.size() > 1) fv->cleanDRMatchSet(L1OffDRMatchSet);
+  if(L1OffDRMatchSet.size() > 1) {
+	
+    LogDebug("FourVectorHLTOffline") << " Cleaning L1Off mmset" << endl;
+	  fv->cleanDRMatchSet(L1OffDRMatchSet);
 
+	}
 	// clean the set L1-Off
 	// now fill histos
   for ( mmset::iterator setIter = L1OffDRMatchSet.begin( ); setIter != L1OffDRMatchSet.end( ); setIter++ ) 
@@ -1001,7 +1007,12 @@ void objMonData<T>::fillOnOffMatch(FourVectorHLTOffline* fv)
   unsigned int NOnOff=0;
 
 	// clean the set L1-Off
-  if(OnOffDRMatchSet.size() > 1) fv->cleanDRMatchSet(OnOffDRMatchSet);
+  if(OnOffDRMatchSet.size() > 1){
+	
+    LogDebug("FourVectorHLTOffline") << " Cleaning OnOff mmset" << endl;
+	  fv->cleanDRMatchSet(OnOffDRMatchSet);
+
+	}
 	// now fill histos
   for ( mmset::iterator setIter = OnOffDRMatchSet.begin( ); setIter != OnOffDRMatchSet.end( ); setIter++ ) 
   {
@@ -1056,7 +1067,12 @@ void objMonData<T>::fillOnL1Match(FourVectorHLTOffline* fv, const trigger::Keys 
   unsigned int NOnL1=0;
 
 	// clean the set On-L1
-	if(OnL1DRMatchSet.size() > 1) fv->cleanDRMatchSet(OnL1DRMatchSet);
+	if(OnL1DRMatchSet.size() > 1) {
+	
+    LogDebug("FourVectorHLTOffline") << " Cleaning L1On mmset" << endl;
+	  fv->cleanDRMatchSet(OnL1DRMatchSet);
+
+	}
 	// now fill histos
   for ( mmset::iterator setIter = OnL1DRMatchSet.begin( ); setIter != OnL1DRMatchSet.end( ); setIter++ ) 
   {

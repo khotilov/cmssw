@@ -38,10 +38,6 @@ SiStripBaseCondObjDQM::SiStripBaseCondObjDQM(const edm::EventSetup & eSetup,
   //The OR of the two conditions allow to switch on this feature for all the components (if the FillConditions_PSet has the TkMap_On =true) or for single MEs (if the PSet for a ME has the TkMap_On =true)
   if(fPSet_.getParameter<bool>("TkMap_On") || hPSet_.getParameter<bool>("TkMap_On")) bookTkMap(hPSet_.getParameter<std::string>("TkMapName"));
 
-
-  minValue=hPSet_.getParameter<double>("minValue");
-  maxValue=hPSet_.getParameter<double>("maxValue");
-
 }
 // -----
 
@@ -73,7 +69,7 @@ void SiStripBaseCondObjDQM::analysis(const edm::EventSetup & eSetup_){
     sprintf(sRun,"_Run_%d",eSetup_.iovSyncValue().eventID().run());
     filename.insert(filename.find("."),sRun);
     
-    saveTkMap(filename.c_str(), minValue, maxValue);
+    saveTkMap(filename.c_str(), hPSet_.getParameter<double>("minValue"), hPSet_.getParameter<double>("maxValue"));
   }
 }
 // -----
@@ -1200,40 +1196,7 @@ void SiStripBaseCondObjDQM::fillTkMap(const uint32_t& detid, const float& value)
 }
 
 //==========================
-void SiStripBaseCondObjDQM::saveTkMap(const std::string& TkMapname, double minValue, double maxValue){
-  if(tkMapScaler.size()!=0){
-    //check that saturation is below x%  below minValue and above minValue, and in case re-arrange.
-    float th=hPSet_.getParameter<double>("saturatedFraction");
-
-    size_t i,imin=0,imax=0;
-    float entries=0 ;
-    for(i=0;i<tkMapScaler.size();++i)
-      entries+=tkMapScaler[i];
-
-    float min=0 ;
-    for(i=0;i<tkMapScaler.size() & min<th;++i){
-      min+=tkMapScaler[i]/entries;
-      imin=i;
-    }
-
-    float max=0;
-    for(i=tkMapScaler.size()-1;i>=0 & max<th;--i){
-      max+=tkMapScaler[i]/entries;
-      imax=i;
-    }
-    
-    //reset maxValue;
-    if(maxValue<imax){
-      edm::LogInfo("")<< "Resetting TkMap maxValue from " << maxValue << " to " << imax;
-      maxValue=imax;
-    }
-    //reset minValue;
-    if(minValue>imin){
-      edm::LogInfo("")<< "Resetting TkMap minValue from " << minValue << " to " << imin;
-      minValue=imin;
-    }
-  }
-
+void SiStripBaseCondObjDQM::saveTkMap(const std::string& TkMapname, const double& minValue, const double& maxValue){
   tkMap->save(false, minValue, maxValue, TkMapname.c_str());
   tkMap->setPalette(1); tkMap->showPalette(true);
 

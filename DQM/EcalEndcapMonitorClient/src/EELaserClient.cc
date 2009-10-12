@@ -1,8 +1,8 @@
 /*
  * \file EELaserClient.cc
  *
- * $Date: 2009/08/03 23:44:22 $
- * $Revision: 1.110 $
+ * $Date: 2009/08/26 18:12:24 $
+ * $Revision: 1.114 $
  * \author G. Della Ricca
  * \author G. Franzoni
  *
@@ -599,6 +599,19 @@ void EELaserClient::setup(void) {
 
     for ( int i = 1; i <= 10; i++ ) {
 
+        if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 6. );
+        if ( meg06_[ism-1] ) meg06_[ism-1]->setBinContent( i, 1, 6. );
+        if ( meg07_[ism-1] ) meg07_[ism-1]->setBinContent( i, 1, 6. );
+        if ( meg08_[ism-1] ) meg08_[ism-1]->setBinContent( i, 1, 6. );
+        if ( meg09_[ism-1] ) meg09_[ism-1]->setBinContent( i, 1, 6. );
+        if ( meg10_[ism-1] ) meg10_[ism-1]->setBinContent( i, 1, 6. );
+        if ( meg11_[ism-1] ) meg11_[ism-1]->setBinContent( i, 1, 6. );
+        if ( meg12_[ism-1] ) meg12_[ism-1]->setBinContent( i, 1, 6. );
+
+        // non-existing mem
+        if ( (ism >=  3 && ism <=  4) || (ism >=  7 && ism <=  9) ) continue;
+        if ( (ism >= 12 && ism <= 13) || (ism >= 16 && ism <= 18) ) continue;
+
         if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 2. );
         if ( meg06_[ism-1] ) meg06_[ism-1]->setBinContent( i, 1, 2. );
         if ( meg07_[ism-1] ) meg07_[ism-1]->setBinContent( i, 1, 2. );
@@ -846,11 +859,9 @@ void EELaserClient::cleanup(void) {
 
 }
 
-bool EELaserClient::writeDb(EcalCondDBInterface* econn, RunIOV* runiov, MonRunIOV* moniov, bool& status, bool flag) {
+bool EELaserClient::writeDb(EcalCondDBInterface* econn, RunIOV* runiov, MonRunIOV* moniov, bool& status) {
 
   status = true;
-
-  if ( ! flag ) return false;
 
   EcalLogicID ecid;
 
@@ -2295,7 +2306,7 @@ void EELaserClient::analyze(void) {
 
             EcalLogicID ecid = m->first;
 
-            int itt = Numbers::iTT(ism, EcalEndcap, ix, iy);
+            int itt = Numbers::iSC(ism, EcalEndcap, ix, iy);
 
             if ( ecid.getLogicID() == LogicID::getEcalLogicID("EE_readout_tower", Numbers::iSM(ism, EcalEndcap), itt).getLogicID() ) {
               if ( (m->second).getErrorBits() & bits01 ) {
@@ -2313,6 +2324,19 @@ void EELaserClient::analyze(void) {
     }
 
     for ( int i = 1; i <= 10; i++ ) {
+
+      if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg06_[ism-1] ) meg06_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg07_[ism-1] ) meg07_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg08_[ism-1] ) meg08_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg09_[ism-1] ) meg09_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg10_[ism-1] ) meg10_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg11_[ism-1] ) meg11_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg12_[ism-1] ) meg12_[ism-1]->setBinContent( i, 1, 6. );
+
+      // non-existing mem
+      if ( (ism >=  3 && ism <=  4) || (ism >=  7 && ism <=  9) ) continue;
+      if ( (ism >= 12 && ism <= 13) || (ism >= 16 && ism <= 18) ) continue;
 
       if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 2. );
       if ( meg06_[ism-1] ) meg06_[ism-1]->setBinContent( i, 1, 2. );
@@ -2576,10 +2600,6 @@ void EELaserClient::analyze(void) {
     }
 
   }
-
-}
-
-void EELaserClient::softReset(bool flag) {
 
 }
 

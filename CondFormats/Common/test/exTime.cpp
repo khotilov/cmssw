@@ -7,10 +7,6 @@
 int main() {
 
   {
-
-    std::cout << "boost frac digits " 
-	      << boost::posix_time::time_duration::num_fractional_digits()
-	      << std::endl;
     ::timeval stv;
     ::gettimeofday(&stv,0);
     
@@ -35,10 +31,9 @@ int main() {
     std::cout << "ns " << td.total_nanoseconds()  << std::endl;
     std::cout << std::endl;
     
-    // FIXME (when agree with Coral)
-    //bt +=  boost::posix_time::nanoseconds(19*25);
-    bt +=  cond::time::nanoseconds(19*25);
-
+    
+    bt +=  boost::posix_time::nanoseconds(19*25);
+   
     td = bt - cond::time::time0;
  
     

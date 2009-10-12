@@ -1,8 +1,6 @@
 #include <iostream>
 
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "SimDataFormats/GeneratorProducts/interface/GenRunInfoProduct.h"
 
 // essentials !!!
 #include "FWCore/Framework/interface/Event.h"
@@ -27,7 +25,6 @@ class HZZ4muAnalyzer : public edm::EDAnalyzer
       
       virtual void analyze( const edm::Event&, const edm::EventSetup& ) ;
       virtual void beginJob( const edm::EventSetup& ) ;
-      virtual void endRun( const edm::Run&, const edm::EventSetup& ) ;
       virtual void endJob() ;
 
    private:
@@ -62,16 +59,6 @@ void HZZ4muAnalyzer::beginJob( const EventSetup& )
 void HZZ4muAnalyzer::analyze( const Event& e, const EventSetup& )
 {
   
-  // here's an example of accessing GenEventInfoProduct
-  Handle< GenEventInfoProduct > GenInfoHandle;
-  e.getByLabel( "generator", GenInfoHandle );
-  double qScale = GenInfoHandle->qScale();
-  double pthat = ( GenInfoHandle->hasBinningValues() ? 
-                  (GenInfoHandle->binningValues())[0] : 0.0);
-  cout << " qScale = " << qScale << " pthat = " << pthat << endl;
-  
-  // here's an example of accessing particles in the event record (HepMCProduct)
-  //
   Handle< HepMCProduct > EvtHandle ;
   
   // find initial (unsmeared, unfiltered,...) HepMCProduct
@@ -243,14 +230,6 @@ void HZZ4muAnalyzer::analyze( const Event& e, const EventSetup& )
    return ;
    
 }
-
-void HZZ4muAnalyzer::endRun( const edm::Run& r, const edm::EventSetup& )
-{
-
-   return;
-
-}
-
 
 void HZZ4muAnalyzer::endJob()
 {

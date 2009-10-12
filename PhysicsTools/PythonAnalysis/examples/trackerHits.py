@@ -2,9 +2,6 @@
 from PhysicsTools.PythonAnalysis import *
 from ROOT import *
 
-gSystem.Load("libFWCoreFWLite.so")
-AutoLibraryLoader.enable()
-
 # opening file
 events = EventTree("simevent.root")
 

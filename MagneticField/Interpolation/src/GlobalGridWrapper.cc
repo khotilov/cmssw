@@ -48,10 +48,10 @@ MFGrid::LocalPoint GlobalGridWrapper::fromGridFrame( double a, double b, double 
   return LocalPoint( 0, 0, 0);
 }
 
-Dimensions GlobalGridWrapper::dimensions() const
+vector<int> GlobalGridWrapper::dimensions() const
 {
   throw MagLogicError ("GlobalGridWrapper::dimensions not implemented yet");
-  return Dimensions();
+  return vector<int>();
 }
 
 MFGrid::LocalPoint GlobalGridWrapper::nodePosition( int i, int j, int k) const

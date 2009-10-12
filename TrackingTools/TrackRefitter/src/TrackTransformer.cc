@@ -160,12 +160,13 @@ vector<Trajectory> TrackTransformer::transform(const reco::Track& newTrack) cons
   // Build the transient Rechits
   TransientTrackingRecHit::ConstRecHitContainer recHitsForReFit = getTransientRecHits(track);
 
-  return transform(track, recHitsForReFit);
+  return transform(newTrack, track, recHitsForReFit);
 }
 
 
 /// Convert Tracks into Trajectories with a given set of hits
-vector<Trajectory> TrackTransformer::transform(const reco::TransientTrack track,
+vector<Trajectory> TrackTransformer::transform(const reco::Track& newTrack, 
+                                               const reco::TransientTrack track,
                                                TransientTrackingRecHit::ConstRecHitContainer recHitsForReFit) const {
   
   const std::string metname = "Reco|TrackingTools|TrackTransformer";
@@ -235,17 +236,17 @@ vector<Trajectory> TrackTransformer::transform(const reco::TransientTrack track,
     
   // Apply rule -B-
   TrajectoryStateOnSurface firstTSOS = track.innermostMeasurementState();
-  unsigned int innerId = track.track().innerDetId();
+  unsigned int innerId = newTrack.innerDetId();
   if(theRefitDirection.propagationDirection() != anyDirection){
     if(propagationDirection == oppositeToMomentum){
-      innerId   = track.track().outerDetId();
+      innerId   = newTrack.outerDetId();
       firstTSOS = track.outermostMeasurementState();
     }
   }
   else { // if(theRefitDirection.propagationDirection() == anyDirection)
     // Apply rule -B0-
     if(theRefitDirection.geometricalDirection() == RefitDirection::outsideIn){
-      innerId   = track.track().outerDetId();
+      innerId   = newTrack.outerDetId();
       firstTSOS = track.outermostMeasurementState();
     }
     // -B0-

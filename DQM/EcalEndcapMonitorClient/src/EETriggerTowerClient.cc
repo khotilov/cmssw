@@ -1,8 +1,8 @@
 /*
  * \file EETriggerTowerClient.cc
  *
- * $Date: 2009/02/27 19:14:42 $
- * $Revision: 1.84 $
+ * $Date: 2009/08/23 20:07:16 $
+ * $Revision: 1.88 $
  * \author G. Della Ricca
  * \author F. Cossutti
  *
@@ -184,11 +184,9 @@ void EETriggerTowerClient::cleanup(void) {
 
 }
 
-bool EETriggerTowerClient::writeDb(EcalCondDBInterface* econn, RunIOV* runiov, MonRunIOV* moniov, bool& status, bool flag) {
+bool EETriggerTowerClient::writeDb(EcalCondDBInterface* econn, RunIOV* runiov, MonRunIOV* moniov, bool& status) {
 
   status = true;
-
-  if ( ! flag ) return false;
 
   for ( unsigned int i=0; i<superModules_.size(); i++ ) {
 
@@ -222,12 +220,12 @@ void EETriggerTowerClient::analyze(void) {
 
     int ism = superModules_[i];
 
-    sprintf(histo, (prefixME_ + "/EETriggerTowerClient/EETTT EmulError %s").c_str(), Numbers::sEE(ism).c_str());
+    sprintf(histo, (prefixME_ + "/EETriggerTowerTask/EETTT EmulError %s").c_str(), Numbers::sEE(ism).c_str());
     me = dqmStore_->get(histo);
     l01_[ism-1] = UtilsClient::getHisto<TH2F*>( me, cloneME_, l01_[ism-1] );
     mel01_[ism-1] = me;
 
-    sprintf(histo, (prefixME_ + "/%s/EETTT EmulMatch %s").c_str(), Numbers::sEE(ism).c_str());
+    sprintf(histo, (prefixME_ + "/EETriggerTowerTask/EETTT EmulMatch %s").c_str(), Numbers::sEE(ism).c_str());
     me = dqmStore_->get(histo);
     o01_[ism-1] = UtilsClient::getHisto<TH3F*>( me, cloneME_, o01_[ism-1] );
     meo01_[ism-1] = me;
@@ -238,8 +236,8 @@ void EETriggerTowerClient::analyze(void) {
     for (int ix = 1; ix <= 50; ix++) {
       for (int iy = 1; iy <= 50; iy++) {
 
-        int jx = ix + Numbers::ix0EE(ism);
-        int jy = iy + Numbers::iy0EE(ism);
+//         int jx = ix + Numbers::ix0EE(ism);
+//         int jy = iy + Numbers::iy0EE(ism);
 
         if ( o01_[ism-1] ) {
           // find the most frequent TP timing that matches the emulator
@@ -247,7 +245,7 @@ void EETriggerTowerClient::analyze(void) {
           double max=0;
           double total=0;
           for (int j=0; j<6; j++) {
-            double sampleEntries = o01_[ism-1]->GetBinContent(jx, jy, j+1);
+            double sampleEntries = o01_[ism-1]->GetBinContent(ix, iy, j+1);
             if(sampleEntries > max) {
               index=j;
               max = sampleEntries;
@@ -255,21 +253,20 @@ void EETriggerTowerClient::analyze(void) {
             total += sampleEntries;
           }
           if ( max > 0 ) {
-            if ( index == 0 ) me_o01_[ism-1]->setBinContent(jx, jy, -1);
-            else me_o01_[ism-1]->setBinContent(jx, jy, index );
+            if ( index == 0 ) {
+              me_o01_[ism-1]->setBinContent(ix, iy, -1);
+            } else {
+              me_o01_[ism-1]->setBinContent(ix, iy, index );
+            }
           }
           double fraction = (total > 0) ? 1.0 - max/total : 0.;
-          if ( me_o02_[ism-1] ) me_o02_[ism-1]->setBinContent(jx, jy, fraction);
+          if ( me_o02_[ism-1] ) me_o02_[ism-1]->setBinContent(ix, iy, fraction);
         }
 
       }
     }
 
   }
-
-}
-
-void EETriggerTowerClient::softReset(bool flag) {
 
 }
 

@@ -24,7 +24,7 @@ MFGrid::LocalVector ZReflectedMFGrid::valueInTesla( const LocalPoint& p) const
   return LocalVector( -mirrorB.x(), -mirrorB.y(), mirrorB.z());
 }
 
-void ZReflectedMFGrid::throwUp( const char* message) const
+void ZReflectedMFGrid::throwUp( const std::string& message) const
 {
   std::cout << "Throwing exception " << message << std::endl;
   throw MagGeometryError(message);
@@ -40,7 +40,7 @@ MFGrid::LocalPoint ZReflectedMFGrid::fromGridFrame( double a, double b, double c
   return LocalPoint();
 }
 
-Dimensions ZReflectedMFGrid::dimensions() const {return theSectorGrid->dimensions();}
+vector<int> ZReflectedMFGrid::dimensions() const {return theSectorGrid->dimensions();}
 
 MFGrid::LocalPoint  ZReflectedMFGrid::nodePosition( int i, int j, int k) const
 {

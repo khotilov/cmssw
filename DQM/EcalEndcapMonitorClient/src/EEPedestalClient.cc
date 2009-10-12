@@ -1,8 +1,8 @@
 /*
  * \file EEPedestalClient.cc
  *
- * $Date: 2009/07/27 10:34:47 $
- * $Revision: 1.87 $
+ * $Date: 2009/08/26 18:12:24 $
+ * $Revision: 1.91 $
  * \author G. Della Ricca
  * \author F. Cossutti
  *
@@ -372,6 +372,13 @@ void EEPedestalClient::setup(void) {
 
     for ( int i = 1; i <= 10; i++ ) {
 
+      if ( meg04_[ism-1] ) meg04_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 6. );
+
+      // non-existing mem
+      if ( (ism >=  3 && ism <=  4) || (ism >=  7 && ism <=  9) ) continue;
+      if ( (ism >= 12 && ism <= 13) || (ism >= 16 && ism <= 18) ) continue;
+
       if ( meg04_[ism-1] ) meg04_[ism-1]->setBinContent( i, 1, 2. );
       if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 2. );
 
@@ -515,11 +522,9 @@ void EEPedestalClient::cleanup(void) {
 
 }
 
-bool EEPedestalClient::writeDb(EcalCondDBInterface* econn, RunIOV* runiov, MonRunIOV* moniov, bool& status, bool flag) {
+bool EEPedestalClient::writeDb(EcalCondDBInterface* econn, RunIOV* runiov, MonRunIOV* moniov, bool& status) {
 
   status = true;
-
-  if ( ! flag ) return false;
 
   EcalLogicID ecid;
 
@@ -977,7 +982,7 @@ void EEPedestalClient::analyze(void) {
 
             EcalLogicID ecid = m->first;
 
-            int itt = Numbers::iTT(ism, EcalEndcap, ix, iy);
+            int itt = Numbers::iSC(ism, EcalEndcap, ix, iy);
 
             if ( ecid.getLogicID() == LogicID::getEcalLogicID("EE_readout_tower", Numbers::iSM(ism, EcalEndcap), itt).getLogicID() ) {
               if ( (m->second).getErrorBits() & bits01 ) {
@@ -1000,6 +1005,13 @@ void EEPedestalClient::analyze(void) {
     // PN diodes
 
     for ( int i = 1; i <= 10; i++ ) {
+
+      if ( meg04_[ism-1] ) meg04_[ism-1]->setBinContent( i, 1, 6. );
+      if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 6. );
+
+      // non-existing mem
+      if ( (ism >=  3 && ism <=  4) || (ism >=  7 && ism <=  9) ) continue;
+      if ( (ism >= 12 && ism <= 13) || (ism >= 16 && ism <= 18) ) continue;
 
       if ( meg04_[ism-1] ) meg04_[ism-1]->setBinContent( i, 1, 2. );
       if ( meg05_[ism-1] ) meg05_[ism-1]->setBinContent( i, 1, 2. );
@@ -1227,10 +1239,6 @@ void EEPedestalClient::analyze(void) {
 #endif
 
   }
-
-}
-
-void EEPedestalClient::softReset(bool flag) {
 
 }
 

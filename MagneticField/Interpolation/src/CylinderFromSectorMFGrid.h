@@ -17,7 +17,7 @@ public:
 
   virtual LocalPoint fromGridFrame( double a, double b, double c) const ;
 
-  virtual Dimensions dimensions() const;
+  virtual std::vector<int> dimensions() const ;
 
   virtual LocalPoint  nodePosition( int i, int j, int k) const ;
 
@@ -31,7 +31,7 @@ private:
   MFGrid* theSectorGrid;
   double  theDelta;
 
-  void throwUp( const char *message) const;
+  void throwUp( const std::string& message) const;
 
 };
 

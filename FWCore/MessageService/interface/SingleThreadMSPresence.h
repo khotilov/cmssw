@@ -17,12 +17,13 @@ public:
   ~SingleThreadMSPresence();
 
   // --- Access to the scribe
-  // REMOVED AbstractMLscribe * scribe_ptr() { return &m; }  
+  AbstractMLscribe * scribe_ptr() { return &m; }  
 
 private:
   // --- no copying:
   SingleThreadMSPresence(SingleThreadMSPresence const &);
   void  operator = (SingleThreadMSPresence const &);
+  MessageLoggerScribe m; 
   
 };  // SingleThreadMSPresence
 

@@ -10,6 +10,8 @@ such code sees the Run class, which is a proxy for RunPrincipal.
 The major internal component of the RunPrincipal
 is the DataBlock.
 
+$Id: RunPrincipal.h,v 1.28 2009/04/15 23:22:30 wmtan Exp $
+
 ----------------------------------------------------------------------*/
 
 #include "boost/shared_ptr.hpp"
@@ -65,22 +67,17 @@ namespace edm {
     void put(boost::shared_ptr<EDProduct> edp,
 	     ConstBranchDescription const& bd, std::auto_ptr<ProductProvenance> productProvenance);
 
-    void addGroupScheduled(ConstBranchDescription const& bd);
+    void addGroup(ConstBranchDescription const& bd);
 
-    void addGroupSource(ConstBranchDescription const& bd);
+    void addGroup(boost::shared_ptr<EDProduct> prod, ConstBranchDescription const& bd, std::auto_ptr<ProductProvenance> productProvenance);
 
-    void addGroup(ConstBranchDescription const& bd, bool dropped = false);
-
-    void addGroupIfNeeded(ConstBranchDescription const& bd);
-
-    void addToGroup(boost::shared_ptr<EDProduct> prod, ConstBranchDescription const& bd,
-	 std::auto_ptr<ProductProvenance> productProvenance);
+    void addGroup(ConstBranchDescription const& bd, std::auto_ptr<ProductProvenance> productProvenance);
 
     void swap(RunPrincipal&);
 
   private:
 
-    void addOrReplaceGroup(std::auto_ptr<Group> g);
+    virtual void addOrReplaceGroup(std::auto_ptr<Group> g);
 
     virtual ProcessHistoryID const& processHistoryID() const {return aux().processHistoryID_;}
 

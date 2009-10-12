@@ -36,7 +36,7 @@ MFGrid::LocalVector CylinderFromSectorMFGrid::valueInTesla( const LocalPoint& p)
   }
 }
 
-void CylinderFromSectorMFGrid::throwUp( const char *message) const
+void CylinderFromSectorMFGrid::throwUp( const std::string& message) const
 {
   std::cout << "Throwing exception " << message << std::endl;
   throw MagGeometryError(message);
@@ -52,8 +52,7 @@ MFGrid::LocalPoint CylinderFromSectorMFGrid::fromGridFrame( double a, double b, 
   return LocalPoint();
 }
 
-Dimensions CylinderFromSectorMFGrid::dimensions() const 
-{return theSectorGrid->dimensions();}
+std::vector<int> CylinderFromSectorMFGrid::dimensions() const {return theSectorGrid->dimensions();}
 
 MFGrid::LocalPoint  CylinderFromSectorMFGrid::nodePosition( int i, int j, int k) const
 {

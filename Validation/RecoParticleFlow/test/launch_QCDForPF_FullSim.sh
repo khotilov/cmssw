@@ -2,7 +2,7 @@
 #!/bin/sh
 
 castorDir=/castor/cern.ch/user/p/pjanot/CMSSW312/
-cmsswDir=$CMSSW_BASE/src
+cmsswDir=/afs/cern.ch/user/p/pjanot/scratch0/CMSSW_3_1_2/src
 
 for ((job=0;job<90;job++));
   do
@@ -36,7 +36,7 @@ cmsRun TEST_cfg.py >& log
 
 rfcp display.root $castorDir$displayfilename
 rfcp aod.root $castorDir$aodfilename
-rfcp reco.root $castorDir$recofilename
+#rfcp reco.root $castorDir$recofilename
 
 EOF
 chmod 755 job_${name}.sh

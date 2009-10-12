@@ -4,7 +4,6 @@ process = cms.Process("PROD")
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(300)
-#    input = cms.untracked.int32(2)
 )
 
 #generation
@@ -48,7 +47,7 @@ process.load("Configuration.StandardSequences.Generator_cff")
 process.load("Configuration.StandardSequences.Simulation_cff")
 
 process.RandomNumberGeneratorService.generator.initialSeed= ==SEED==
-
+#process.RandomNumberGeneratorService.theSource.initialSeed= 1414
 
 # please note the IMPORTANT: 
 # in order to operate Digis, one needs to include Mixing module 
@@ -118,7 +117,7 @@ process.p4 = cms.Path(process.DigiToRaw)
 process.p5= cms.Path(process.RawToDigi)
 process.p6= cms.Path(process.reconstruction+process.particleFlowSimParticle)
 #process.outpath = cms.EndPath(process.aod+process.reco+process.display)
-process.outpath = cms.EndPath(process.aod+process.reco+process.display)
+process.outpath = cms.EndPath(process.aod+process.display)
 process.schedule = cms.Schedule(process.p0,process.p1,process.p2,process.p3,process.p4,process.p5,process.p6,process.outpath)
 
 

@@ -5,8 +5,8 @@
  *
  *  Generic virtual implementation of a MFGrid for a 3D underlying regular grid.
  *
- *  $Date: 2008/04/09 19:37:23 $
- *  $Revision: 1.7 $
+ *  $Date: $
+ *  $Revision: $
  *  \author T. Todorov
  */
 
@@ -21,12 +21,12 @@ public:
   explicit MFGrid3D( const GloballyPositioned<float>& vol) : MFGrid(vol) {}
 
 
-  virtual Dimensions dimensions(void) const {
-    Dimensions tmp;
-    tmp.w = grid_.grida().nodes();
-    tmp.h = grid_.gridb().nodes();
-    tmp.d = grid_.gridc().nodes();
-    return tmp;
+  virtual std::vector<int> dimensions() const {
+    std::vector<int> result(3);
+    result[0] = grid_.grida().nodes();
+    result[1] = grid_.gridb().nodes();
+    result[2] = grid_.gridc().nodes();
+    return result;
   }
     
   /// Position of node in local frame
@@ -40,13 +40,13 @@ public:
     return MFGrid::LocalVector(grid_( i, j, k));
   }
 
-  virtual Indexes index( const LocalPoint& p) const {
-    Indexes result;
+  virtual std::vector<int> index( const LocalPoint& p) const {
+    std::vector<int> result(3);
     double a, b, c;
     toGridFrame( p, a, b, c);
-    result.i = grid_.grida().index(a);
-    result.j = grid_.gridb().index(b);
-    result.k = grid_.gridc().index(c);
+    result[0] = grid_.grida().index(a);
+    result[1] = grid_.gridb().index(b);
+    result[2] = grid_.gridc().index(c);
     return result;
   }
 

@@ -3,8 +3,8 @@
 
 #include <map>
 /* #include <iostream> */
-#include <DetectorDescription/Base/interface/rep_type.h>
-#include <FWCore/MessageLogger/interface/MessageLogger.h>
+#include "DetectorDescription/Base/interface/rep_type.h"
+
 //;
 //FIXME: Store : implement readOnly-behaviour ..
 namespace DDI {
@@ -77,10 +77,6 @@ namespace DDI {
    
    // clear all objects
    void clear();
-
- // swap moves the registry from this guy to another of the same 
- // type
- void swap ( registry_type& ) ; 
    
    bool isDefined(const name_type & n ) const;
    void setReadOnly(bool b) { readOnly_ = b; }
@@ -88,11 +84,10 @@ namespace DDI {
    
    Store() : readOnly_(false) { }
    ~Store();
-
  protected:
-   registry_type reg_;
    Store(const Store &);
    Store & operator=(const Store &);
+   registry_type reg_;
    bool readOnly_;
  };
 
@@ -125,8 +120,6 @@ Store<N,I,K>::clear()
    std::pair<typename registry_type::iterator,bool> result 
      = reg_.insert(std::make_pair(n,tmp));
    if (result.second) {
-     if (readOnly_) throw cms::Exception("DetectorDescriptionStore")<<" Store has been locked.  Illegal attempt to add " << n << " to a global store."; 
-     // ELSE     
      result.first->second = new Rep_type(n,(I)0);
    }
    return result.first->second;    
@@ -137,21 +130,19 @@ Store<N,I,K>::clear()
  typename Store<N,I,K>::prep_type 
  Store<N,I,K>::create(const name_type & n, 
                       pimpl_type p)
- {			
-   if (readOnly_) throw cms::Exception("DetectorDescriptionStore")<<" Store has been locked.  Illegal attempt to add " << n << " to a global store."; 
-   // ELSE     
+ {					  
    prep_type tmp = 0;
-   std::pair<typename registry_type::iterator,bool> result 
-     = reg_.insert(std::make_pair(n,tmp));
-   if (!result.second) {
-     delete result.first->second->second;
-     result.first->second->second = p;
-     //delete result.first->second->swap(p);
-   }
-   else {
-     result.first->second = new Rep_type(n,p);
-   }
-   return result.first->second;
+     std::pair<typename registry_type::iterator,bool> result 
+       = reg_.insert(std::make_pair(n,tmp));
+     if (!result.second) {
+       delete result.first->second->second;
+       result.first->second->second = p;
+       //delete result.first->second->swap(p);
+     }
+     else {
+       result.first->second = new Rep_type(n,p);
+     }
+     return result.first->second;
  }
 
  
@@ -159,7 +150,6 @@ Store<N,I,K>::clear()
  typename Store<N,I,K>::prep_type 
  Store<N,I,K>::create(typename Store<N,I,K>::pimpl_type p)
  {					  
-   if (readOnly_) throw cms::Exception("DetectorDescriptionStore")<<" Store has been locked.  Illegal attempt to add " << name_type() << " to a global store."; 
     return new Rep_type(name_type(),p);
  }
 
@@ -178,7 +168,6 @@ Store<N,I,K>::clear()
 template<class N, class I, class K>
 bool Store<N,I,K>::isDefined(const name_type & n ) const
 {
-  if (readOnly_) edm::LogWarning("DetectorDescriptionStore") << " Store is locked and most likely empty.  isDefined will be false.";
   typename registry_type::const_iterator it = reg_.find(n);
   bool result(false);
   if (it != reg_.end()) {
@@ -189,10 +178,7 @@ bool Store<N,I,K>::isDefined(const name_type & n ) const
   return result;
 }
 
-template<class N, class I, class K>
-void Store<N, I, K>::swap ( registry_type& regtoreceive ) {
-  reg_.swap(regtoreceive);
-}
+
 }
 
 #endif

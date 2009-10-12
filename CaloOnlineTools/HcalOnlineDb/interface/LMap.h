@@ -19,7 +19,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Tue Nov 06 14:30:33 CDT 2007
-// $Id: LMap.h,v 1.5 2009/08/04 22:25:17 kukartse Exp $
+// $Id: LMap.h,v 1.3 2008/04/16 13:31:25 kukartse Exp $
 //
 
 // system include files
@@ -30,7 +30,6 @@
 
 #include "CaloOnlineTools/HcalOnlineDb/interface/ConfigurationDatabase.hh"
 #include "DataFormats/HcalDetId/interface/HcalSubdetector.h"
-#include "CondFormats/HcalObjects/interface/HcalElectronicsMap.h"
 
 using namespace std;
 using namespace boost;
@@ -100,7 +99,6 @@ class EMap
  public:
   EMap(){}
   EMap( std::string filename ){ read_map(filename); }
-  EMap( const HcalElectronicsMap * map );
   ~EMap(){}
 
   class EMapRow
@@ -108,10 +106,6 @@ class EMap
   public:
     int rawId,crate,slot,dcc,spigot,fiber,fiberchan,ieta,iphi,idepth;
     string topbottom,subdet;
-    // ZDC channels:
-    // section: ZDC EM, ZDC HAD, ZDC LUM(?)
-    int zdc_zside,zdc_channel;
-    string zdc_section;
     
     EMapRow(){
       rawId=0;
@@ -126,9 +120,6 @@ class EMap
       idepth=0;
       topbottom="";
       subdet="";
-      zdc_zside=0;
-      zdc_channel = 0;
-      zdc_section = "UNKNOWN";
     }
     ~EMapRow(){};  
 

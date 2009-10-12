@@ -6,11 +6,6 @@
 #include "CalibFormats/HcalObjects/interface/HcalTPGRecord.h"
 #include "CalibFormats/HcalObjects/interface/HcalTPGCoder.h"
 #include "CaloOnlineTools/HcalOnlineDb/interface/HcalLutManager.h"
-#include "CalibFormats/CaloTPG/interface/CaloTPGRecord.h"
-//#include "CalibCalorimetry/CaloTPG/src/CaloTPGTranscoderULUT.h"
- #include "CondFormats/HcalObjects/interface/HcalElectronicsMap.h"
-
-#include "CaloOnlineTools/HcalOnlineDb/interface/LMap.h"
 
 
 #include <iostream>
@@ -34,97 +29,41 @@ void HcalLutGenerator::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 {
   
   cout << " --> HcalLutGenerator::analyze()" << endl;
-  
-  //
-  //_____ get the coders from Event Setup _______________________________
-  //
+
   edm::ESHandle<HcalTPGCoder> inputCoder;
-  cout << "***DEBUG1 --> HcalLutGenerator::analyze()" << endl;
   iSetup.get<HcalTPGRecord>().get(inputCoder);
-  cout << "***DEBUG2 --> HcalLutGenerator::analyze()" << endl;
   HcalTopology theTopo;
-  cout << "***DEBUG3 --> HcalLutGenerator::analyze()" << endl;
   HcalDetId did;
-  cout << "***DEBUG4 --> HcalLutGenerator::analyze()" << endl;
-  //
-  edm::ESHandle<CaloTPGTranscoder> outTranscoder;
-  cout << "***DEBUG5 --> HcalLutGenerator::analyze()" << endl;
-  iSetup.get<CaloTPGRecord>().get(outTranscoder);
-  cout << "***DEBUG6 --> HcalLutGenerator::analyze()" << endl;
-  outTranscoder->setup(iSetup,CaloTPGTranscoder::HcalTPG);
-  cout << "***DEBUG7 --> HcalLutGenerator::analyze()" << endl;
-  edm::ESHandle<CaloTPGTranscoderULUT> transcoder;
-  cout << "***DEBUG8 --> HcalLutGenerator::analyze()" << endl;
-  transcoder.swap(outTranscoder);
-  cout << "***DEBUG9 --> HcalLutGenerator::analyze()" << endl;
 
-  //
-  //_____ get EMAP from Event Setup _____________________________________
-  //
-  edm::ESHandle<HcalElectronicsMap> hEmap;
-  iSetup.get<HcalElectronicsMapRcd>().get(hEmap);
-  std::vector<HcalGenericDetId> vEmap = hEmap->allPrecisionId();
-  cout << "EMAP from Event Setup has " << vEmap.size() << " entries" << endl;
 
-  //
-  //_____ get Channel Quality conditions from Event Setup (example)______
-  //
-  edm::ESHandle<HcalChannelQuality> hCQ;
-  iSetup.get<HcalChannelQualityRcd>().get(hCQ);
-  const HcalChannelQuality * _cq = &(*hCQ);
-  //
-  // Here's how one gets channel status from the Channel Quality condition.
-  // One can use their own loop over channels or get a vactor of all
-  // channels from the conditions object
-  //
-  //_____ get list of all channels
-  //
-  std::vector<DetId> _channels = _cq->getAllChannels();
-  cout << "Channel Quality available for " << _channels.size() << " channels" << endl;
-  //
-  //_____ loop over channels
-  //
-  for (std::vector<DetId>::const_iterator _ch = _channels.begin();
-       _ch != _channels.end();
-       _ch++){
-    //
-    //_____ select only HBEF logical channels
-    //
-    HcalGenericDetId _gid( *_ch );
-    if ( !(_gid.null()) &&
-	 (_gid.genericSubdet()==HcalGenericDetId::HcalGenBarrel ||
-	  _gid.genericSubdet()==HcalGenericDetId::HcalGenEndcap ||
-	  _gid.genericSubdet()==HcalGenericDetId::HcalGenForward ||
-	  _gid.genericSubdet()==HcalGenericDetId::HcalGenOuter
-	  )
-	 ){
-      const HcalChannelStatus * _cs = _cq->getValues( *_ch );
-
-      // get the full 32-bit channel status word
-      uint32_t status_word = _cs->getValue();
-      
-      // get the 15th bit (which is supposed to mean hot channel)
-      bool is_hot = _cs->isBitSet(15);
-      cout << "HCAL channel ID: " << _ch->rawId()
-	   << ", status word: " << status_word
-	   << ", hot flag: " << is_hot << endl;
-    }
-  }
-  //_____end of Channel Quality example_____________________
-
-  //
-  //_____ generate LUTs _________________________________________________
-  //
-  //HcalLutManager * manager = new HcalLutManager(); // old ways
-  HcalLutManager * manager = new HcalLutManager(&(*hEmap));
+  HcalLutManager manager;
   bool split_by_crate = true;
+  //manager . createAllLutXmlFilesFromCoder( *inputCoder, _tag, split_by_crate );
   cout << " tag name: " << _tag << endl;
   cout << " HO master file: " << _lin_file << endl;
-  manager -> createLutXmlFiles_HBEFFromCoder_HOFromAscii( _tag, *inputCoder, *transcoder, _lin_file, split_by_crate );
-  delete manager;
+  manager . createLutXmlFiles_HBEFFromCoder_HOFromAscii( _tag, *inputCoder, _lin_file, split_by_crate );
 
-  transcoder->releaseSetup();
+
+  // FIXME: compr LUTs off EventSetup - implement here
+  //edm::ESHandle<CaloTPGTranscoder> transcoder;
+  //iSetup.get<CaloTPGRecord>().get(transcoder);  
+  //edm::Handle<HcalTrigPrimDigiCollection> hcal;
+  //iEvent.getByLabel("hcalTriggerPrimitiveDigis",hcal);
+  //HcalTrigPrimDigiCollection hcalCollection = *hcal;
+  //HcalTrigTowerGeometry theTrigTowerGeometry;
    
+  // DEBUG: checking a lin LUT
+  /*
+  did=HcalDetId(HcalBarrel,1,1,1);
+  if (theTopo.valid(did)) {
+    std::vector<unsigned short> lut=inputCoder->getLinearizationLUT(HcalDetId(did));
+    for (std::vector<unsigned short>::const_iterator _i=lut.begin(); _i!=lut.end();_i++){
+      unsigned int _entry = (unsigned int)(*_i);
+      std::cout << "LUT" << "     " << _entry << std::endl;
+      
+    }
+  }
+  */
 }
 
 

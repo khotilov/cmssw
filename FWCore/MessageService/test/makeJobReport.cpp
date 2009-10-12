@@ -78,7 +78,6 @@ void work()
  std::size_t inpFile = theReport->inputFileOpened("InputPFN",
 						  "InputLFN",
 						  "InputCatalog",
-						  "InputType",
 						  "InputSource",
 						  "InputLabel",
 						  "InputGUID",
@@ -99,7 +98,6 @@ void work()
 						    "OutputModuleName",
 						    "OutputGUID",
 						    "DataType",
-						    "OutputBranchesHash",
 						    outputBranches);
 
   

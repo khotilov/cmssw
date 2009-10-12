@@ -1,8 +1,8 @@
 /*
  * \file L1TCSCTF.cc
  *
- * $Date: 2009/08/05 13:04:50 $
- * $Revision: 1.27 $
+ * $Date: 2008/12/15 15:58:35 $
+ * $Revision: 1.26 $
  * \author J. Berryhill
  *
  */
@@ -425,8 +425,11 @@ void L1TCSCTF::analyze(const Event& e, const EventSetup& c)
 			if( phiReal > (2 *(M_PI) ) ) phiReal -= (2*(M_PI));
 						
 			csctfoccupancies->Fill( etaReal, phiReal);
-			csctfTrackPhi->Fill(phiReal);
-			csctfTrackEta->Fill(etaReal);
+			if(trigMode != 0xb)
+			{
+				csctfTrackPhi->Fill(trk->first.phi_packed());
+				csctfTrackEta->Fill( trk->first.eta_packed() );
+			}
 			//std::cout << "Eta, phi, trigger mode, sector: " << etaReal << ", " << phiReal << ", " << trigMode << ", " << trk->first.sector() <<  "." << std::endl;
 			
 			csctfTrackQ->Fill( trigMode );

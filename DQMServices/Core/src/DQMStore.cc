@@ -612,6 +612,36 @@ DQMStore::bookProfile(const std::string &name, const std::string &title,
 					      option));
 }
 
+/// Book variable bin profile.  Option is one of: " ", "s" (default), "i", "G" (see
+/// TProfile::BuildOptions).  The number of channels in Y is
+/// disregarded in a profile plot.
+MonitorElement *
+DQMStore::bookProfile(const std::string &name, const std::string &title,
+		      int nchX, double *xbinsize,
+		      int nchY, double lowY, double highY,
+		      const char *option /* = "s" */)
+{
+  return bookProfile(pwd_, name, new TProfile(name.c_str(), title.c_str(),
+					      nchX, xbinsize,
+					      lowY, highY,
+					      option));
+}
+
+/// Book variable bin profile.  Option is one of: " ", "s" (default), "i", "G" (see
+/// TProfile::BuildOptions).  The number of channels in Y is
+/// disregarded in a profile plot.
+MonitorElement *
+DQMStore::bookProfile(const std::string &name, const std::string &title,
+		      int nchX, double *xbinsize,
+		                double lowY, double highY,
+		      const char *option /* = "s" */)
+{
+  return bookProfile(pwd_, name, new TProfile(name.c_str(), title.c_str(),
+					      nchX, xbinsize,
+					      lowY, highY,
+					      option));
+}
+
 /// Book TProfile by cloning an existing profile.
 MonitorElement *
 DQMStore::bookProfile(const std::string &name, TProfile *source)
@@ -1540,11 +1570,13 @@ DQMStore::readDirectory(TFile *file,
   // directory into which we dump everything.
   std::string dirpart = curdir;
   if (dirpart.compare(0, s_monitorDirName.size(), s_monitorDirName) == 0)
+  {
     if (dirpart.size() == s_monitorDirName.size())
       dirpart.clear();
     else if (dirpart[s_monitorDirName.size()] == '/')
       dirpart.erase(0, s_monitorDirName.size()+1);
-      
+  }
+
   // See if we are going to skip this directory.
   bool skip = (! onlypath.empty() && ! isSubdirectory(onlypath, dirpart));
   

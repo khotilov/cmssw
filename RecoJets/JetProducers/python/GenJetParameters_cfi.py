@@ -1,23 +1,13 @@
 import FWCore.ParameterSet.Config as cms
 
+# Standard CalooJets parameters
+# $Id: GenJetParameters_cfi.py,v 1.3 2008/08/20 15:51:08 oehler Exp $
 GenJetParameters = cms.PSet(
-    src            = cms.InputTag("genParticlesForJets"),
-    srcPVs         = cms.InputTag(''),
-    jetType        = cms.string('GenJet'),
-    jetPtMin       = cms.double(5.0),
-    inputEtMin     = cms.double(0.0),
-    inputEMin      = cms.double(0.0),
-    doPVCorrection = cms.bool(False),
-    # pileup with offset correction
-    doPUOffsetCorr = cms.bool(False),
-       # if pileup is false, these are not read:
-       nSigmaPU = cms.double(1.0),
-       radiusPU = cms.double(0.5),  
-    # fastjet-style pileup     
-    doPUFastjet    = cms.bool(False),
-      # if doPU is false, these are not read:
-      Active_Area_Repeats = cms.int32(5),
-      GhostArea = cms.double(0.01),
-      Ghost_EtaMax = cms.double(6.0)
-    )
+    src = cms.InputTag("genParticlesForJets"),
+    verbose = cms.untracked.bool(False),
+    jetPtMin = cms.double(5.0),
+    inputEtMin = cms.double(0.0),
+    jetType = cms.untracked.string('GenJet'),
+    inputEMin = cms.double(0.0)
+)
 

@@ -41,11 +41,14 @@ root muon_branch           recoMuons_muons__PROD.obj
 // Conversion branch
 root conversion_branch     recoPFConversions_pfConversions__PROD.obj
 
+// root clusters_island_barrel_branch recoBasicClusters_islandBasicClusters_islandBarrelBasicClusters_PROD.obj
+
 root caloTowers_branch     CaloTowersSorted_towerMaker__PROD.obj
 
 // reconstructed tracks branch
 
 root recTracks_branch      recoPFRecTracks_trackerDrivenElectronSeeds__PROD.obj
+//root stdTracks_branch      recoTracks_iterativeGSWithMaterialTracks__PROD.obj
 root stdTracks_branch      recoTracks_generalTracks__PROD.obj
 
 // true particles branch
@@ -119,10 +122,6 @@ display rechits                 1
 display   clusters              1
 // display reconstructed tracks yes/no
 display  rectracks              1
-// display Gsf tracks yes/no
-display  gsftracks              1
-// display Gsf tracks yes/no
-display  brems              1
 // display true particles yes/no
 display  particles              1              
 
@@ -131,9 +130,6 @@ display  particles_ptmin 0
 
 // min pt for rectracks display
 display  rectracks_ptmin 0
-
-// min pt for rectracks display
-display  gsfrectracks_ptmin 0
 
 //min energy threshold to display hits
 display rechits_enmin    0 
@@ -153,8 +149,6 @@ display  r/z      1
 display cluster_attributes 2 5 20 1
 // color, line style, marker style, marker size 
 display track_attributes   8 1 8 1
-display gsf_attributes   419 2 23 1
-display brem_attributes   921 3 22 1
 // color, line style, marker size 
 display simPart_attributes 4 2 1
 display drawPFBlock 0
@@ -468,6 +462,9 @@ pfmet_benchmark debug 0
 //pfmet benchmark outputfile
 pfmet_benchmark outmetfile pfmetBenchmark.root
 
+//PlotagainstReco  yes/no
+pfmet_benchmark PlotAgainstReco 0
+
 //MET cut
 pfmet_benchmark truemetcut 10.0
 
@@ -476,11 +473,6 @@ pfmet_benchmark deltametcut 200.0
 
 //phi cut (absolute value)
 pfmet_benchmark deltaphicut 3.8
-
-// true_MET
-pfmet_benchmark trueMetIgnoreParticlesIDs 1 2 3 4 5 6 12 14 16 21 39 1000022
-pfmet_benchmark trueMetSpecificIdCut 13
-pfmet_benchmark trueMetSpecificEtaCut 2.4
 
 // FWLITE CMSSW Jet Algorithm options --------------------------------------
 

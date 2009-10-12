@@ -202,8 +202,6 @@ namespace edm {
 	  groupSelectorRules_, !primarySequence_, duplicateChecker_, dropDescendants_,
           fileIndexes_, currentFileIndex));
           fileIndexes_[currentFileIndex] = rootFile_->fileIndexSharedPtr();
-      rootFile_->reportOpened(primary() ?
-	 (primarySequence_ ? "primaryFiles" : "secondaryFiles") : "mixingFiles");
     } else {
       if(!skipBadFiles) {
 	throw edm::Exception(edm::errors::FileOpenError) <<
@@ -357,9 +355,12 @@ namespace edm {
     if (fileIter_ != fileIterBegin_) {
       closeFile_();
       fileIter_ = fileIterBegin_;
+    }
+    if (!rootFile_) {
       initFile(false);
     }
     rewindFile();
+    firstFile_ = true; 
   }
 
   // Rewind to the beginning of the current file

@@ -1,7 +1,7 @@
 /*
  * \file EcalEndcapRecHitsValidation.cc
  *
- * $Date: 2009/07/02 11:17:47 $
+ * $Date: 2008/02/29 20:48:32 $
  * \author C. Rovelli
  *
  */
@@ -81,7 +81,7 @@ EcalEndcapRecHitsValidation::EcalEndcapRecHitsValidation(const ParameterSet& ps)
       meEEUncalibRecHitsJitter_ = dbe_->book1D(histo, histo, 100, 0., 100.);
       
       sprintf (histo, "EE Chi2" );
-      meEEUncalibRecHitsChi2_ = dbe_->book1D(histo, histo, 100, 18000., 22000.);
+      meEEUncalibRecHitsChi2_ = dbe_->book1D(histo, histo, 100, 0., 100.);
 
       sprintf (histo, "EE RecHit Max Sample Ratio"); 
       meEEUncalibRecHitMaxSampleRatio_ = dbe_->book1D(histo, histo, 120, 0.90, 1.05);
@@ -102,7 +102,7 @@ EcalEndcapRecHitsValidation::EcalEndcapRecHitsValidation(const ParameterSet& ps)
       meEEUncalibRecHitsJitterGt60adc_ = dbe_->book1D(histo, histo, 100, 0., 100.);
       
       sprintf (histo, "EE Chi2 gt 60 adc counts" );
-      meEEUncalibRecHitsChi2Gt60adc_ = dbe_->book1D(histo, histo, 100, 18000., 22000.);
+      meEEUncalibRecHitsChi2Gt60adc_ = dbe_->book1D(histo, histo, 100, 0., 100.);
 
       sprintf (histo, "EE RecHit Max Sample Ratio gt 60 adc counts"); 
       meEEUncalibRecHitMaxSampleRatioGt60adc_ = dbe_->book1D(histo, histo, 120, 0.90, 1.05);
@@ -204,7 +204,7 @@ void EcalEndcapRecHitsValidation::analyze(const Event& e, const EventSetup& c){
         EcalPedestalsMap::const_iterator it=myped->getMap().find( EEid );
         if( it != myped->getMap().end() ){
           
-          if (eMax > (*it).mean_x1 + 5 * (*it).rms_x1 && eMax != 0 ){ //only real signal RecHit
+          if (eMax > (*it).mean_x1 + 5 * (*it).rms_x1 ){ //only real signal RecHit
             
             if ( meEEUncalibRecHitMaxSampleRatio_ )
               { meEEUncalibRecHitMaxSampleRatio_->Fill( (uncalibRecHit->amplitude()+uncalibRecHit->pedestal())/eMax); }

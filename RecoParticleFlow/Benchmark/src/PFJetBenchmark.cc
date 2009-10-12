@@ -440,10 +440,7 @@ void PFJetBenchmark::process(const reco::PFJetCollection& pfJets, const reco::Ge
 	  if ( pt_denom > 750. && pt_denom < 1250. ) hBRPt750_1250->Fill (resPt);
 	  if ( pt_denom > 1250. && pt_denom < 2000. ) hBRPt1250_2000->Fill (resPt);
 	  if ( pt_denom > 2000. && pt_denom < 5000. ) hBRPt2000_5000->Fill (resPt);
-	  if ( rec_eta > 0. ) 
-	    hBDEtavsPt->Fill(pt_denom,rec_eta-true_eta);
-	  else
-	    hBDEtavsPt->Fill(pt_denom,-rec_eta+true_eta);
+	  hBDEtavsPt->Fill(pt_denom,rec_eta-true_eta);
 	  hBDPhivsPt->Fill(pt_denom,rec_phi-true_phi);
 	}
 	if(plot2)hBRCHE->Fill(resChargedHadEnergy);
@@ -483,10 +480,7 @@ void PFJetBenchmark::process(const reco::PFJetCollection& pfJets, const reco::Ge
 	  if ( pt_denom > 750. && pt_denom < 1250. ) hERPt750_1250->Fill (resPt);
 	  if ( pt_denom > 1250. && pt_denom < 2000. ) hERPt1250_2000->Fill (resPt);
 	  if ( pt_denom > 2000. && pt_denom < 5000. ) hERPt2000_5000->Fill (resPt);
-	  if ( rec_eta > 0. ) 
-	    hEDEtavsPt->Fill(pt_denom,rec_eta-true_eta);
-	  else
-	    hEDEtavsPt->Fill(pt_denom,-rec_eta+true_eta);
+	  hEDEtavsPt->Fill(pt_denom,rec_eta-true_eta);
 	  hEDPhivsPt->Fill(pt_denom,rec_phi-true_phi);
 	}
 	if(plot2)hERCHE->Fill(resChargedHadEnergy);
@@ -525,10 +519,7 @@ void PFJetBenchmark::process(const reco::PFJetCollection& pfJets, const reco::Ge
 	  if ( pt_denom > 750. && pt_denom < 1250. ) hFRPt750_1250->Fill (resPt);
 	  if ( pt_denom > 1250. && pt_denom < 2000. ) hFRPt1250_2000->Fill (resPt);
 	  if ( pt_denom > 2000. && pt_denom < 5000. ) hFRPt2000_5000->Fill (resPt);
-	  if ( rec_eta > 0. ) 
-	    hFDEtavsPt->Fill(pt_denom,rec_eta-true_eta);
-	  else
-	    hFDEtavsPt->Fill(pt_denom,-rec_eta+true_eta);
+	  hFDEtavsPt->Fill(pt_denom,rec_eta-true_eta);
 	  hFDPhivsPt->Fill(pt_denom,rec_phi-true_phi);
 	}
 	if(plot2)hFRCHE->Fill(resChargedHadEnergy);

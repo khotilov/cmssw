@@ -5,7 +5,7 @@ process = cms.Process("TEST")
 process.MessageLogger=cms.Service("MessageLogger",
                               destinations=cms.untracked.vstring("cout"),
                               cout=cms.untracked.PSet(
-                              threshold=cms.untracked.string("INFO")
+                              treshold=cms.untracked.string("INFO")
                               )
 )
 
@@ -23,8 +23,7 @@ process.source = cms.Source("EmptyIOVSource",
 process.es_ascii = cms.ESSource("HcalTextCalibrations",
     input = cms.VPSet(cms.PSet(
         object = cms.string('RespCorrs'),
-        #file = cms.FileInPath('CondFormats/HcalObjects/data/hcal_respCorr_trivial_HF0.7.txt')
-        file = cms.FileInPath('CondTools/Hcal/test/DumpCondRespCorrs_Run1.txt')
+        file = cms.FileInPath('CondFormats/HcalObjects/data/hcal_respCorr_trivial_HF0.7.txt')
     ))
 )
 

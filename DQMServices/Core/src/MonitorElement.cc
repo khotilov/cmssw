@@ -282,7 +282,6 @@ MonitorElement::ShiftFillLast(float y, float ye, int xscale)
     sprintf (buffer, "%d", xup*xscale); 
     std::string b(buffer); setBinLabel(nbins,b);
     setBinLabel(1,"av.");
-    static_cast<TH1*>(getRootObject())->SetOption("HIST");
   }
   else
     incompatible(__PRETTY_FUNCTION__);
@@ -1092,7 +1091,7 @@ MonitorElement::copyFunctions(TH1 *from, TH1 *to)
   {
     TObject *obj = fromf->At(i);
     // not interested in statistics
-    if (obj->IsA()->GetName() == "TPaveStats")
+    if (!strcmp(obj->IsA()->GetName(), "TPaveStats"))
       continue;
 
     if(TF1 *fn = dynamic_cast<TF1 *>(obj))

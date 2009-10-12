@@ -13,7 +13,7 @@
 //
 // Original Author:  Mike Case
 //         Created:  Fri Jan 16 01:45:49 CET 2009
-// $Id: XMLIdealGeometryESProducer.cc,v 1.2 2009/08/12 01:00:28 case Exp $
+// $Id$
 //
 //
 
@@ -36,18 +36,7 @@
 #include "CondFormats/GeometryObjects/interface/GeometryFile.h"
 #include "Geometry/Records/interface/GeometryFileRcd.h"
 
-#include "DetectorDescription/Core/interface/DDMaterial.h"
-#include "DetectorDescription/Core/interface/DDSolid.h"
-#include "DetectorDescription/Core/interface/DDSpecifics.h"
-#include "DetectorDescription/Base/interface/DDRotationMatrix.h"
 
-
-namespace DDI {
-  class Material;
-  class Solid;
-  class LogicalPart;
-  class Specific;
-}
 
 //
 // class decleration
@@ -65,14 +54,6 @@ private:
   // ----------member data ---------------------------
   //  std::string label_;
   std::string rootDDName_; // this must be the form namespace:name
-    // 2009-07-09 memory patch
-    // for copying and protecting DD Store's after parsing is complete.
-    DDI::Store<DDName, DDI::Material*>::registry_type matStore_;
-    DDI::Store<DDName, DDI::Solid*>::registry_type solidStore_;
-    DDI::Store<DDName, DDI::LogicalPart*>::registry_type lpStore_;
-    DDI::Store<DDName, DDI::Specific*>::registry_type specStore_;
-    DDI::Store<DDName, DDRotationMatrix*>::registry_type rotStore_;    
-
 };
 
 //
@@ -121,48 +102,23 @@ XMLIdealGeometryESProducer::produce(const IdealGeometryRecord& iRecord)
    iRecord.getRecord<GeometryFileRcd>().get( "", gdd );
 
    DDLParser * parser = DDLParser::instance();
-   parser->getDDLSAX2FileHandler()->setUserNS(true);
-   // 2009-07-09 memory patch
-   parser->clearFiles();
-   //std::cout <<"got in produce"<<std::endl;
-   DDName ddName(rootDDName_);
-   //std::cout <<"ddName \""<<ddName<<"\""<<std::endl;
-   DDLogicalPart rootNode(ddName);
-   //std::cout <<"made the DDLogicalPart"<<std::endl;
-   DDRootDef::instance().set(rootNode);
-   
-   
+   DDRootDef::instance().set(DDName(rootDDName_));
+
    std::vector<unsigned char>* tb = (*gdd).getUncompressedBlob();
-   
+
    parser->parse(*tb, tb->size()); 
-   
+
+
    delete tb;
    
    std::cout << std::endl;
-  // at this point we should have a valid store of DDObjects and we will move these
-  // to the local storage area using swaps with the existing Singleton<Store...>'s
-  // NOTE TO SELF:  this is similar to the below explicit copy of the graph of the
-  // DDCompactView at this point with this XMLIdealGeometryESSource so as not to
-  // share the Store's anymore.
-  // 2009-07-09 memory patch
-   DDMaterial::StoreT::instance().swap(matStore_);
-   DDSolid::StoreT::instance().swap(solidStore_);
-   DDLogicalPart::StoreT::instance().swap(lpStore_);
-   DDSpecifics::StoreT::instance().swap(specStore_);
-   DDRotation::StoreT::instance().swap(rotStore_);
 
-   DDMaterial::StoreT::instance().setReadOnly(true);
-   DDSolid::StoreT::instance().setReadOnly(true);
-   DDLogicalPart::StoreT::instance().setReadOnly(true);
-   DDSpecifics::StoreT::instance().setReadOnly(true);
-   DDRotation::StoreT::instance().setReadOnly(true);
+   std::auto_ptr<DDCompactView> returnValue(new DDCompactView(DDLogicalPart(DDName(rootDDName_))));
 
-   std::auto_ptr<DDCompactView> returnValue(new DDCompactView(rootNode));
 
-   //copy the graph from the global one
    DDCompactView globalOne;
-   returnValue->swap(globalOne);
-   
+   returnValue->writeableGraph() = globalOne.graph();
+
    return returnValue ;
 }
 

@@ -76,23 +76,14 @@ namespace service {
 //	 restore getAparameter behavior to NOT throw for tracked, since
 //       now this will be caught when validating the PSet.
 //
-//  12 - 8/10/09 mf, cj
-//	 member data  to hold shared pointer to thread queue
-//
 // -----------------------------------------------------------------------
-
-class ThreadQueue;
-class ErrorLog;
 
 class MessageLoggerScribe : public AbstractMLscribe
 {
 public:
   // ---  birth/death:
-  
-  // ChangeLog 12
-  /// --- If queue is NULL, this sets singleThread true 
-  explicit MessageLoggerScribe(boost::shared_ptr<ThreadQueue> queue);
-  
+  MessageLoggerScribe();
+  explicit MessageLoggerScribe(bool singleThreadMode);
   virtual ~MessageLoggerScribe();
 
   // --- receive and act on messages:
@@ -246,7 +237,6 @@ private:
   bool 				      done;			// changeLog 9
   bool 				      purge_mode;		// changeLog 9
   int				      count;			// changeLog 9
-  boost::shared_ptr<ThreadQueue>      m_queue;			// changeLog 12
       
 };  // MessageLoggerScribe
 

@@ -64,7 +64,7 @@ void ProcessSubDetCT(TFile &ref_file, TFile &val_file, ifstream &ctstr, const in
   int RefCol, ValCol;
   TString HistName;
   char xAxisTitle[200];
-  float xAxisRange, yAxisRange, xMin;
+  float xAxisRange, yAxisRange;
   TString OutLabel;
   
   int nh1 = 0;
@@ -100,12 +100,7 @@ void ProcessSubDetCT(TFile &ref_file, TFile &val_file, ifstream &ctstr, const in
     //Set the colors, styles, titles, stat boxes and format x-axis for the histograms 
     if (StatSwitch == "Stat") ref_hist1[nh1]->SetStats(kTRUE);
 
-    if (xAxisRange > 0){
-      xMin = ref_hist1[nh1]->GetXaxis()->GetXmin();
-      ref_hist1[nh1]->GetXaxis()->SetRangeUser(xMin,xAxisRange);
-    }
-    if (yAxisRange > 0) ref_hist1[nh1]->GetYaxis()->SetRangeUser(0.,yAxisRange);
-
+    if (xAxisRange > 0) ref_hist1[nh1]->GetXaxis()->SetRangeUser(0.,xAxisRange);
     ref_hist1[nh1]->GetXaxis()->SetTitle(xAxisTitle);
     
     //Different histo colors and styles

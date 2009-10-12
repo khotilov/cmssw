@@ -1,5 +1,5 @@
 //
-// $Id: Electron.cc,v 1.16 2009/07/08 08:46:38 salerno Exp $
+// $Id: Electron.cc,v 1.15 2009/03/26 06:23:10 hegner Exp $
 //
 
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -13,9 +13,7 @@ Electron::Electron() :
     Lepton<reco::GsfElectron>(),
     embeddedGsfTrack_(false),
     embeddedSuperCluster_(false),
-    embeddedTrack_(false),
-    cachedDB_(false),
-    dB_(0.0)
+    embeddedTrack_(false)
 {
 }
 
@@ -25,9 +23,7 @@ Electron::Electron(const reco::GsfElectron & anElectron) :
     Lepton<reco::GsfElectron>(anElectron),
     embeddedGsfTrack_(false),
     embeddedSuperCluster_(false),
-    embeddedTrack_(false),
-    cachedDB_(false),
-    dB_(0.0)
+    embeddedTrack_(false)
 {
 }
 
@@ -37,9 +33,7 @@ Electron::Electron(const edm::RefToBase<reco::GsfElectron> & anElectronRef) :
     Lepton<reco::GsfElectron>(anElectronRef),
     embeddedGsfTrack_(false),
     embeddedSuperCluster_(false),
-    embeddedTrack_(false),
-    cachedDB_(false),
-    dB_(0.0)
+    embeddedTrack_(false)
 {
 }
 
@@ -48,10 +42,7 @@ Electron::Electron(const edm::Ptr<reco::GsfElectron> & anElectronRef) :
     Lepton<reco::GsfElectron>(anElectronRef),
     embeddedGsfTrack_(false),
     embeddedSuperCluster_(false),
-    embeddedTrack_(false),
-    cachedDB_(false),
-    dB_(0.0)
-{
+    embeddedTrack_(false){
 }
 
 
@@ -154,18 +145,5 @@ void Electron::embedPFCandidate() {
   if ( pfCandidateRef_.isAvailable() && pfCandidateRef_.isNonnull()) {
     pfCandidate_.push_back( *pfCandidateRef_ );
     embeddedPFCandidate_ = true;
-  }
-}
-
-
-/// dB gives the impact parameter wrt the beamline.
-/// If this is not cached it is not meaningful, since
-/// it relies on the distance to the beamline. 
-double Electron::dB() const {
-  if ( cachedDB_ ) {
-    return dB_;
-  } else {
-    throw cms::Exception("DataNotFound") << "dB is not stored in this electron object";
-    return 0.0;
   }
 }

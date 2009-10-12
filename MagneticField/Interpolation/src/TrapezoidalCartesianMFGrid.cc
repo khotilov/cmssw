@@ -1,7 +1,7 @@
 /** \file
  *
- *  $Date: 2008/04/09 19:59:04 $
- *  $Revision: 1.4 $
+ *  $Date: $
+ *  $Revision: $
  *  \author T. Todorov - updated N. Amapane (2008)
  */
 
@@ -66,7 +66,6 @@ TrapezoidalCartesianMFGrid::TrapezoidalCartesianMFGrid( binary_ifstream& inFile,
   vector<BVector> fieldValues;
   float Bx, By, Bz;
   int nLines = n1*n2*n3;
-  fieldValues.reserve(nLines);
   for (int iLine=0; iLine<nLines; ++iLine){
     inFile >> Bx >> By >> Bz;
     if (convertToLocal) {
