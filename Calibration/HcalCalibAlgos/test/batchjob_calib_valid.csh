@@ -11,7 +11,6 @@ cmsrel CMSSW_3_1_2
 cd CMSSW_3_1_2/src
 cmsenv
 cvs co Calibration/HcalCalibAlgos
-cp /afs/cern.ch/user/a/andrey/scratch1/CMSSW_3_1_2/src/Calibration/HcalCalibAlgos/plugins/ValidIsoTrkCalib.cc Calibration/HcalCalibAlgos/plugins
 scram b
 cd Calibration/HcalCalibAlgos/test
 
@@ -49,9 +48,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(5000)
 process.load("Calibration.HcalCalibAlgos.calib_validator_cfi")
 process.ValidationIsoTrk.outputFileName = cms.string("ValidFile_XX.root")
 process.ValidationIsoTrk.calibFactorsFileName = cms.string("Calibration/HcalCalibAlgos/data/response_corrections.txt")
-process.ValidationIsoTrk.AxB = cms.string("Cone")
-#process.ValidationIsoTrk.AxB = cms.string("3x3")
-process.ValidationIsoTrk.calibrationConeSize = cms.double(26)
+process.ValidationIsoTrk.AxB = cms.string("3x3")
 process.ValidationIsoTrk.takeAllRecHits = cms.untracked.bool(False)
 
 #process.ValidationIsoTrk.outputFileName = cms.string("ValidFile_10_${1}.root")

@@ -1,17 +1,166 @@
 #!/usr/bin/env python
-import os,string
+"""
+runLumiDataTransfer
+
+python script to run EDAnalyzer LumiSectionDataPopCon
+
+"""
+import sys,os,string,shutil
+from ConfigParser import ConfigParser
 from optparse import OptionParser
 
+def writeLumiSectionDataPopConCfg(filename,cfgTemplate,rootFilename,
+                                  tagName,databaseConnect,
+                                  logdbConnect,authenticationPath,
+                                  allowForceFirstSince,debugMode):
+   """
+   
+   """
+   # copy the template file to the new cfg.py file
+   shutil.copyfile(cfgTemplate,filename)
+   # open the new cfg file and add the necessary lines
+   f = open(filename, 'a')
+   f.write('\n')
+   f.write('process.lumidatatransfer.Source.lumiFileName="'+rootFilename+'"\n')
+   if len(logdbConnect)==0:
+      f.write('process.lumidatatransfer.loggingOn=False\n')
+   else:
+      f.write('process.PoolDBOutputService.logconnect="'+logdbConnect+'"\n')
+   if allowForceFirstSince:
+      f.write('process.lumidatatransfer.Source.allowForceFirstSince=True\n')
+   f.write('process.PoolDBOutputService.DBParameters.authenticationPath="'+authenticationPath+'"\n')
+   f.write('process.PoolDBOutputService.connect="'+databaseConnect+'"\n')
+   f.write('process.PoolDBOutputService.toPut[0].tag="'+tagName+'"\n')
+   f.write('process.p = cms.Path(process.lumidatatransfer)')
+
+
 def main():
-   parser = OptionParser()
+   if 'CMSSW_BASE' not in os.environ:
+      print 'CMSSW is not set up! Please run "cmsenv"'
+      sys.exit(2)
+   usage = "usage: \%prog [options] commandconfigfile"
+   parser = OptionParser(usage=usage)
+   parser.add_option("-f","--filename",action="store",dest="rootfilename",
+                     help="path and name to lumi root file (REQUIRED)")
+   parser.add_option("-t","--tagname",action="store",dest="tagname",
+                     help="tag name (REQUIRED)")
+   parser.add_option("-c","--connect",action="store",dest="connect",
+                     help="connect string to database (REQUIRED)")
+   parser.add_option("-P","--authPath",action="store",dest="authPath",
+                     help="path to authentication file(REQUIRED)")
+   parser.add_option("-i","--inputTemplate",action="store",dest="inputTemplate",
+                     help="path to authentication file(REQUIRED)")
+   parser.add_option("-l","--logdatabase",action="store",dest="logdatabase",
+                     help="log database connect string (OPTIONAL)")
+   parser.add_option("-o","--outputFilename",action="store",dest="outputFilename",
+                     help="output config file(OPTIONAL)")
+   parser.add_option("-d","--dryrun",action="store_true",dest="dryrun",
+                     help="dryrun mode-only write the config file (OPTIONAL)")
+   parser.add_option("-a","--allowForceFirstSince",action="store_true",dest="allowforcefirstsince",help="set allowForceFirstSince parameter to True (OPTIONAL)")
    parser.add_option("-v","--verbose",action="store_true",dest="verbose",
-                          help="verbose mode")
-   parser.add_option("-f","--filename",action="store",dest="filename", help="filename")
-   parser.add_option("-c","--connect",action="store",dest="connect", help="database connection string")
-   parser.add_option("-P","--authpath",action="store",dest="authpath",help="authentication file path")
-   parser.add_option("-t","--tag",action="store",dest="tag",help="iov tag")
+                     help="verbose mode")
    (options, args) = parser.parse_args()
    
+   rootfilename=''
+   tagname=''
+   connect=''
+   authpath=''
+   inputTemplate=''
+   logdatabase=''
+   outputFilename='outputcfg.py'
+   dryrun=False
+   allowForceFirstSince=False
+   verbose=False
+   
+   if args[0]:
+      print 'parse parameters from config file ',args[0]
+      Config=ConfigParser()
+      Config.read(args[0])
+      sectionName='TRANSFERTOEVT'
+      try:
+        if Config.has_option(sectionName,'logconnect') :
+           logdatabase=Config.get(sectionName,'logconnect')
+        if Config.has_option(sectionName,'outputfilename') :
+           outputFilename=Config.get(sectionName,'outputfilename')
+        
+        if Config.has_option(sectionName,'dryrun'):
+           dryrun=Config.getboolean(sectionName,'dryrun')
+        
+        if Config.has_option(sectionName,'allowforcefirstsince'):
+           allowForceFirstSince=Config.getboolean(sectionName,'allowforcefirstsince')
+        if Config.has_option(sectionName,'verbose'):
+           verbose=Config.getboolean(sectionName,'verbose')
+        if Config.has_option(sectionName,'rootfilename'):
+           rootfilename=Config.get(sectionName,'rootfilename')
+        else:
+           raise ValueError, "option rootfilename is required"
+        if Config.has_option(sectionName,'tagname'):
+           tagname=Config.get(sectionName,'tagname')
+        else:
+           raise ValueError, "option tagname is required"
+        if Config.has_option(sectionName,'dbconnect'):
+           connect=Config.get(sectionName,'dbconnect')
+        else:
+           raise ValueError, "option dbconnect is required"
+        if Config.has_option(sectionName,'authpath'):
+           authpath=Config.get(sectionName,'authpath')
+        else:
+           raise ValueError, "option authpath is required"
+        if Config.has_option(sectionName,'inputTemplate'):
+           inputTemplate=Config.get(sectionName,'inputTemplate')
+        else:
+           raise ValueError, "option inputTemplate is required"
+           
+      except Exception,er:
+        print str(er)
+        sys.exit(2) 
+
+   else: 
+      if not options.rootfilename:
+         parser.error('option -f or --filename is required')
+      if not options.tagname:
+         parser.error('option -t or --tagname is required')
+      if not options.connect:
+         parser.error('option -c or --connect is required')
+      if not options.authPath:
+         parser.error('option -P or --authPath is required')
+      if not options.inputTemplate:
+         parser.error('option -i or --inputTemplate is required')
+      rootfilename=options.rootfilename
+      tagname=options.tagname
+      connect=options.connect
+      authpath=options.authPath
+      inputTemplate=options.inputTemplate
+      if options.logdatabase:
+         logdatabase=options.logdatabase
+      if options.outputFilename:
+         outputFilename=options.outputFilename
+      verbose=options.verbose
+      dryrun=options.dryrun
+      allowForceFirstSince=options.allowforcefirstsince
+   if verbose:
+      print 'rootfilename:\t',rootfilename
+      print 'tagname:\t',tagname
+      print 'connect:\t',connect
+      print 'authpath:\t',authpath
+      print 'inputTemplate:\t',inputTemplate
+      if len(logdatabase)==0:
+         print 'logdatabase:\t logging off'
+      else:
+         print 'logdatabase:\t',logdatabase
+      print 'outputFilename:\t',outputFilename
+      if allowForceFirstSince:
+         print 'allowForceFirstSince:\t True'
+      if dryrun:
+         print 'dryrun mode'
+   
+   writeLumiSectionDataPopConCfg(outputFilename,inputTemplate,rootfilename,tagname,connect,logdatabase,authpath,allowForceFirstSince,verbose)
+   if not dryrun:
+      print '====== running config file ',outputFilename
+      os.system('cmsRun '+outputFilename)
+   else:
+      print 'written cfg file as ',outputFilename
+      
 if __name__ == '__main__':
    main()
 

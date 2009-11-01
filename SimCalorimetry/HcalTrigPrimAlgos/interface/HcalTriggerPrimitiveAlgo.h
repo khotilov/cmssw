@@ -21,8 +21,7 @@ public:
   HcalTriggerPrimitiveAlgo(bool pf, const std::vector<double>& w, 
                            int latency,
                            uint32_t FG_threshold, uint32_t ZS_threshold,
-                           int numberOfSamples, int numberOfPresamples,
-                           uint32_t minSignalThreshold=0, uint32_t PMT_NoiseThreshold=0);
+                           int numberOfSamples, int numberOfPresamples);
   ~HcalTriggerPrimitiveAlgo();
 
   void run(const HcalTPGCoder * incoder,
@@ -45,24 +44,8 @@ public:
   /// adds the actual RecHits
   void analyze(IntegerCaloSamples & samples, HcalTriggerPrimitiveDigi & result);
   void analyzeHF(IntegerCaloSamples & samples, HcalTriggerPrimitiveDigi & result);
-
-   // Member initialized by constructor
-  const HcalTPGCoder * incoder_;
-  const HcalTPGCompressor * outcoder_;
-  double theThreshold;
-  bool peakfind_;
-  std::vector<double> weights_;
-  int latency_;
-  uint32_t FG_threshold_;
-  uint32_t ZS_threshold_;
-  int numberOfSamples_;
-  int numberOfPresamples_;
-  uint32_t minSignalThreshold_;
-  uint32_t PMT_NoiseThreshold_; 
-
-
-  // Member not initialzed
-  //std::vector<HcalTrigTowerDetId> towerIds(const HcalDetId & id) const;
+ 
+  std::vector<HcalTrigTowerDetId> towerIds(const HcalDetId & id) const;
 
   HcalTrigTowerGeometry theTrigTowerGeometry; // from event setup eventually?
 
@@ -73,17 +56,16 @@ public:
   typedef std::map< HcalTrigTowerDetId, SumFGContainer > TowerMapFGSum;
   TowerMapFGSum theTowerMapFGSum;
 
-  // ==============================
-  // =  HF Veto
-  // ==============================
-  // Sum = Long + Short;" // intermediate calculation. 
-  //  if ((Short < MinSignalThresholdET OR Long  < MinSignalThresholdET)
-  //     AND Sum > PMTNoiseThresholdET) VetoedSum = 0; 
-  //  else VetoedSum = Sum; 
-  // ==============================
-  // Map from FG id to veto booleans
-  typedef std::map<uint32_t, std::vector<bool> > TowerMapVeto;
-  TowerMapVeto HF_Veto;
-
+  // Member initialized by constructor
+  const HcalTPGCoder * incoder_;
+  const HcalTPGCompressor * outcoder_;
+  double theThreshold;
+  bool peakfind_;
+  std::vector<double> weights_;
+  int latency_;
+  uint32_t FG_threshold_;
+  uint32_t ZS_threshold_;
+  int numberOfSamples_;
+  int numberOfPresamples_;
 };
 #endif

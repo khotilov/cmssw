@@ -1,8 +1,8 @@
 /*
  * \file EcalEndcapMonitorClient.cc
  *
- * $Date: 2009/09/01 09:52:49 $
- * $Revision: 1.223 $
+ * $Date: 2009/10/27 08:21:10 $
+ * $Revision: 1.227 $
  * \author G. Della Ricca
  * \author F. Cossutti
  *
@@ -617,7 +617,7 @@ EcalEndcapMonitorClient::~EcalEndcapMonitorClient() {
 
 }
 
-void EcalEndcapMonitorClient::beginJob(const EventSetup &c) {
+void EcalEndcapMonitorClient::beginJob(void) {
 
   begin_run_ = false;
   end_run_   = false;
@@ -658,12 +658,10 @@ void EcalEndcapMonitorClient::beginJob(const EventSetup &c) {
   }
 
   for ( unsigned int i=0; i<clients_.size(); i++ ) {
-    clients_[i]->beginJob(dqmStore_);
+    clients_[i]->beginJob();
   }
 
-  if ( summaryClient_ ) summaryClient_->beginJob(dqmStore_);
-
-  Numbers::initGeometry(c, verbose_);
+  if ( summaryClient_ ) summaryClient_->beginJob();
 
 }
 
@@ -702,6 +700,8 @@ void EcalEndcapMonitorClient::beginRun(void) {
 }
 
 void EcalEndcapMonitorClient::beginRun(const Run& r, const EventSetup& c) {
+
+  Numbers::initGeometry(c, verbose_);
 
   if ( verbose_ ) {
     cout << endl;
@@ -796,6 +796,8 @@ void EcalEndcapMonitorClient::endRun(void) {
 
   subrun_ = -1;
 
+  this->softReset(false);
+
 }
 
 void EcalEndcapMonitorClient::endRun(const Run& r, const EventSetup& c) {
@@ -825,8 +827,6 @@ void EcalEndcapMonitorClient::endRun(const Run& r, const EventSetup& c) {
     }
 
   }
-
-  this->softReset(false);
 
 }
 
@@ -1132,7 +1132,7 @@ void EcalEndcapMonitorClient::writeDb() {
     if ( econn ) {
       try {
         if ( verbose_ ) cout << "Inserting MonIOV ..." << endl;
-//        econn->insertMonRunIOV(&moniov_);
+        econn->insertMonRunIOV(&moniov_);
         RunTag runtag = runiov_.getRunTag();
         moniov_ = econn->fetchMonRunIOV(&runtag, &montag, run_, subrun_);
         if ( verbose_ ) cout << "done." << endl;

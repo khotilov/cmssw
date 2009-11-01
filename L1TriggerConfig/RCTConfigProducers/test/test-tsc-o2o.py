@@ -11,9 +11,7 @@ process.load("CondTools.L1Trigger.L1TriggerKeyListDummy_cff")
 
 # Get configuration data from OMDS.  This is the subclass of L1ConfigOnlineProdBase.
 process.load("L1TriggerConfig.RCTConfigProducers.L1RCTParametersOnline_cfi")
-process.load("L1TriggerConfig.L1ScalesProducers.L1EmEtScaleConfigOnline_cfi")
-process.load("L1TriggerConfig.L1ScalesProducers.L1CaloEcalScaleConfigOnline_cfi")
-
+process.load("L1TriggerConfig.L1ScaleProducers.L1EmEtScaleConfigOnline_cfi")
 
 
 process.maxEvents = cms.untracked.PSet(
@@ -35,9 +33,6 @@ process.getter = cms.EDAnalyzer("EventSetupRecordDataGetter",
                      cms.PSet(
     record = cms.string('L1RCTParametersRcd'),
     data = cms.vstring('L1RCTParameters')
-    ), cms.PSet(
-    record = cms.string('L1CaloEcalScaleRcd'),
-    data = cms.vstring('L1CaloEcalScale')
     )),
    verbose = cms.untracked.bool(True)
 )
@@ -49,7 +44,7 @@ process.L1TriggerKeyDummy.objectKeys = cms.VPSet()
 process.L1TriggerKeyDummy.label = cms.string('SubsystemKeysOnly')
 
 # rctKey = csctfKey, dttfKey, rpcKey, gmtKey, rctKey, gctKey, gtKey, or tsp0Key
-process.L1TriggerKeyDummy.rctKey = cms.string('EEG_ESUMS_TAU3_DECO_25_FALLGR09_FULLECAL')
+process.L1TriggerKeyDummy.rctKey = cms.string('RCT_DUMMY')
 
 # Subclass of L1ObjectKeysOnlineProdBase.
 process.load("L1TriggerConfig.RCTConfigProducers.L1RCTObjectKeysOnline_cfi")

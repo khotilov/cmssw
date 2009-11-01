@@ -8,10 +8,7 @@
 #include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
 #include "TMVA/Reader.h"
 #include <iostream>
-
-namespace reco { 
-class PFCandidate;
-}
+class reco::PFCandidate;
 
 class PFElectronAlgo {
  public:
@@ -76,12 +73,11 @@ class PFElectronAlgo {
   
   std::vector<reco::PFCandidate> elCandidate_;
   std::vector<reco::PFCandidate> allElCandidate_;
-  std::map<unsigned int,std::vector<reco::PFCandidate> > electronConstituents_;
+  std::map<unsigned int,std::vector<reco::PFCandidate> > photonCandidates_;
   std::vector<double> BDToutput_;
   std::vector<bool> lockExtraKf_;
   std::vector<bool> GsfTrackSingleEcal_;
   std::vector< std::pair <unsigned int, unsigned int> > fifthStepKfTrack_;
-  std::vector< std::pair <unsigned int, unsigned int> > convGsfTrack_;
 
   double mvaEleCut_;
   TMVA::Reader    *tmvaReader_;
@@ -102,7 +98,6 @@ class PFElectronAlgo {
   float SigmaEtaEta; 
   int lateBrem,firstBrem,earlyBrem;
   float HOverHE,HOverPin;
-
 
 
   bool isvalid_;

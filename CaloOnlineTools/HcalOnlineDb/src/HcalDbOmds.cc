@@ -2,7 +2,7 @@
 //
 // Original Author:  Gena Kukartsev Mar 11, 2009
 // Adapted from HcalDbASCIIIO.cc,v 1.41
-// $Id: HcalDbOmds.cc,v 1.13 2009/10/18 18:08:12 kukartse Exp $
+// $Id: HcalDbOmds.cc,v 1.11 2009/03/27 09:46:13 kukartse Exp $
 //
 //
 #include <vector>
@@ -499,9 +499,9 @@ bool HcalDbOmds::getObject (oracle::occi::Connection * connection,
   try {
     oracle::occi::Statement* stmt = connection->createStatement(fQuery);
     stmt->setString(1,fTag);
-    //stmt->setString(2,fVersion);
+    stmt->setString(2,fVersion);
     //stmt->setInt(3,fSubversion);
-    stmt->setInt(2,fIOVBegin);
+    stmt->setInt(3,fIOVBegin);
 
     ResultSet *rs = stmt->executeQuery();
 

@@ -1,25 +1,21 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 use File::Basename;
 
 print "Configuring the python executables and run scripts...\n";
 
 $odir = $ARGV[0];
-$datalist = $ARGV[1];
-@datafile=split(/;/,$datalist);
+$datafile = $ARGV[1];
 
-$dircount=0;
+print "Output directory: $odir \n";
+print "Datafile: $datafile \n";
 
-foreach $dataitem ( @datafile ){
-    print "Output directory: $odir \n";
-    print "Datafile: $dataitem \n";
-    
 # open datafile, get skim name
-    open (dataitem) or die "Can't open the file!";
-    @dataFileInput = <dataitem>;
-    
-    $dataskim = basename( $dataitem, ".dat" );
-    
-    system( "
+open (datafile) or die "Can't open the file!";
+@dataFileInput = <datafile>;
+
+$dataskim = basename( $datafile, ".dat" );
+
+system( "
 cp python/common_cff_py.txt $odir/.;
 cp python/$dataskim\TrackSelection_cff_py.txt $odir/.;
 cp python/align_tpl.py $odir/.;
@@ -38,7 +34,7 @@ open (SELECTION) or die "Can't open the file!";
 @selectionsInput = <SELECTION>;
 
 ## setting up parallel jobs
-$j = $dircount;
+$j = 0;
 
 foreach $data ( @dataFileInput ) {
 	$j++;
@@ -58,20 +54,18 @@ foreach $data ( @dataFileInput ) {
 	insertBlock( "$odir/job$j/align_cfg.py", "<COMMON>", @commonFileInput );
 	insertBlock( "$odir/job$j/align_cfg.py", "<SELECTION>", @selectionsInput );
 	# replaces for runScript
-	replace( "$odir/job$j/runScript.csh", "<ODIR>", "$odir/job$j" );
+    replace( "$odir/job$j/runScript.csh", "<ODIR>", "$odir/job$j" );
 	replace( "$odir/job$j/runScript.csh", "<JOBTYPE>", "align_cfg.py" );
 	close OUTFILE;
 	system "chmod a+x $odir/job$j/runScript.csh";
 }
-    $dircount=$j;
+
 system( "
 mkdir $odir/main;
 cp python/initial_tpl.py $odir/main/initial_cfg.py;
 cp python/collect_tpl.py $odir/main/collect_cfg.py;
 cp python/upload_tpl.py $odir/upload_cfg.py;
 cp scripts/runScript.csh $odir/main/.;
-cp scripts/runControl.csh $odir/main/.;
-cp scripts/checkError.sh $odir/main/.;
 ");
 ## setting up initial job
 replace( "$odir/main/initial_cfg.py", "<PATH>", "$odir" );
@@ -84,13 +78,10 @@ insertBlock( "$odir/main/collect_cfg.py", "<COMMON>", @commonFileInput );
 replace( "$odir/main/runScript.csh", "<ODIR>", "$odir/main" );
 replace( "$odir/main/runScript.csh", "<JOBTYPE>", "collect_cfg.py" );
 system "chmod a+x $odir/main/runScript.csh";
-system "chmod a+x $odir/main/checkError.sh";
 
 ## setting up upload job
 replace( "$odir/upload_cfg.py", "<PATH>", "$odir" );
 insertBlock( "$odir/upload_cfg.py", "<COMMON>", @commonFileInput );
-
-}#end loop on datafiles
 
 # replace sub routines #
 ###############################################################################

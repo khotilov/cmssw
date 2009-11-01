@@ -9,8 +9,6 @@ from DQM.HLTEvF.FourVectorHLTOnline_cff import *
 from DQM.HLTEvF.HLTMonJetMETDQMSource_cff import * 
 from DQM.HLTEvF.HLTMonMuonDQM_cff import *
 from DQM.HLTEvF.HLTLocalRecoDT_cff import *
-from DQM.HLTEvF.HLTLocalRecoSiStrip_cff import *
 from DQM.HLTEvF.HLTMonAlCaPi0_cff import *
 from DQM.HLTEvF.HLTMonAlCaPhySim_cff import *
-from DQM.HLTEvF.hltMonBTag_cff import *
 

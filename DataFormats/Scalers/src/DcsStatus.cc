@@ -7,6 +7,62 @@
 #include <cstdio>
 #include <ostream>
 
+const int DcsStatus::partitionList[DcsStatus::nPartitions] = {
+  EBp         ,
+  EBm         ,
+  EEp         ,
+  EEm         ,
+  HBHEa       ,
+  HBHEb       ,
+  HBHEc       ,
+  HF          ,
+  HO          ,
+  RPC         ,
+  DT0         ,
+  DTp         ,
+  DTm         ,
+  CSCp        ,
+  CSCm        ,
+  DTTF        ,
+  CSCTF       ,
+  CASTOR      ,
+  TIBTID      ,
+  TOB         ,
+  TECp        ,
+  TECm        ,
+  BPIX        ,
+  FPIX        ,
+  ESp         ,
+  ESm };
+
+const char * DcsStatus::partitionName[DcsStatus::nPartitions] = {
+  "EBp"         ,
+  "EBm"         ,
+  "EEp"         ,
+  "EEm"         ,
+  "HBHEa"       ,
+  "HBHEb"       ,
+  "HBHEc"       ,
+  "HF"          ,
+  "HO"          ,
+  "RPC"         ,
+  "DT0"         ,
+  "DTp"         ,
+  "DTm"         ,
+  "CSCp"        ,
+  "CSCm"        ,
+  "DTTF"        ,
+  "CSCTF"       ,
+  "CASTOR"      ,
+  "TIBTID"      ,
+  "TOB"         ,
+  "TECp"        ,
+  "TECm"        ,
+  "BPIX"        ,
+  "FPIX"        ,
+  "ESp"         ,
+  "ESm" };
+
 DcsStatus::DcsStatus() : 
    trigType_(0),
    eventID_(0),
@@ -14,7 +70,9 @@ DcsStatus::DcsStatus() :
    bunchNumber_(0),
    version_(0),
    collectionTime_(0,0),
-   ready_(0)
+   ready_(0),
+   magnetCurrent_((float)0.0),
+   magnetTemperature_((float)0.0)
 { 
 }
 
@@ -32,9 +90,11 @@ DcsStatus::DcsStatus(const unsigned char * rawData)
   version_ = raw->version;
   if ( version_ >= 4 )
   {
-    collectionTime_.set_tv_sec(static_cast<long>(raw->beamSpot.collectionTime_sec));
-    collectionTime_.set_tv_nsec(raw->beamSpot.collectionTime_nsec);
-    ready_       = raw->dcsStatus.ready;
+    collectionTime_.set_tv_sec(static_cast<long>(raw->dcsStatus.collectionTime_sec));
+    collectionTime_.set_tv_nsec(raw->dcsStatus.collectionTime_nsec);
+    ready_             = raw->dcsStatus.ready;
+    magnetCurrent_     = raw->dcsStatus.magnetCurrent;
+    magnetTemperature_ = raw->dcsStatus.magnetTemperature;
   }
 }
 
@@ -62,8 +122,24 @@ std::ostream& operator<<(std::ostream& s, const DcsStatus& c)
 	  c.trigType(), c.eventID(), c.bunchNumber());
   s << line << std::endl;
 
+  sprintf(line," MagnetCurrent: %e    MagnetTemperature: %e", 
+	  c.magnetCurrent(), c.magnetTemperature());
+  s << line << std::endl;
+
   sprintf(line," Ready: %d  0x%8.8X", c.ready(), c.ready());
   s << line << std::endl;
 
+  for ( int i=0; i<DcsStatus::nPartitions; i++)
+  {
+    if ( c.ready(DcsStatus::partitionList[i]))
+    {
+      sprintf(line,"  %2d %6s: READY", i, DcsStatus::partitionName[i]);
+    }
+    else
+    {
+      sprintf(line,"  %2d %6s: NOT READY", i, DcsStatus::partitionName[i]);
+    }
+  s << line << std::endl;
+  }
   return s;
 }

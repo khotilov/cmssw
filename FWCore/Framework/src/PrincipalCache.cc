@@ -223,13 +223,18 @@ namespace edm {
   }
 
   void PrincipalCache::adjustEventToNewProductRegistry(boost::shared_ptr<ProductRegistry const> reg) {
-    eventPrincipal_->adjustIndexesAfterProductRegistryAddition();
-    bool eventOK = eventPrincipal_->adjustToNewProductRegistry(*reg);
-    assert(eventOK);
+    if (eventPrincipal_) {
+      eventPrincipal_->adjustIndexesAfterProductRegistryAddition();
+      bool eventOK = eventPrincipal_->adjustToNewProductRegistry(*reg);
+      assert(eventOK);
+    }
   }
   
   void PrincipalCache::adjustIndexesAfterProductRegistryAddition() {
     for (ConstRunIterator it = runPrincipals_.begin(), itEnd = runPrincipals_.end(); it != itEnd; ++it) {
+      it->second->adjustIndexesAfterProductRegistryAddition();
+    }
+    for (ConstLumiIterator it = lumiPrincipals_.begin(), itEnd = lumiPrincipals_.end(); it != itEnd; ++it) {
       it->second->adjustIndexesAfterProductRegistryAddition();
     }
   }
