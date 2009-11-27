@@ -91,7 +91,7 @@ valGctDigis.inputLabel = 'gctDigis'
 #valDtTriggerPrimitiveDigis.inputLabel = 'muonDTDigis'
 valDttfDigis.DTDigi_Source = 'dttfDigis'
 valDttfDigis.CSCStub_Source = 'valCsctfTrackDigis'
-muonDtMon.CSCinput = 'dttfDigis'
+muonDtMon.DTinput = 'dttfDigis'
 valCscTriggerPrimitiveDigis.CSCComparatorDigiProducer = cms.InputTag("muonCSCDigis","MuonCSCComparatorDigi")
 valCscTriggerPrimitiveDigis.CSCWireDigiProducer = cms.InputTag("muonCSCDigis","MuonCSCWireDigi")
 valCsctfTrackDigis.SectorReceiverInput = 'csctfDigis'
@@ -115,6 +115,8 @@ valHcalTriggerPrimitiveDigis.FG_threshold = cms.uint32(12)
 EcalTrigPrimESProducer.DatabaseFile = 'TPG_startup.txt.gz'
 HcalTPGCoderULUT.read_Ascii_LUTs = True
 HcalTPGCoderULUT.inputLUTs = 'L1Trigger/HardwareValidation/hwtest/globrun/HcalCRAFTPhysicsV2.dat'
+valGctDigis.preSamples = cms.uint32(0)
+valGctDigis.postSamples = cms.uint32(0)
 
 # the comparator module
 # parameters are specified in cfi
