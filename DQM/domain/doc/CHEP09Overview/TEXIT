@@ -34,7 +34,7 @@ makeindex      -o $NAME.aind $NAME.aidx
 latex          $NAME.tex </dev/null
 latex          $NAME.tex </dev/null
 #dvips          -o $NAME.ps $NAME.dvi
-dvipdfmx -V 6  -o $NAME.pdf $NAME.dvi
+dvipdfmx -V 5  -o $NAME.pdf $NAME.dvi
 #dvipdfm -V 5  -o $NAME.pdf $NAME.dvi
 
 rm -f $NAME.aind

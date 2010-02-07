@@ -31,14 +31,14 @@ operations arrangements and the key technical implementation aspects.
 Data quality monitoring (DQM) is critically important for the detector and
 operation efficiency, and for the reliable certification of the recorded data
 for physics analyses.  The CMS experiment at CERN's Large Hadron
-Collider~\cite{cms_tp} has standardised on a single end-to-end DQM chain
+Collider~\cite{cms_tp} has standardised on a single end to end DQM chain
 (Fig.~\ref{fig:overview}).  The system comprises:
 
 \begin{itemize}
   \item tools for the creation, filling, transport and archival of histogram
     and scalar monitor elements, with standardised algorithms for performing
-    automated quality and validity tests on value distributions;
-  \item monitoring systems live online for the detector, the trigger, and the
+    automated quality and validity tests on distributions;
+  \item monitoring systems live online for the detector, the trigger, the
     DAQ hardware status and data throughput, for the offline reconstruction
     and for validating calibration results, software releases and simulated
     data;
@@ -84,14 +84,14 @@ processing at the CAF analysis facility~\cite{cms_caf_09}.
 \section{Online DQM system}
 \subsection{Data processing}
 
-As illustrated in Fig.~\ref{fig:online}, the online DQM applications in the
-online are an integral part of the rest of the event data processing at the
+As illustrated in Fig.~\ref{fig:online}, the online DQM applications
+are an integral part of the rest of the event data processing at the
 cluster at CMS Point-5.  DQM distributions are created at two different
 levels, {\em high-level trigger filter units} and {\em data quality monitoring
   applications.}
 
 The high-level trigger filter units process events at up to 100~kHz and
-produce a limited number of histograms.  The histogram monitor elements are
+produce a limited number of histograms.  These histograms are
 delivered from the filter units to the storage managers at the end of each
 luminosity section.  Identical histograms across different filter units are
 summed together and sent to a storage manager proxy server, which saves the
@@ -111,7 +111,10 @@ request additional high level trigger information.
 Each application receives events from the storage manager proxy over HTTP and
 runs its choice of algorithms and analysis modules and generates its results
 in the form of {\em monitoring elements,} including meta data such as the run
-number and the time the last event was seen.  The applications re-run
+number and the time the last event was seen.  The detector level algorithms
+include for example checks for hot, cold or otherwise bad channels, data
+integrity, noise and pedestal levels, occupancy, timing problems, reconstructed quantities,
+trigger issues, and detector-specific known problems.  The applications re-run
 reconstruction according to the monitoring needs.  The monitor element output
 includes reference histograms and quality test results.  The latter are defined
 using a generic standard quality testing module, and are configured via an XML
@@ -119,16 +122,17 @@ file.
 
 \subsection{Visualisation}
 
-All the result monitor element data including alarm states based on quality
-test results is made available to a central DQM GUI for visualisation in real
-time~\cite{dqm_gui_09}, and stored to a ROOT file~\cite{root} from time to
-time during the run.  At the end of the run the final archived results are
-uploaded to a large disk pool on the central GUI.  There the files are merged
-to larger size and backed up to tape.  The automatic certification summary
-from the online DQM step is extracted and uploaded to the run registry and on
-to the condition database (see section~\ref{certification}), where it can be
-analysed using another web-based monitoring tool, WBM~\cite{wbm}.  Several
-months of recent DQM data is kept on disk available for archive web browsing.
+All the result monitor element data is made available to a central DQM GUI
+for visualisation in real time~\cite{dqm_gui_09}.  The data includes alarm
+states based on quality test results.  During the run the data are also
+stored to a ROOT file~\cite{root} from time to time.  At the end of the run
+the final archived results are uploaded to a large disk pool on the central
+GUI server.  There the files are merged to larger size and backed up to tape.
+The automatic certification summary from the online DQM step is extracted and
+uploaded to the run registry and on to the condition database (see
+section~\ref{certification}), where it can be analysed using another
+web-based monitoring tool, WBM~\cite{wbm}.  Several months of recent DQM data
+is kept on disk available for archive web browsing.
 
 \subsection{Operation}
 
@@ -143,8 +147,8 @@ artificial dead-lines.
 
 The central DQM team invests significantly in three major areas: 1)~to
 integrate and standardise the DQM processes, in particular to define and
-enforce standard interfaces, naming conventions and look and feel of the
-summary level information; 2)~to organise shift activities, maintain
+enforce standard interfaces, naming conventions and the appearance and behaviour
+of the summary level information; 2)~to organise shift activities, maintain
 sufficiently useful shift documentation, and train people taking shifts; and
 3)~to support and consult the subsystem DQM responsibles and the physicists
 using the DQM tools.
@@ -163,7 +167,7 @@ control.  The file management on the DQM GUI server is increasingly automated.
 As illustrated in Fig.~\ref{fig:overview}, numerous offline workflows in CMS
 involve data quality monitoring: Tier-0 prompt reconstruction,
 re-reconstruction at the Tier-1s and the validation of the alignment and
-calibration results, the software releases and all the simulated data.  These
+calibration results, the software releases and the simulated data.  These
 systems vary considerably in location, data content and timing, but as far as
 DQM is concerned, CMS has standardised on a single two-step process for all
 these activities, shown in Fig.~\ref{fig:offline}.
@@ -194,7 +198,7 @@ The key differences between the various offline DQM processes are in content
 and timing.  The Tier-0 and the Tier-1s re-determine the detector status on
 real data using full event statistics and full reconstruction, and add
 higher-level physics object monitoring to the detector and trigger performance
-monitoring.  The Tier-0 does so at $\Delta t$ of a day or two whereas the
+monitoring.  The Tier-0 does so at time scale of a day or two whereas the
 Tier-1 re-processing takes from days to weeks.  On CAF the time to validate
 alignment and calibration quantities varies from hours to days.  The
 validation cycle of simulated data reflects the sample production times, and
@@ -216,11 +220,11 @@ section~\ref{certification}.
 
 CMS provides one central DQM GUI web server instance per offline activity,
 including one public test instance for development.  All online and offline
-servers provide a common look and feel and are linked together as one entity,
-to give the entire worldwide collaboration access to inspect and analyse all
-the DQM data at one central location.  While the GUI will offer in its final
+servers provide a common look and feel and are linked together as one entity.
+They give the entire worldwide collaboration access to inspect and analyse all
+the DQM data at one central location.  The GUI will offer in its final
 form all the capabilities needed for shift and expert use for all the DQM
-activities, we emphasise it is custom-built for the purpose of efficient
+activities.  We emphasise it is custom-built for the purpose of efficient
 interactive visualisation and navigation of DQM results; it is not a general
 physics analysis tool.
 
@@ -230,7 +234,7 @@ In all the offline processing the initial histogram production step is
 incorporated in the standard data processing workflows as an additional
 execution sequence, using components from standard software releases.  The
 harvesting step implementation currently varies by the activity.  The Tier-0
-processing systems has fully integrated automated harvest step and upload to
+processing system has fully integrated an automated harvest step and upload to
 the DQM GUI.  For other data we currently submit analysis jobs with the CMS
 CRAB tool~\cite{cms_crab_07} to perform the harvest step; the histogram
 result file is returned in the job sandbox which the operator then uploads
@@ -240,7 +244,7 @@ to the GUI.  This is largely a manual operation at present.
 
 \begin{figure}[!tbp]
 \begin{center}
-\includegraphics[width=.90\textwidth]{Snippets/Run_registry}
+\includegraphics[width=.99\textwidth]{Snippets/Run_registry}
 \caption{\label{fig:runregistry}DQM run registry web interface.}
 \end{center}
 \end{figure}
@@ -285,7 +289,7 @@ quality evaluation, and correlation with other variables such as temperature
 data.  In the DBS the quality flags are used to define convenience {\em
   analysis datasets.}  The flags are also accessible in the CMS data discovery
 interface~\cite{cms_dbs_discovery_07}, a web interface to browse and select
-data in the DBS (Fig.~\ref{fig:dbsqflags}).
+data in the DBS (Fig.~\ref{fig:dbsqflags}, ``data quality'' column).
 
 Some trivial trend plots of the key monitor element metrics have recently
 been generated automatically.  We plan to extend this to more comprehensive
@@ -294,7 +298,7 @@ on common design for convenient access and presentation of trends over time.
 
 \begin{figure}[!tbp]
 \begin{center}
-\includegraphics[width=.90\textwidth]{Snippets/DBS_discovery_qflags}
+\includegraphics[width=.99\textwidth]{Snippets/DBS_discovery_qflags}
 \caption{\label{fig:dbsqflags}DBS discovery page displaying quality flags.}
 \end{center}
 \end{figure}
@@ -313,7 +317,7 @@ illustrated in Fig.~\ref{fig:shiftdoc}, have been fully exercised.
 
 \begin{figure}[!tbp]
 \begin{center}
-\includegraphics[width=.75\textwidth]{Snippets/DQM_shift_instructions}
+\includegraphics[width=.95\textwidth]{Snippets/DQM_shift_instructions}
 \caption{\label{fig:shiftdoc}Example shift instructions.}
 \end{center}
 \end{figure}
@@ -386,7 +390,9 @@ physics software, production tools, operators, and so on.
   (Prague, Czech Republic)
 
 \bibitem{root}
-  ROOT---A data analysis framework, 2009, \url{http://root.cern.ch}
+  Brun R, Rademakers F, 1996, {\it Proc. AIHENP'96 Workshop},
+  ``ROOT -- An Object Oriented Data Analysis Framework''
+  (Lausanne, Switzerland); see also \url{http://root.cern.ch}
 
 \bibitem{runcontrol}
   Bauer G, et al,

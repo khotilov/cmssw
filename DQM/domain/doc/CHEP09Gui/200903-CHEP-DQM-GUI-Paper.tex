@@ -57,19 +57,15 @@ histogram display on (Fig.~\ref{fig:views-reference}).  Shift views
 are usually defined as collections of layouts.
 
 \begin{figure}[!tbp]
-\begin{minipage}[b]{.40\textwidth}
-\vspace{0em}
 \begin{center}
-\raisebox{3em}{
-  \includegraphics[width=.90\textwidth]{Snippets/DQM_GUI_architecture_v2}}
-\end{center}
+\includegraphics[width=.80\textwidth]{Snippets/DQM_GUI_architecture_v2}
 \caption{\label{fig:arch}GUI architecture overview.}
-\end{minipage}
-\hfill
-\begin{minipage}[b]{.55\textwidth}
-\vspace{0em}
+\end{center}
+\end{figure}
+
+\begin{figure}[!tbp]
 \begin{center}
-\tiny
+\vspace{1em}
 \begin{verbatim}
 ([{kind: 'AutoUpdate', interval: 300, stamp: 1237219783, serverTime: 96.78},
  { kind: 'DQMHeaderRow', run: "77'025", lumi: "47", event: "6'028'980",
@@ -83,14 +79,13 @@ are usually defined as collections of layouts.
      location: "archive/77025/Global/Online/ALL/Global run",
      reportSummary: "0.998", eventTimeStamp: "1236244352" },  ...]}])
 \end{verbatim}
-\end{center}
 \caption{\label{fig:json}A JSON state response from which the Summary
   page of Fig.~\ref{fig:views-summary-page} was rendered.  The
   response contains the minimal raw data needed for this particular
   page view, grouped by browser side JavaScript GUI plug-in which
   knows how to translate the state in HTML+CSS, including the user
   interaction controls.}
-\end{minipage}
+\end{center}
 \end{figure}
 
 \begin{figure}[!tbp]
@@ -107,8 +102,8 @@ are usually defined as collections of layouts.
   \includegraphics[width=.31\textwidth]{Snippets/DQM_GUI_shift_view}}\hfill
 \subfigure[Single histogram explorer and editor.]{\label{fig:views-histo-edit}%
   \includegraphics[width=.31\textwidth]{Snippets/DQM_GUI_plot_edit}}
-\end{center}
 \caption{\label{fig:views}DQM GUI views.}
+\end{center}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,24 +143,22 @@ concurrently.
 \includegraphics[width=.45\textwidth]{Snippets/DQM_GUI_custom_original}\hfill
 \raisebox{6em}{\LARGE\,$\Rightarrow$}\hfill
 \includegraphics[width=.45\textwidth]{Snippets/DQM_GUI_custom_render}
-\end{center}
 \caption{\label{fig:plugin}A render plug-in can be added to modify the appearance of a histogram.}
+\end{center}
 \end{figure}
 
 \begin{figure}[!tbp]
-\begin{minipage}{.45\textwidth}
 \begin{center}
-\includegraphics[width=.99\textwidth]{Snippets/CMS_centre_console_small_extract}
+\includegraphics[width=.50\textwidth]{Snippets/CMS_centre_console_small_extract}
 \caption{\label{fig:console}One of the central DQM and event display consoles at the CMS centre in Meyrin, 10 Sept 2008.}
 \end{center}
-\end{minipage}
-\hfill
-\begin{minipage}{.45\textwidth}
+\end{figure}
+
+\begin{figure}[!tbp]
 \begin{center}
-\includegraphics[width=.70\textwidth]{Snippets/DQM_GUI_servers}
+\includegraphics[width=.7\textwidth]{Snippets/DQM_GUI_servers}
 \caption{\label{fig:shmem}The distributed shared memory system.}
 \end{center}
-\end{minipage}
 \end{figure}
 
 The histograms are rendered in separate fortified processes to isolate
@@ -204,11 +197,12 @@ high-quality anti-alias filter.
 \begin{figure}[!b]
 \begin{center}
 \subfigure[The daily average DQM GUI response time versus date and number of requests per day.]{\label{fig:responsetime}%
-  \includegraphics[width=.31\textwidth]{Snippets/DQM_GUI_accesses_response}}\hfill
+  \includegraphics[width=.7\textwidth]{Snippets/DQM_GUI_accesses_response}}\hfill
 \subfigure[Number of DQM GUI HTTP requests per day from December 2007 to March 2009.]{\label{fig:requests}%
-  \includegraphics[width=.65\textwidth]{Snippets/DQM_GUI_accesses_traffic}}\hfill
-\end{center}
+  \hspace{-3.5em}
+  \includegraphics[width=1.15\textwidth]{Snippets/DQM_GUI_accesses_traffic}}\hfill
 \caption{\label{fig:performance}DQM GUI HTTP server performance.}
+\end{center}
 \end{figure}
 
 \section{Operation and experience}
@@ -227,7 +221,7 @@ effort on the entire DQM GUI has gone into debugging ROOT
 instabilities and producing countermeasures.  We are very pleased with
 the robustness of the rest of the DQM GUI system.
 
-CMS typically creates circa 50'000 histograms per run.  The average
+CMS typically creates approximately 50'000 histograms per run.  The average
 GUI HTTP response time is around 270 ms (Fig.~\ref{fig:responsetime}),
 which we find satisfactory.  The production server has scaled to about
 750'000 HTTP requests per day with little apparent impact on the
