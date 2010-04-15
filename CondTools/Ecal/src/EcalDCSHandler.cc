@@ -103,7 +103,7 @@ uint16_t  popcon::EcalDCSHandler::updateHV( RunDCSHVDat* hv, uint16_t dbStatus, 
   
   uint16_t temp=0;
 
-  if(mode == 0 | mode ==1) {
+  if(mode == 0 || mode == 1) {
     for (int i=0; i<16; i++) {
       if( i!= EcalDCSTowerStatusHelper::HVSTATUS &&  i!=EcalDCSTowerStatusHelper::HVNOMINALSTATUS  ) {
 	temp = temp | (1<<i) ;  
@@ -374,7 +374,7 @@ int * popcon::EcalDCSHandler::HVEELogicIDToDetID(int dee, int chan) const {
     iy1=1; iy2=10;
   } else if(dee==1 && chan==2) {
     ix1=1; ix2=10;
-    iy1=11; iy2=20;
+    iy1=1; iy2=10;
   } else if(dee==2 && chan==2) {
     ix1=11; ix2=20;
     iy1=11; iy2=20;
@@ -708,7 +708,7 @@ void popcon::EcalDCSHandler::getNewObjects()
 	string location_p5="P5_Co";
 	econn->fetchValidDataSet(&rundat , &rp, location_p5 ,runmax);
 	
-	run_t irun=rp.getRunNumber();
+	unsigned long long  irun=(unsigned long long) rp.getRunNumber();
 	
 	
 	if(max_since< irun) { 

@@ -13,7 +13,6 @@
 //#include "IOMC/ParticleGuns/interface/ExpoRandomPtGunSource.h"
 //#include "IOMC/ParticleGuns/interface/MultiParticleInConeGunSource.h"
 
-#include "IOMC/ParticleGuns/interface/FileRandomKEThetaGunProducer.h"
 #include "IOMC/ParticleGuns/interface/FlatRandomEGunProducer.h"
 #include "IOMC/ParticleGuns/interface/FlatRandomPtGunProducer.h"
 #include "IOMC/ParticleGuns/interface/FlatRandomEThetaGunProducer.h"
@@ -43,8 +42,6 @@ using edm::MultiParticleInConeGunSource;
 DEFINE_FWK_INPUT_SOURCE(MultiParticleInConeGunSource);
 */
 
-using edm::FileRandomKEThetaGunProducer;
-DEFINE_FWK_MODULE(FileRandomKEThetaGunProducer);
 using edm::FlatRandomEGunProducer;
 DEFINE_FWK_MODULE(FlatRandomEGunProducer);
 using edm::FlatRandomPtGunProducer;

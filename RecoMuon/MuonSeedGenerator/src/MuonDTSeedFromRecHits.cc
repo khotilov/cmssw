@@ -2,8 +2,8 @@
  *  See header file for a description of this class.
  *
  *
- *  $Date: 2010/04/08 23:40:33 $
- *  $Revision: 1.17 $
+ *  $Date: 2009/10/30 18:53:30 $
+ *  $Revision: 1.15 $
  *  \author A. Vitelli - INFN Torino, V.Palichik
  *  \author porting  R. Bellan
  *
@@ -18,7 +18,6 @@
 //#include "DataFormats/TrajectoryState/interface/PTrajectoryStateOnDet.h"
 #include "DataFormats/Common/interface/OwnVector.h"
 #include "DataFormats/MuonDetId/interface/DTChamberId.h"
-#include "DataFormats/Math/interface/deltaPhi.h"
 //#include "DataFormats/MuonDetId/interface/CSCDetId.h"
 //#include "DataFormats/MuonDetId/interface/RPCDetId.h"
 
@@ -80,13 +79,13 @@ TrajectorySeed MuonDTSeedFromRecHits::seed() const {
   LogTrace(metname) << " Seed Pt: " << ptmean << " +/- " << sptmean << endl;
   
   // take the best candidate
-  ConstMuonRecHitPointer last = bestBarrelHit(theRhits);
+  ConstMuonRecHitPointer last = best_cand();
   return createSeed(ptmean, sptmean,last);
 }
 
 
 MuonDTSeedFromRecHits::ConstMuonRecHitPointer 
-MuonDTSeedFromRecHits::bestBarrelHit(const MuonRecHitContainer & barrelHits) const {
+MuonDTSeedFromRecHits::best_cand() const {
 
   int alt_npt = 0;
   int best_npt = 0;
@@ -94,8 +93,8 @@ MuonDTSeedFromRecHits::bestBarrelHit(const MuonRecHitContainer & barrelHits) con
   MuonRecHitPointer best = 0;
   MuonRecHitPointer alter=0;
 
-  for (MuonRecHitContainer::const_iterator iter=barrelHits.begin();
-       iter!=barrelHits.end(); iter++ ) {
+  for (MuonRecHitContainer::const_iterator iter=theRhits.begin();
+       iter!=theRhits.end(); iter++ ) {
 
     bool hasZed = ((*iter)->projectionMatrix()[1][1]==1);
 
@@ -198,7 +197,9 @@ void MuonDTSeedFromRecHits::computePtWithVtx(double* pt, double* spt) const {
     GlobalPoint pos = (*iter)->globalPosition();
     GlobalVector dir = (*iter)->globalDirection();
 
-    float dphi = deltaPhi(dir.phi(), pos.phi());
+    float dphi = -pos.phi()+dir.phi();
+    if(dphi>M_PI) dphi -= 2*M_PI;
+    if(dphi<-M_PI) dphi += 2*M_PI;
     int ch = (dphi<0) ? 1 : -1;
 
     if( stat==1 ) {
@@ -269,7 +270,10 @@ void MuonDTSeedFromRecHits::computePtWithoutVtx(double* pt, double* spt) const {
 
       GlobalVector globalDir1 = (*iter)->globalDirection();
       GlobalVector globalDir2 = (*iter2)->globalDirection();
-      float dphi = deltaPhi(globalDir2.phi(), -globalDir1.phi());
+      float dphi = -globalDir1.phi()+globalDir2.phi();
+      // Maybe these aren't necessary with Geom::Phi
+      if(dphi>M_PI) dphi -= 2*M_PI;
+      if(dphi<-M_PI) dphi += 2*M_PI;
       // assume we're going inward, so + dphi means + charge
       int ch = (dphi > 0) ? 1 : -1;
 

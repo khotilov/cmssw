@@ -16,7 +16,7 @@
 //
 // Original Author:  Chris Jones
 //         Created:  Thu Jan  3 14:02:21 EST 2008
-// $Id: FWEventItem.h,v 1.39 2010/03/04 21:31:47 chrjones Exp $
+// $Id: FWEventItem.h,v 1.38 2010/01/21 21:01:34 amraktad Exp $
 //
 
 // system include files
@@ -157,8 +157,12 @@ public:
 
    // ---------- member functions ---------------------------
    void setEvent(const fwlite::Event* iEvent);
-
-   const DetIdToMatrix* getGeom() const;
+   void setGeom(const DetIdToMatrix* geom){
+      m_detIdToGeo = geom;
+   }
+   const DetIdToMatrix* getGeom() const {
+      return m_detIdToGeo;
+   }
 
    void setLabels(const std::string& iModule,
                   const std::string& iProductInstance,
@@ -231,6 +235,8 @@ private:
    std::string m_processName;
    const fwlite::Event* m_event;
    ROOT::Reflex::Type m_wrapperType;
+   const DetIdToMatrix* m_detIdToGeo;
+
    FWItemValueGetter m_interestingValueGetter;
 
    FWModelFilter m_filter;

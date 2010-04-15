@@ -5,6 +5,8 @@
 #include "TEveTrackPropagator.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
+#include "DataFormats/CaloTowers/interface/CaloTower.h"
+#include "DataFormats/CaloTowers/interface/CaloTowerFwd.h"
 #include "Fireworks/Core/interface/FWEventItem.h"
 #include "TGeoBBox.h"
 #include "TGeoArb8.h"
