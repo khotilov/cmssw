@@ -4,16 +4,6 @@
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
 
 # ----------------------------------------------------
-# switch off new tau features introduced in 33X to
-# restore 31X defaults new feaures:
-# - shrinkingConeTaus instead of fixedCone ones
-# - TaNC discriminants attached for shrinkingConeTaus
-# - default preselection on cleaningLayer1
-# ----------------------------------------------------
-from PhysicsTools.PatAlgos.tools.tauTools import *
-switchTo31Xdefaults(process)
-
-# ----------------------------------------------------
 # EXAMPLE 1: change the pat jet collection in the 
 #            event content
 # ----------------------------------------------------
@@ -35,11 +25,11 @@ switchTo31Xdefaults(process)
 # ----------------------------------------------------
 #from PhysicsTools.PatAlgos.tools.jetTools import *
 #addJetCollection(process,cms.InputTag('ak7CaloJets'),
-#                 'AK7',
+#                 'AK7', 'Calo',
 #                 doJTA        = True,
 #                 doBTagging   = False,
 #                 jetCorrLabel = None,
-#                 doType1MET   = True,
+#                 doType1MET   = False,
 #                 doL1Cleaning = True,                 
 #                 doL1Counters = False,
 #                 genJetCollection=cms.InputTag("ak7GenJets"),
@@ -47,7 +37,7 @@ switchTo31Xdefaults(process)
 #                 jetIdLabel   = "ak7"
 #                 )
 #addJetCollection(process,cms.InputTag('iterativeCone5CaloJets'),
-#                 'IC5',
+#                 'IC5', 'Calo',
 #                 doJTA        = True,
 #                 doBTagging   = True,
 #                 jetCorrLabel = ('IC5', 'Calo'),
@@ -57,10 +47,6 @@ switchTo31Xdefaults(process)
 #                 genJetCollection=cms.InputTag("iterativeCone5GenJets"),
 #                 doJetID      = False
 #                 )
-#process.out.outputCommands += ["keep *_cleanLayer1Jets*_*_*",
-#                               "keep *_selectedLayer1Jets*_*_*",                               
-#                               "keep *_layer1METs*_*_*"
-#                               ]
 
 # ----------------------------------------------------
 # EXAMPLE 3: add different kinds of MET to the event
@@ -69,14 +55,12 @@ switchTo31Xdefaults(process)
 #from PhysicsTools.PatAlgos.tools.metTools import *
 #addTcMET(process, 'TC')
 #addPfMET(process, 'PF')
-#process.out.outputCommands += ["keep *_layer1METs*_*_*"
-#                               ]
 
 # ----------------------------------------------------
 # EXAMPLE 4: switch to different standard ouputs of
 #            the pat tuple
 # ----------------------------------------------------
-## switched from cleanLayer1Candidates to selectedLayer1Candidates
+## switched from cleanPatCandidates to selectedPatCandidates
 #from PhysicsTools.PatAlgos.tools.coreTools import removeCleaning
 #removeCleaning(process)
 
