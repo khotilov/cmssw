@@ -9,7 +9,7 @@
 // Original Author:  Chris Jones
 //         Created:  Mon Feb 11 11:06:40 EST 2008
 
-// $Id: FWGUIManager.cc,v 1.194 2010/04/07 16:56:20 amraktad Exp $
+// $Id: FWGUIManager.cc,v 1.192 2010/03/26 20:20:21 matevz Exp $
 
 //
 
@@ -60,7 +60,6 @@
 #include "Fireworks/Core/interface/FWColorManager.h"
 #include "Fireworks/Core/interface/FWDetailViewManager.h"
 #include "Fireworks/Core/interface/FWViewBase.h"
-#include "Fireworks/Core/interface/FWViewType.h"
 #include "Fireworks/Core/interface/FWModelChangeManager.h"
 #include "Fireworks/Core/interface/FWViewManagerManager.h"
 
@@ -1005,7 +1004,7 @@ FWGUIManager::addTo(FWConfiguration& oTo) const
       TEveWindow* ew = (*it).eveWindow;
       if (ew) {
          FWViewBase* wb = m_viewMap[ew];
-         FWConfiguration tempWiew(wb->version());
+         FWConfiguration tempWiew(1);
          wb->addTo(tempWiew);
          views.addKeyValue(wb->typeName(), tempWiew, true);
          FWConfiguration tempArea(cfgVersion);
@@ -1110,7 +1109,8 @@ FWGUIManager::setFrom(const FWConfiguration& iFrom) {
       {
          float weight = atof((areaIt->second).valueForKey("weight")->value().c_str());
          TEveWindowSlot* slot = ( m_viewMap.size() || (primSlot == 0) ) ? m_viewSecPack->NewSlotWithWeight(weight) : primSlot;
-         ViewMap_i lastViewIt = createView(it->first, slot);
+
+          ViewMap_i lastViewIt = createView(it->first, slot);
          lastViewIt->second->setFrom(it->second);
 
          bool  undocked = atof((areaIt->second).valueForKey("undocked")->value().c_str());
