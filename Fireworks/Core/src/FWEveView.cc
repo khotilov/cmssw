@@ -1,43 +1,24 @@
-// -*- C++ -*-
-//
-// Package:     Core
-// Class  :     FWEveView
-// 
-// Implementation:
-//     [Notes on implementation]
-//
-// Original Author:  Alja Mrak-Tadel
-//         Created:  Thu Mar 16 14:11:32 CET 2010
-// $Id: FWEveView.cc,v 1.5 2010/04/06 20:00:36 amraktad Exp $
-//
-
-
-
 #include <RVersion.h>
 #include <boost/bind.hpp>
 #include <stdexcept>
 
 
-// user include files
-
-#define private public  //!!! TODO add get/sets for camera zoom and FOV
-#include "TGLOrthoCamera.h"
-#include "TGLPerspectiveCamera.h"
-#undef private
-
 #include "TGLEmbeddedViewer.h"
 #include "TEveViewer.h"
-#include "TGLScenePad.h"
 #include "TEveManager.h"
 #include "TEveElement.h"
 #include "TEveWindow.h"
 #include "TEveScene.h"
 
+// user include files
 #include "Fireworks/Core/interface/FWEveView.h"
+
 #include "Fireworks/Core/interface/FWEventAnnotation.h"
 #include "Fireworks/Core/interface/CmsAnnotation.h"
+
 #include "Fireworks/Core/interface/FWGLEventHandler.h"
 #include "Fireworks/Core/interface/FWViewContextMenuHandlerGL.h"
+
 #include "Fireworks/Core/interface/FWConfiguration.h"
 #include "Fireworks/Core/interface/FWColorManager.h"
 #include "Fireworks/Core/interface/fwLog.h"
@@ -47,11 +28,8 @@
 //
 
 FWEveView::FWEveView(TEveWindowSlot* iParent) :
-   FWViewBase(2),
-   m_type(FWViewType::kSize),
-   m_viewer(0),
-   m_eventScene(0),
-   m_geoScene(0),
+   m_viewer(),
+   m_scene(),
    m_overlayEventInfo(0),
 #if ROOT_VERSION_CODE >= ROOT_VERSION(5,26,0)
    m_imageScale(this, "Image Scale", 1.0, 1.0, 6.0),
@@ -73,10 +51,10 @@ FWEveView::FWEveView(TEveWindowSlot* iParent) :
 #endif
    iParent->ReplaceWindow(m_viewer);
    gEve->GetViewers()->AddElement(m_viewer);
-   // spawn geo scene
-   m_geoScene = gEve->SpawnNewScene("Viewer GeoScene");
-   m_geoScene->GetGLScene()->SetSelectable(kFALSE);
-   m_viewer->AddScene(m_geoScene);
+
+   m_scene = gEve->SpawnNewScene(typeName().c_str());
+   m_viewer->AddScene(m_scene);
+
    m_viewContextMenu.reset(new FWViewContextMenuHandlerGL(m_viewer));
 
    FWGLEventHandler* eh = new FWGLEventHandler((TGWindow*)embeddedViewer->GetGLWidget(), (TObject*)embeddedViewer);
@@ -101,7 +79,7 @@ FWEveView::FWEveView(TEveWindowSlot* iParent) :
 
 FWEveView::~FWEveView()
 {
-   if (m_geoScene) delete m_geoScene;
+   m_scene->Destroy();
    m_viewer->DestroyWindowAndSlot();
 }
 
@@ -111,7 +89,8 @@ FWEveView::~FWEveView()
 const std::string& 
 FWEveView::typeName() const
 {
-   return m_type.name();
+   static std::string s_name("FWEveView");
+   return s_name;
 }
 
 FWViewContextMenuHandlerBase* 
@@ -141,7 +120,37 @@ FWEveView::saveImageTo(const std::string& iName) const
    fwLog(fwlog::kInfo) <<  "Saved image " << iName << std::endl;
 }
 
-//-------------------------------------------------------------------------------
+void
+FWEveView::addTo(FWConfiguration& iTo) const
+{
+   // take care of parameters
+   FWConfigurableParameterizable::addTo(iTo);
+
+   { 
+      assert ( m_overlayEventInfo );
+      m_overlayEventInfo->addTo(iTo);
+   }
+   { 
+      assert ( m_overlayLogo );
+      m_overlayLogo->addTo(iTo);
+   }
+}
+
+void
+FWEveView::setFrom(const FWConfiguration& iFrom)
+{
+   // take care of parameters
+   FWConfigurableParameterizable::setFrom(iFrom);
+   {
+      assert( m_overlayEventInfo);
+      m_overlayEventInfo->setFrom(iFrom);
+   }
+   {
+      assert( m_overlayLogo);
+      m_overlayLogo->setFrom(iFrom);
+   }
+}
+
 void
 FWEveView::lineWidthChanged()
 {
@@ -168,171 +177,3 @@ FWEveView::resetCamera()
 {
    viewerGL()->ResetCurrentCamera();
 }
-
-void
-FWEveView::setEventScene(TEveScene* eventScene)
-{
-   m_eventScene = eventScene;
-}
-
-
-void
-FWEveView::setType(FWViewType::EType t)
-{
-   m_type = FWViewType(t);
-
-   // update viewer name for debug purposes
-   m_viewer->SetElementName(Form("Viewer_%s", typeName().c_str()));
-}
-
-//-------------------------------------------------------------------------------
-void
-FWEveView::addTo(FWConfiguration& iTo) const
-{
-   // take care of parameters
-   FWConfigurableParameterizable::addTo(iTo);
-   
-   { 
-      assert ( m_overlayEventInfo );
-      m_overlayEventInfo->addTo(iTo);
-   }
-   { 
-      assert ( m_overlayLogo );
-      m_overlayLogo->addTo(iTo);
-   }
-}
-
-void
-FWEveView::setFrom(const FWConfiguration& iFrom)
-{
-   if (version() != iFrom.version())
-   {
-      fwLog(fwlog::kWarning) << "Skiping configuration. Version do not mach in view " << typeName() << std::endl;
-      return;
-   }
-   // take care of parameters
-   FWConfigurableParameterizable::setFrom(iFrom);
-   {
-      assert( m_overlayEventInfo);
-      m_overlayEventInfo->setFrom(iFrom);
-   }
-   {
-      assert( m_overlayLogo);
-      m_overlayLogo->setFrom(iFrom);
-   }
-}
-
-
-void
-FWEveView::addToOrthoCamera(TGLOrthoCamera* camera, FWConfiguration& iTo) const
-{
-   // zoom
-   std::ostringstream s;
-   s<<(camera->fZoom);
-   std::string name("cameraZoom");
-   iTo.addKeyValue(name+typeName(),FWConfiguration(s.str()));
-   
-   // transformation matrix
-   std::string matrixName("cameraMatrix");
-   for ( unsigned int i = 0; i < 16; ++i ) {
-      std::ostringstream osIndex;
-      osIndex << i;
-      std::ostringstream osValue;
-      osValue << camera->GetCamTrans()[i];
-      iTo.addKeyValue(matrixName+osIndex.str()+typeName(),FWConfiguration(osValue.str()));
-   }   
-}
-
-void
-FWEveView::setFromOrthoCamera(TGLOrthoCamera* camera,  const FWConfiguration& iFrom)
-{
-   // zoom
-   std::string zoomName("cameraZoom"); zoomName += typeName();
-   assert( 0!=iFrom.valueForKey(zoomName) );
-   std::istringstream s(iFrom.valueForKey(zoomName)->value());
-   s>>(camera->fZoom);
-   
-   // transformation matrix
-   std::string matrixName("cameraMatrix");
-   for ( unsigned int i = 0; i < 16; ++i ) {
-      std::ostringstream os;
-      os << i;
-      const FWConfiguration* value = iFrom.valueForKey( matrixName + os.str() + typeName() );
-      assert( value );
-      std::istringstream s(value->value());
-      s>> (camera->RefCamTrans()[i]);
-   }
-
-   camera->IncTimeStamp();
-}
-
-
- 
-void
-FWEveView::addToPerspectiveCamera(TGLPerspectiveCamera* cam, const std::string& name, FWConfiguration& iTo) const
-{   
-   // transformation matrix
-   std::string matrixName("cameraMatrix");
-   for ( unsigned int i = 0; i < 16; ++i ){
-      std::ostringstream osIndex;
-      osIndex << i;
-      std::ostringstream osValue;
-      osValue << (cam->GetCamTrans())[i];
-      iTo.addKeyValue(matrixName+osIndex.str()+name,FWConfiguration(osValue.str()));
-   }
-   
-   // transformation matrix base
-   matrixName = "cameraMatrixBase";
-   for ( unsigned int i = 0; i < 16; ++i ){
-      std::ostringstream osIndex;
-      osIndex << i;
-      std::ostringstream osValue;
-      osValue << (cam->GetCamBase())[i];
-      iTo.addKeyValue(matrixName+osIndex.str()+name,FWConfiguration(osValue.str()));
-   }
-   {
-      std::ostringstream osValue;
-      osValue << cam->fFOV;
-      iTo.addKeyValue(name+" FOV",FWConfiguration(osValue.str()));
-   }
-   
-}
-
-void
-FWEveView::setFromPerspectiveCamera(TGLPerspectiveCamera* cam, const std::string& name, const FWConfiguration& iFrom)
-{
-   std::string matrixName("cameraMatrix");
-   for ( unsigned int i = 0; i < 16; ++i ){
-      std::ostringstream os;
-      os << i;
-      const FWConfiguration* value = iFrom.valueForKey( matrixName + os.str() + name );
-      assert( value );
-      std::istringstream s(value->value());
-      s>>((cam->RefCamTrans())[i]);
-   }
-   
-   // transformation matrix base
-   matrixName = "cameraMatrixBase";
-   for ( unsigned int i = 0; i < 16; ++i ){
-      std::ostringstream os;
-      os << i;
-      const FWConfiguration* value = iFrom.valueForKey( matrixName + os.str() + name );
-      assert( value );
-      std::istringstream s(value->value());
-      s>>((cam->RefCamBase())[i]);
-   }
-   
-   {
-      const FWConfiguration* value = iFrom.valueForKey( name + " FOV" );
-      if (value) // assert not necessary in version 1
-      {
-         std::istringstream s(value->value());
-         s>>cam->fFOV;
-      }
-   }
-   
-   cam->IncTimeStamp();
-}
-
-
-//// TODO : add getters, setters for FOV and ZOOM in camera
