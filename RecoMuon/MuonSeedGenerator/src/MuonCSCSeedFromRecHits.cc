@@ -5,7 +5,6 @@
 #include "RecoMuon/TrackingTools/interface/MuonPatternRecoDumper.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHit.h"
 #include "DataFormats/TrajectoryState/interface/PTrajectoryStateOnDet.h"
-#include "DataFormats/Math/interface/deltaPhi.h"
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateTransform.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "Geometry/CSCGeometry/interface/CSCChamberSpecs.h"
@@ -156,7 +155,7 @@ bool MuonCSCSeedFromRecHits::makeSeed(const MuonRecHitContainer & hits1, const M
           }
 
           // get the position and direction from the higher-quality segment
-          ConstMuonRecHitPointer bestSeg = bestEndcapHit(theRhits);
+          ConstMuonRecHitPointer bestSeg = bestSegment();
           seed = createSeed(pt, sigmapt, bestSeg);
 
           //std::cout << "FITTED TIMESPT " << pt << " dphi " << dphi << " eta " << eta << std::endl;
@@ -185,7 +184,8 @@ int MuonCSCSeedFromRecHits::segmentQuality(ConstMuonRecHitPointer  segment) cons
   if ( nhits == 4 ) quality = 3 + Nchi2;
   if ( nhits == 3 ) quality = 5 + Nchi2;
 
-  float dPhiGloDir = fabs ( deltaPhi(segment->globalPosition().phi(), segment->globalDirection().phi()) );
+  float dPhiGloDir = fabs ( segment->globalPosition().phi() - segment->globalDirection().phi() );
+  if ( dPhiGloDir > M_PI   )  dPhiGloDir = 2.*M_PI - dPhiGloDir;
 
   if ( dPhiGloDir > .2 ) ++quality;
   return quality;
@@ -194,14 +194,14 @@ int MuonCSCSeedFromRecHits::segmentQuality(ConstMuonRecHitPointer  segment) cons
 
 
 MuonCSCSeedFromRecHits::ConstMuonRecHitPointer
-MuonCSCSeedFromRecHits::bestEndcapHit(const MuonRecHitContainer & endcapHits) const
+MuonCSCSeedFromRecHits::bestSegment() const
 {
   MuonRecHitPointer me1=0, meit=0;
   float dPhiGloDir = .0;                            //  +v
   float bestdPhiGloDir = M_PI;                      //  +v
   int quality1 = 0, quality = 0;        //  +v  I= 5,6-p. / II= 4p.  / III= 3p.
 
-  for ( MuonRecHitContainer::const_iterator iter = endcapHits.begin(); iter!= endcapHits.end(); iter++ ){
+  for ( MuonRecHitContainer::const_iterator iter = theRhits.begin(); iter!= theRhits.end(); iter++ ){
     if ( !(*iter)->isCSC() ) continue;
 
     // tmp compar. Glob-Dir for the same tr-segm:
@@ -210,7 +210,9 @@ MuonCSCSeedFromRecHits::bestEndcapHit(const MuonRecHitContainer & endcapHits) co
 
     quality = segmentQuality(meit);
 
-    dPhiGloDir = fabs ( deltaPhi(meit->globalPosition().phi(), meit->globalDirection().phi()) );
+    dPhiGloDir = fabs ( meit->globalPosition().phi() - meit->globalDirection().phi() );
+    if ( dPhiGloDir > M_PI   )  dPhiGloDir = 2.*M_PI - dPhiGloDir;
+
 
     if(!me1){
       me1 = meit;
@@ -250,7 +252,7 @@ MuonCSCSeedFromRecHits::bestEndcapHit(const MuonRecHitContainer & endcapHits) co
 void MuonCSCSeedFromRecHits::makeDefaultSeed(TrajectorySeed & seed) const
 {
   //Search ME1  ...
-  ConstMuonRecHitPointer me1= bestEndcapHit(theRhits);
+  ConstMuonRecHitPointer me1= bestSegment();
   bool good=false;
 
   if(me1 && me1->isValid() )
@@ -284,10 +286,12 @@ void MuonCSCSeedFromRecHits::analyze() const
 
       CSCDetId cscId1((*iter)->geographicalId().rawId());
       CSCDetId cscId2((*iter2)->geographicalId().rawId());
-      double dphi = deltaPhi((**iter).globalPosition().phi(), (**iter2).globalPosition().phi());
+      double dphi = (**iter).globalPosition().phi() - (**iter2).globalPosition().phi();
+      if(dphi > M_PI) dphi -= 2*M_PI;
+      if(dphi < -M_PI) dphi += 2*M_PI;
 
-      int type1 = cscId1.iChamberType();
-      int type2 = cscId2.iChamberType();
+      int type1 = CSCChamberSpecs::whatChamberType(cscId1.station(), cscId1.ring());
+      int type2 = CSCChamberSpecs::whatChamberType(cscId2.station(), cscId2.ring());
 
       // say the lower station first
       if(type1 < type2)

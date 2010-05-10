@@ -65,27 +65,32 @@ void popcon::RPCEMapSourceHandler::getNewObjects()
 void popcon::RPCEMapSourceHandler::ConnectOnlineDB(string connect, string authPath)
 {
   cout << "RPCEMapConfigSourceHandler: connecting to " << connect << "..." << flush;
-  connection = new cond::DbConnection() ;
-//  session->configuration().setAuthenticationMethod(cond::XML);
-  connection->configuration().setAuthenticationPath( authPath ) ;
-  connection->configure();
-  session = new cond::DbSession(connection->createSession());
-  session->open(connect,true) ;
+  session = new cond::DBSession();
+  session->configuration().setAuthenticationMethod(cond::XML);
+  session->configuration().setAuthenticationPath( authPath ) ;
+  session->open() ;
+  connection = new cond::Connection( connect ) ;
+  connection->connect( session ) ;
+  coralTr = & (connection->coralTransaction()) ;
   cout << "Done." << endl;
 }
 
 void popcon::RPCEMapSourceHandler::DisconnectOnlineDB()
 {
-  connection->close() ;
-  delete connection ;
-  session->close();
-  delete session ;
+  if (m_connect=="") {
+    env->terminateConnection(conn);
+    Environment::terminateEnvironment(env);
+  } else {
+    connection->disconnect() ;
+    delete connection ;
+    delete session ;
+  }
 }
 
 void popcon::RPCEMapSourceHandler::readEMap1()
 {
-  session->transaction().start( true );
-  coral::ISchema& schema = session->nominalSchema();
+  coralTr->start( true );
+  coral::ISchema& schema = coralTr->nominalSchema();
   std::string condition="";
   coral::AttributeList conditionData;
 
@@ -375,6 +380,7 @@ void popcon::RPCEMapSourceHandler::readEMap1()
     std::cout<<"DCC added"<<std::endl;
     eMap->theDccs.push_back(thisDcc);
   }
+  coralTr->commit();
   cout << endl <<"Building RPC e-Map done!" << flush << endl << endl;
 }
 
