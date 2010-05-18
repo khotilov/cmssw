@@ -512,7 +512,7 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaa(0);
-  topaaa.addValue("");
+  topaaa.addValue("RECO");
   topaa.addKeyValue("processName", topaaa);
 }
 {
@@ -609,12 +609,12 @@ FWConfiguration* fwConfig() {
   FWConfiguration topaa(2);
 {
   FWConfiguration topaaa(0);
-  topaaa.addValue("33");
+  topaaa.addValue("9");
   topaa.addKeyValue("x", topaaa);
 }
 {
   FWConfiguration topaaa(0);
-  topaaa.addValue("174");
+  topaaa.addValue("74");
   topaa.addKeyValue("y", topaaa);
 }
 {
@@ -642,21 +642,16 @@ FWConfiguration* fwConfig() {
 {
   FWConfiguration topaa(1);
 {
-  FWConfiguration topaaa(2);
+  FWConfiguration topaaa(1);
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
+  topaaaa.addValue("2");
   topaaa.addKeyValue("Overlay Event Info", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Logo", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
   topaaaa.addValue("1");
-  topaaa.addKeyValue("Line width", topaaaa);
+  topaaa.addKeyValue("Show Logo", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
@@ -685,8 +680,18 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
+  topaaaa.addValue("1");
   topaaa.addKeyValue("Calo auto scale", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("Line width", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Smooth line", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
@@ -695,42 +700,12 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
+  topaaaa.addValue("0");
   topaaa.addKeyValue("Show HF", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.03");
-  topaaa.addKeyValue("EventInfoTextSize", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.05");
-  topaaa.addKeyValue("EventInfoPosX", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.95");
-  topaaa.addKeyValue("EventInfoPosY", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.2");
-  topaaa.addKeyValue("LogoSize", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.02");
-  topaaa.addKeyValue("LogoPosX", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.98");
-  topaaa.addKeyValue("LogoPosY", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.22613");
+  topaaaa.addValue("2.16374");
   topaaa.addKeyValue("cameraZoomRho Phi", topaaaa);
 }
 {
@@ -795,12 +770,12 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("375");
+  topaaaa.addValue("1199.34");
   topaaa.addKeyValue("cameraMatrix12Rho Phi", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
+  topaaaa.addValue("-10.1328");
   topaaa.addKeyValue("cameraMatrix13Rho Phi", topaaaa);
 }
 {
@@ -813,25 +788,40 @@ FWConfiguration* fwConfig() {
   topaaaa.addValue("1");
   topaaa.addKeyValue("cameraMatrix15Rho Phi", topaaaa);
 }
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.03");
+  topaaa.addKeyValue("EventInfoTextSize", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.170507");
+  topaaa.addKeyValue("EventInfoPosX", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.97368");
+  topaaa.addKeyValue("EventInfoPosY", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.110995");
+  topaaa.addKeyValue("LogoSize", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.0284567");
+  topaaa.addKeyValue("LogoPosX", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.972714");
+  topaaa.addKeyValue("LogoPosY", topaaaa);
+}
   topaa.addKeyValue("Rho Phi", topaaa);
 }
 {
-  FWConfiguration topaaa(2);
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Overlay Event Info", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Logo", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("Line width", topaaaa);
-}
+  FWConfiguration topaaa(1);
 {
   FWConfiguration topaaaa(0);
   topaaaa.addValue("1");
@@ -844,7 +834,7 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("10");
+  topaaaa.addValue("8");
   topaaa.addKeyValue("Pixels per bin", topaaaa);
 }
 {
@@ -854,62 +844,17 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("100");
-  topaaa.addKeyValue("Lego scale GeV)", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("Lego auto scale", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.03");
-  topaaa.addKeyValue("EventInfoTextSize", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.05");
-  topaaa.addKeyValue("EventInfoPosX", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.95");
-  topaaa.addKeyValue("EventInfoPosY", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.2");
-  topaaa.addKeyValue("LogoSize", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.02");
-  topaaa.addKeyValue("LogoPosX", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.98");
-  topaaa.addKeyValue("LogoPosY", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("topViewLego", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("-0.441787");
+  topaaaa.addValue("-0.022986");
   topaaa.addKeyValue("cameraMatrix0Lego", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("-0.525262");
+  topaaaa.addValue("0.478874");
   topaaa.addKeyValue("cameraMatrix1Lego", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.727274");
+  topaaaa.addValue("0.877583");
   topaaa.addKeyValue("cameraMatrix2Lego", topaaaa);
 }
 {
@@ -919,12 +864,12 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.765299");
+  topaaaa.addValue("-0.99885");
   topaaa.addKeyValue("cameraMatrix4Lego", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("-0.643675");
+  topaaaa.addValue("-0.0479449");
   topaaa.addKeyValue("cameraMatrix5Lego", topaaaa);
 }
 {
@@ -939,17 +884,17 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.468127");
+  topaaaa.addValue("0.0420756");
   topaaa.addKeyValue("cameraMatrix8Lego", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.55658");
+  topaaaa.addValue("-0.876573");
   topaaa.addKeyValue("cameraMatrix9Lego", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.686349");
+  topaaaa.addValue("0.479426");
   topaaa.addKeyValue("cameraMatrix10Lego", topaaaa);
 }
 {
@@ -959,17 +904,17 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("-11.1838");
+  topaaaa.addValue("-0.624612");
   topaaa.addKeyValue("cameraMatrix12Lego", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("-13.5005");
+  topaaaa.addValue("13.0127");
   topaaa.addKeyValue("cameraMatrix13Lego", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("20.8196");
+  topaaaa.addValue("23.8471");
   topaaa.addKeyValue("cameraMatrix14Lego", topaaaa);
 }
 {
@@ -1059,13 +1004,98 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("17.9601");
-  topaaa.addKeyValue("Lego FOV", topaaaa);
-}
-  topaa.addKeyValue("Lego", topaaa);
+  topaaaa.addValue("0.916372");
+  topaaa.addKeyValue("orthoCameraZoom3D Lego", topaaaa);
 }
 {
-  FWConfiguration topaaa(2);
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("topView3D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("orthoCameraMatrix03D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix13D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix23D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix33D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix43D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("orthoCameraMatrix53D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix63D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix73D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix83D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix93D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("orthoCameraMatrix103D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("orthoCameraMatrix113D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("16.1268");
+  topaaa.addKeyValue("orthoCameraMatrix123D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("-5.21805e-15");
+  topaaa.addKeyValue("orthoCameraMatrix133D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1.95399e-14");
+  topaaa.addKeyValue("orthoCameraMatrix143D Lego", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("orthoCameraMatrix153D Lego", topaaaa);
+}
+  topaa.addKeyValue("3D Lego", topaaa);
+}
+{
+  FWConfiguration topaaa(1);
 {
   FWConfiguration topaaaa(0);
   topaaaa.addValue("0");
@@ -1075,11 +1105,6 @@ FWConfiguration* fwConfig() {
   FWConfiguration topaaaa(0);
   topaaaa.addValue("0");
   topaaa.addKeyValue("Show Logo", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("Line width", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
@@ -1108,42 +1133,22 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
+  topaaaa.addValue("1");
   topaaa.addKeyValue("Calo auto scale", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.03");
-  topaaa.addKeyValue("EventInfoTextSize", topaaaa);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("Line width", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.05");
-  topaaa.addKeyValue("EventInfoPosX", topaaaa);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Smooth line", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.95");
-  topaaa.addKeyValue("EventInfoPosY", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.2");
-  topaaa.addKeyValue("LogoSize", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.02");
-  topaaa.addKeyValue("LogoPosX", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.98");
-  topaaa.addKeyValue("LogoPosY", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.144723");
+  topaaaa.addValue("1.42704");
   topaaa.addKeyValue("cameraZoomRho Z", topaaaa);
 }
 {
@@ -1208,7 +1213,7 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaa(0);
-  topaaaa.addValue("375");
+  topaaaa.addValue("1761.85");
   topaaa.addKeyValue("cameraMatrix12Rho Z", topaaaa);
 }
 {
@@ -1225,75 +1230,6 @@ FWConfiguration* fwConfig() {
   FWConfiguration topaaaa(0);
   topaaaa.addValue("1");
   topaaa.addKeyValue("cameraMatrix15Rho Z", topaaaa);
-}
-  topaa.addKeyValue("Rho Z", topaaa);
-}
-{
-  FWConfiguration topaaa(2);
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Overlay Event Info", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Logo", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("Line width", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Muon Barrel", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Muon Endcap", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Pixel Barrel", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Pixel Endcap", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Tracker Barrel", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("Show Tracker Endcap", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("Show Wire Frame", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("95");
-  topaaa.addKeyValue("Detector Transparency", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("2");
-  topaaa.addKeyValue("Calo scale (GeV/meter)", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("Calo auto scale", topaaaa);
 }
 {
   FWConfiguration topaaaa(0);
@@ -1325,186 +1261,7 @@ FWConfiguration* fwConfig() {
   topaaaa.addValue("0.98");
   topaaa.addKeyValue("LogoPosY", topaaaa);
 }
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.432383");
-  topaaa.addKeyValue("cameraMatrix0Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.848065");
-  topaaa.addKeyValue("cameraMatrix1Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.306318");
-  topaaa.addKeyValue("cameraMatrix2Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrix3Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("-0.890891");
-  topaaa.addKeyValue("cameraMatrix4Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.454217");
-  topaaa.addKeyValue("cameraMatrix5Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrix6Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrix7Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("-0.139136");
-  topaaa.addKeyValue("cameraMatrix8Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("-0.272895");
-  topaaa.addKeyValue("cameraMatrix9Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0.951929");
-  topaaa.addKeyValue("cameraMatrix10Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrix11Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("2144.44");
-  topaaa.addKeyValue("cameraMatrix12Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("4142.19");
-  topaaa.addKeyValue("cameraMatrix13Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1474.21");
-  topaaa.addKeyValue("cameraMatrix14Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("cameraMatrix15Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("-1");
-  topaaa.addKeyValue("cameraMatrixBase0Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase1Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase2Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase3Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase4Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase5Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("cameraMatrixBase6Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase7Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase8Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("cameraMatrixBase9Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase10Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase11Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase12Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase13Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("cameraMatrixBase14Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("cameraMatrixBase15Plain3D", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("7.50012");
-  topaaa.addKeyValue("Plain3D FOV", topaaaa);
-}
-  topaa.addKeyValue("3D", topaaa);
-}
-{
-  FWConfiguration topaaa(1);
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("");
-  topaaa.addKeyValue("Filter", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("HLT");
-  topaaa.addKeyValue("Process", topaaaa);
-}
-  topaa.addKeyValue("TriggerTable", topaaa);
+  topaa.addKeyValue("Rho Z", topaaa);
 }
 {
   FWConfiguration topaaa(1);
@@ -1819,6 +1576,274 @@ FWConfiguration* fwConfig() {
 }
   topaa.addKeyValue("Table", topaaa);
 }
+{
+  FWConfiguration topaaa(1);
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Overlay Event Info", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Show Logo", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Show Muon Barrel", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Show Muon Endcap", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Show Pixel Barrel", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Show Pixel Endcap", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Show Tracker Barrel", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("Show Tracker Endcap", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("Show Wire Frame", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("95");
+  topaaa.addKeyValue("Detector Transparency", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("Line width", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.432383");
+  topaaa.addKeyValue("cameraMatrix0Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.848065");
+  topaaa.addKeyValue("cameraMatrix1Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.306318");
+  topaaa.addKeyValue("cameraMatrix2Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrix3Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("-0.890891");
+  topaaa.addKeyValue("cameraMatrix4Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.454217");
+  topaaa.addKeyValue("cameraMatrix5Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrix6Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrix7Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("-0.139136");
+  topaaa.addKeyValue("cameraMatrix8Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("-0.272895");
+  topaaa.addKeyValue("cameraMatrix9Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.951929");
+  topaaa.addKeyValue("cameraMatrix10Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrix11Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("2144.44");
+  topaaa.addKeyValue("cameraMatrix12Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("4142.19");
+  topaaa.addKeyValue("cameraMatrix13Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1474.21");
+  topaaa.addKeyValue("cameraMatrix14Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("cameraMatrix15Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("-1");
+  topaaa.addKeyValue("cameraMatrixBase0Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase1Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase2Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase3Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase4Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase5Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("cameraMatrixBase6Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase7Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase8Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("cameraMatrixBase9Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase10Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase11Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase12Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase13Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("cameraMatrixBase14Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("cameraMatrixBase15Plain3D", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("7.50012");
+  topaaa.addKeyValue("Plain3D FOV", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.03");
+  topaaa.addKeyValue("EventInfoTextSize", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.05");
+  topaaa.addKeyValue("EventInfoPosX", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.95");
+  topaaa.addKeyValue("EventInfoPosY", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.2");
+  topaaa.addKeyValue("LogoSize", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.02");
+  topaaa.addKeyValue("LogoPosX", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0.98");
+  topaaa.addKeyValue("LogoPosY", topaaaa);
+}
+  topaa.addKeyValue("3D", topaaa);
+}
+{
+  FWConfiguration topaaa(1);
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("");
+  topaaa.addKeyValue("Filter", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("HLT");
+  topaaa.addKeyValue("Process", topaaaa);
+}
+  topaa.addKeyValue("TriggerTable", topaaa);
+}
   topa.addKeyValue("views", topaa);
 }
 {
@@ -1849,7 +1874,21 @@ FWConfiguration* fwConfig() {
   topaaaa.addValue("0");
   topaaa.addKeyValue("undocked", topaaaa);
 }
-  topaa.addKeyValue("Lego", topaaa);
+  topaa.addKeyValue("3D Lego", topaaa);
+}
+{
+  FWConfiguration topaaa(2);
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("1");
+  topaaa.addKeyValue("weight", topaaaa);
+}
+{
+  FWConfiguration topaaaa(0);
+  topaaaa.addValue("0");
+  topaaa.addKeyValue("undocked", topaaaa);
+}
+  topaa.addKeyValue("Rho Z", topaaa);
 }
 {
   FWConfiguration topaaa(2);
@@ -1863,7 +1902,7 @@ FWConfiguration* fwConfig() {
   topaaaa.addValue("0");
   topaaa.addKeyValue("undocked", topaaaa);
 }
-  topaa.addKeyValue("Rho Z", topaaa);
+  topaa.addKeyValue("Table", topaaa);
 }
 {
   FWConfiguration topaaa(2);
@@ -1891,12 +1930,12 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaaa(0);
-  topaaaaa.addValue("1037");
+  topaaaaa.addValue("1004");
   topaaaa.addKeyValue("x", topaaaaa);
 }
 {
   FWConfiguration topaaaaa(0);
-  topaaaaa.addValue("197");
+  topaaaaa.addValue("72");
   topaaaa.addKeyValue("y", topaaaaa);
 }
 {
@@ -1906,7 +1945,7 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaaa(0);
-  topaaaaa.addValue("316");
+  topaaaaa.addValue("314");
   topaaaa.addKeyValue("height", topaaaaa);
 }
   topaaa.addKeyValue("UndockedWindowPos", topaaaa);
@@ -1939,12 +1978,12 @@ FWConfiguration* fwConfig() {
 }
 {
   FWConfiguration topaaaaa(0);
-  topaaaaa.addValue("1037");
+  topaaaaa.addValue("1004");
   topaaaa.addKeyValue("x", topaaaaa);
 }
 {
   FWConfiguration topaaaaa(0);
-  topaaaaa.addValue("538");
+  topaaaaa.addValue("410");
   topaaaa.addKeyValue("y", topaaaaa);
 }
 {
@@ -1960,20 +1999,6 @@ FWConfiguration* fwConfig() {
   topaaa.addKeyValue("UndockedWindowPos", topaaaa);
 }
   topaa.addKeyValue("TriggerTable", topaaa);
-}
-{
-  FWConfiguration topaaa(2);
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("1");
-  topaaa.addKeyValue("weight", topaaaa);
-}
-{
-  FWConfiguration topaaaa(0);
-  topaaaa.addValue("0");
-  topaaa.addKeyValue("undocked", topaaaa);
-}
-  topaa.addKeyValue("Table", topaaa);
 }
   topa.addKeyValue("view area", topaa);
 }
@@ -1996,10 +2021,6 @@ FWConfiguration* fwConfig() {
   topa.addKeyValue("color control", topaa);
 }
   top.addKeyValue("GUI", topa);
-}
-{
-  FWConfiguration topa(1);
-  top.addKeyValue("L1TriggerTables", topa);
 }
 {
   FWConfiguration topa(1);

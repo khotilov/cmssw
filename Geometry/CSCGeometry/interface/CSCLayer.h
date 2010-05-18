@@ -26,14 +26,13 @@ class CSCLayer : public GeomDetUnit {
 public:
 
   CSCLayer( const BoundPlane::BoundPlanePointer sp, CSCDetId id, const CSCChamber* ch, const CSCLayerGeometry* geo ) : 
-  GeomDetUnit( sp ), theId( id ), theChamber( ch ), theGeometry( geo ) {
-    setDetId(id);
-}
+  GeomDetUnit( sp ), theId( id ), theChamber( ch ), theGeometry( geo ) {}
 
   const GeomDetType& type() const { return chamber()->type(); }
 
   const Topology& topology() const { return *(geometry()->topology()); }
 
+  DetId geographicalId() const { return theId; }
 
   /**
    * Get the (concrete) DetId
