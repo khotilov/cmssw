@@ -1,8 +1,8 @@
 /*
  * \file HcalMonitorClient.cc
  * 
- * $Date: 2010/04/10 13:30:22 $
- * $Revision: 1.94 $
+ * $Date: 2010/05/07 18:05:00 $
+ * $Revision: 1.97 $
  * \author J. Temple
  * 
  */
@@ -73,6 +73,8 @@ HcalMonitorClient::HcalMonitorClient(const edm::ParameterSet& ps)
   databaseUpdateTime_ = ps.getUntrackedParameter<int>("databaseUpdateTime",0);
   databaseFirstUpdate_ = ps.getUntrackedParameter<int>("databaseFirstUpdate",10);
 
+  saveByLumiSection_  = ps.getUntrackedParameter<bool>("saveByLumiSection",false);
+
   if (debug_>0)
     {
       std::cout <<"HcalMonitorClient:: The following clients are enabled:"<<std::endl;
@@ -88,7 +90,9 @@ HcalMonitorClient::HcalMonitorClient(const edm::ParameterSet& ps)
   fC_WidthFromDBByDepth=0;
 
   // Add all relevant clients
-  //clients_.reserve(12); // any reason to reserve ahead of time?
+  clients_.clear();
+  clients_.reserve(14); // any reason to reserve ahead of time?
+  summaryClient_=0;
 
   clients_.push_back(new HcalBaseDQClient((std::string)"HcalMonitorModule",ps));
   if (find(enabledClients_.begin(), enabledClients_.end(),"DeadCellMonitor")!=enabledClients_.end())
@@ -117,9 +121,6 @@ HcalMonitorClient::HcalMonitorClient(const edm::ParameterSet& ps)
     clients_.push_back(new HcalDetDiagNoiseMonitorClient((std::string)"DetDiagNoiseMonitor",ps));
   if (find(enabledClients_.begin(), enabledClients_.end(),"DetDiagTimingMonitor")!=enabledClients_.end())
     clients_.push_back(new HcalDetDiagTimingClient((std::string)"DetDiagTimingMonitor",ps));
-
-
-
 
   if (find(enabledClients_.begin(), enabledClients_.end(),"Summary")!=enabledClients_.end())
     summaryClient_ = new HcalSummaryClient((std::string)"ReportSummaryClient",ps);
@@ -325,7 +326,13 @@ void HcalMonitorClient::analyze(int LS)
   for (unsigned int i=0;i<clients_.size();++i)
     clients_[i]->analyze();
   if (summaryClient_!=0)
-    summaryClient_->analyze(LS);
+    {
+      // Always call basic analyze to form histograms for each task
+      summaryClient_->analyze(LS);
+      // Call this if LS-by-LS enabling is set to true
+      if (saveByLumiSection_==true)
+	summaryClient_->fillReportSummaryLSbyLS(LS);
+    }
 } // void HcalMonitorClient::analyze()
 
 
@@ -375,6 +382,11 @@ void HcalMonitorClient::endRun(void)
 {
   begin_run_ = false;
   end_run_   = true;
+
+  // Always fill summaryClient at end of run (as opposed to the end-lumi fills, which may just contain info for a single LS)
+  // At the end of this run, set LS=-1  (LS-based plotting in doesn't work yet anyway)
+  if (summaryClient_)
+    summaryClient_->analyze(-1);
 
   if (databasedir_.size()>0)
     this->writeChannelStatus();
