@@ -1,7 +1,0 @@
-# open plot03.eps in emacs
-# darken the red: query search and replace "1 0 0" with "0.75 0 0" (3 cases)
-# lighten the green: query search and replace "0 1 0" with "0.25 1 0.25" (3 cases)
-
-ps2pdf plot01.eps plot01.pdf
-ps2pdf plot02.eps plot02.pdf
-ps2pdf plot03.eps plot03.pdf
