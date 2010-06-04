@@ -16,7 +16,7 @@
 //
 // Original Author:  Werner Sun
 //         Created:  Sun Mar  2 01:36:06 CET 2008
-// $Id: OMDSReader.h,v 1.13 2010/02/16 21:54:01 wsun Exp $
+// $Id: OMDSReader.h,v 1.12 2009/03/18 22:12:20 wsun Exp $
 //
 
 // system include files
@@ -24,6 +24,7 @@
 #include "boost/shared_ptr.hpp"
 
 // user include files
+#include "CondCore/DBCommon/interface/CoralTransaction.h"
 #include "CondTools/L1Trigger/interface/DataManager.h"
 #include "RelationalAccess/IQuery.h"
 #include "CoralBase/AttributeList.h"
@@ -211,6 +212,7 @@ namespace l1t
       const OMDSReader& operator=(const OMDSReader&); // stop default
 
       // ---------- member data --------------------------------
+      cond::CoralTransaction* m_coralTransaction ;
 };
 
   template< class T > const OMDSReader::QueryResults
@@ -223,8 +225,8 @@ namespace l1t
     const std::string& conditionRHSName ) const
   {
     coral::ISchema& schema = schemaName.empty() ?
-      session->nominalSchema() :
-      session->schema( schemaName ) ;
+      m_coralTransaction->nominalSchema() :
+      m_coralTransaction->coralSessionProxy().schema( schemaName ) ;
 
     coral::ITable& table = schema.tableHandle( tableName ) ;
 
