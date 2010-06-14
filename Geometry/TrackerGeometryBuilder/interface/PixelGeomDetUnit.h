@@ -24,6 +24,8 @@ public:
 
   virtual const Topology& topology() const;
 
+  DetId geographicalId() const;
+
   virtual PixelGeomDetType& specificType() const { return *theType;}
 
   virtual const PixelTopology& specificTopology() const;

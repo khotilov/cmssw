@@ -22,6 +22,8 @@ public:
 
   virtual const Topology& topology() const;
 
+  DetId geographicalId() const;
+
   virtual StripGeomDetType& specificType() const { return *theType;}
 
   virtual const StripTopology& specificTopology() const;

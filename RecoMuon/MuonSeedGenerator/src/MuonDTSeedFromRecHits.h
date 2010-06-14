@@ -24,11 +24,11 @@ class MuonDTSeedFromRecHits : public MuonSeedFromRecHits
 
   virtual TrajectorySeed seed() const;
 
-  ConstMuonRecHitPointer bestBarrelHit(const MuonRecHitContainer & barrelHits) const;
+  private:
+  MuonTransientTrackingRecHit::ConstMuonRecHitPointer best_cand() const;
   // was
   // TrackingRecHit best_cand() const;
 
-private:
   void computePtWithVtx(double* pt, double* spt) const;
   void computePtWithoutVtx(double* pt, double* spt) const;
   void computeBestPt(double* pt, double* spt, float& ptmean, float& sptmean) const;

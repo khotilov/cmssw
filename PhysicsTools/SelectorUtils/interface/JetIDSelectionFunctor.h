@@ -13,7 +13,7 @@
   for a general overview of the selectors. 
 
   \author Salvatore Rappoccio (Update: Amnon Harel)
-  \version  $Id: JetIDSelectionFunctor.h,v 1.7 2010/04/13 14:38:33 srappocc Exp $
+  \version  $Id: JetIDSelectionFunctor.h,v 1.9 2010/04/25 17:06:33 hegner Exp $
 */
 
 
@@ -39,34 +39,25 @@ class JetIDSelectionFunctor : public Selector<pat::Jet>  {
     std::string qualityStr = parameters.getParameter<std::string>("quality");
     Quality_t quality = N_QUALITY;
 
+    if      ( qualityStr == "MINIMAL" )   quality = MINIMAL;
+    else if ( qualityStr == "LOOSE_AOD" ) quality = LOOSE_AOD;
+    else if ( qualityStr == "LOOSE" )     quality = LOOSE;
+    else if ( qualityStr == "TIGHT" )     quality = TIGHT;
+    else       
+      throw cms::Exception("InvalidInput") << "Expect quality to be one of MINIMAL, LOOSE_AOD, LOOSE,TIGHT" << std::endl;
+
+
     if ( versionStr == "CRAFT08" ) {
-      if      ( qualityStr == "MINIMAL" )   quality = MINIMAL;
-      else if ( qualityStr == "LOOSE_AOD" ) quality = LOOSE_AOD;
-      else if ( qualityStr == "LOOSE" )     quality = LOOSE;
-      else                                  quality = TIGHT;
-      
       initialize( CRAFT08, quality );
     } 
     else if ( versionStr == "PURE09" ) {
-      if      ( qualityStr == "MINIMAL" )   quality = MINIMAL;
-      else if ( qualityStr == "LOOSE_AOD" ) quality = LOOSE_AOD;
-      else if ( qualityStr == "LOOSE" )     quality = LOOSE;
-      else                                  quality = TIGHT;
-
       initialize( PURE09, quality );
-      
     }
     else if ( versionStr == "DQM09" ) {
-      
-      if      ( qualityStr == "MINIMAL" )   quality = MINIMAL;
-      else if ( qualityStr == "LOOSE_AOD" ) quality = LOOSE_AOD;
-      else if ( qualityStr == "LOOSE" )     quality = LOOSE;
-      else                                  quality = TIGHT;
-
       initialize( DQM09, quality );
     }
     else {
-      throw cms::Exception("InvalidInput") << "Expect version to be one of SUMMER08, FIRSTDATA," << std::endl;
+      throw cms::Exception("InvalidInput") << "Expect version to be one of CRAFT08, PURE09, DQM09" << std::endl;
     }
   }
 
@@ -209,7 +200,7 @@ class JetIDSelectionFunctor : public Selector<pat::Jet>  {
   // 
   // Accessor from PAT jets
   // 
-  bool operator()( const pat::Jet & jet, std::strbitset & ret )  
+  bool operator()( const pat::Jet & jet, pat::strbitset & ret )  
   {
     if ( ! jet.isCaloJet() ) {
       edm::LogWarning( "NYI" )<<"Criteria for pat::Jet-s other than CaloJets are not yet implemented";
@@ -235,7 +226,7 @@ class JetIDSelectionFunctor : public Selector<pat::Jet>  {
   bool operator()( reco::Candidate::LorentzVector const & correctedP4, 
 		   double emEnergyFraction, 
 		   reco::JetID const & jetID,
-		   std::strbitset & ret )  
+		   pat::strbitset & ret )  
   {
     if ( version_ == CRAFT08 ) return craft08Cuts( correctedP4, emEnergyFraction, jetID, ret );
     edm::LogWarning( "BadInput | NYI" )<<"Requested version ("<<version_
@@ -259,7 +250,7 @@ class JetIDSelectionFunctor : public Selector<pat::Jet>  {
   // 
   bool operator()( reco::CaloJet const & jet,
 		   reco::JetID const & jetID,
-		   std::strbitset & ret )  
+		   pat::strbitset & ret )  
   {
     if ( version_ == CRAFT08 ) return craft08Cuts( jet.p4(), jet.emEnergyFraction(), jetID, ret );
     if ( version_ == PURE09 || version_ == DQM09 ) {
@@ -287,7 +278,7 @@ class JetIDSelectionFunctor : public Selector<pat::Jet>  {
   bool craft08Cuts( reco::Candidate::LorentzVector const & correctedP4, 
 		    double emEnergyFraction,
 		    reco::JetID const & jetID,
-		    std::strbitset & ret) 
+		    pat::strbitset & ret) 
   {
     
     ret.set(false);
@@ -371,7 +362,7 @@ class JetIDSelectionFunctor : public Selector<pat::Jet>  {
   bool fwd09Cuts( reco::Candidate::LorentzVector const & rawP4, 
 		  double emEnergyFraction, double etaWidth, double phiWidth, unsigned int nHit, 
 		  reco::JetID const & jetID,
-		  std::strbitset & ret) 
+		  pat::strbitset & ret) 
   {
     ret.set(false);
 
