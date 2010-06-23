@@ -25,30 +25,35 @@ namespace l1t
 		       const std::string & authenticationPath,
 		       bool isOMDS )
   {
-    connection = new cond::DbConnection() ;
+    session = new cond::DBSession();
     setDebug( false ) ;
 
-    if( !isOMDS )
+    if( isOMDS )
       {
-	connection->configuration().setConnectionSharing( true ) ;
-	connection->configuration().setReadOnlySessionOnUpdateConnections(
-	  true ) ;
+	session->configuration().setAuthenticationMethod(cond::XML);
       }
-
-    connection->configuration().setAuthenticationPath( authenticationPath ) ;
-    connection->configure() ;
-
-    session = new cond::DbSession( connection->createSession() ) ;
-    session->open( connectString, isOMDS ) ;
+    else
+      {
+	//	session->configuration().setAuthenticationMethod(cond::Env);
+	session->configuration().setAuthenticationMethod(cond::XML);
+	session->configuration().connectionConfiguration()
+	  ->enableConnectionSharing ();
+	session->configuration().connectionConfiguration()
+	  ->enableReadOnlySessionOnUpdateConnections ();
+      }
+    session->configuration().setAuthenticationPath( authenticationPath ) ;
+    // session->configuration().setBlobStreamer("COND/Services/TBufferBlobStreamingService") ;
+    session->open() ;
+    
+    connection = new cond::Connection( connectString ) ;
+    connection->connect( session ) ;
 }
 
 DataManager::~DataManager ()
 {
   // delete all in reverse direction
   if( connection )
-    connection->close() ;
-  if( session )
-    session->close() ;
+    connection->disconnect() ;
 
   delete connection ;
   delete session ;
@@ -71,11 +76,11 @@ edm::eventsetup::TypeTag DataManager::findType (const std::string & type) const
   {
     if( debug )
       {
-	connection->configuration().setMessageLevel( coral::Debug ) ;
+	session->configuration().setMessageLevel( cond::Debug ) ;
       }
     else
       {
-	connection->configuration().setMessageLevel( coral::Error ) ;
+	session->configuration().setMessageLevel( cond::Error ) ;
       }
   }
 }

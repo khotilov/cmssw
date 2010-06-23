@@ -8,7 +8,7 @@
 //
 // Original Author:
 //         Created:  Mon Dec  3 08:38:38 PST 2007
-// $Id: CmsShowMain.cc,v 1.152 2010/04/06 20:00:35 amraktad Exp $
+// $Id: CmsShowMain.cc,v 1.150 2010/03/26 20:20:20 matevz Exp $
 //
 
 // system include files
@@ -38,12 +38,14 @@
 //#include "TApplication.h"
 
 #include "Fireworks/Core/src/CmsShowMain.h"
-
-#include "Fireworks/Core/interface/FWEveViewManager.h"
-
+#include "Fireworks/Core/interface/FWRhoPhiZViewManager.h"
+#include "Fireworks/Core/interface/FWEveLegoViewManager.h"
+#include "Fireworks/Core/interface/FWGlimpseViewManager.h"
 #include "Fireworks/Core/interface/FWTableViewManager.h"
-#include "Fireworks/Core/interface/FWL1TriggerTableViewManager.h"
 #include "Fireworks/Core/interface/FWTriggerTableViewManager.h"
+#include "Fireworks/Core/interface/FWL1TriggerTableViewManager.h"
+#include "Fireworks/Core/interface/FW3DViewManager.h"
+
 #include "Fireworks/Core/interface/FWEventItemsManager.h"
 #include "Fireworks/Core/interface/FWViewManagerManager.h"
 #include "Fireworks/Core/interface/FWGUIManager.h"
@@ -435,6 +437,7 @@ void CmsShowMain::draw()
    m_guiManager->updateStatus("loading event ...");
 
    m_viewManager->eventBegin();
+   m_eiManager->setGeom(&m_detIdToGeo);
    m_eiManager->newEvent(m_navigator->getCurrentEvent());
    m_viewManager->eventEnd();
 
@@ -535,17 +538,19 @@ CmsShowMain::loadGeometry()
    m_guiManager->updateStatus("Loading geometry...");
    m_detIdToGeo.loadGeometry( m_geomFileName.c_str() );
    m_detIdToGeo.loadMap( m_geomFileName.c_str() );
-   m_context->setGeom(&m_detIdToGeo);
 }
 
 void
 CmsShowMain::setupViewManagers()
 {
    m_guiManager->updateStatus("Setting up view manager...");
+   boost::shared_ptr<FWViewManagerBase> rpzViewManager( new FWRhoPhiZViewManager(m_guiManager.get()) );
+   rpzViewManager->setGeom(&m_detIdToGeo);
+   m_viewManager->add(rpzViewManager);
 
-   boost::shared_ptr<FWViewManagerBase> eveViewManager( new FWEveViewManager(m_guiManager.get()) );
-   eveViewManager->setContext(m_context.get());
-   m_viewManager->add(eveViewManager);
+   m_viewManager->add( boost::shared_ptr<FWViewManagerBase>( new FWEveLegoViewManager(m_guiManager.get()) ) );
+
+   m_viewManager->add( boost::shared_ptr<FWViewManagerBase>( new FWGlimpseViewManager(m_guiManager.get()) ) );
 
    boost::shared_ptr<FWTableViewManager> tableViewManager( new FWTableViewManager(m_guiManager.get()) );
    m_configurationManager->add(std::string("Tables"), tableViewManager.get());
@@ -558,6 +563,10 @@ CmsShowMain::setupViewManagers()
    boost::shared_ptr<FWL1TriggerTableViewManager> l1TriggerTableViewManager( new FWL1TriggerTableViewManager(m_guiManager.get()) );
    m_configurationManager->add(std::string("L1TriggerTables"), l1TriggerTableViewManager.get());
    m_viewManager->add( l1TriggerTableViewManager );
+
+   boost::shared_ptr<FWViewManagerBase> plain3DViewManager( new FW3DViewManager(m_guiManager.get()) );
+   plain3DViewManager->setGeom(&m_detIdToGeo);
+   m_viewManager->add( plain3DViewManager );
 }
 
 void
