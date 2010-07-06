@@ -29,14 +29,5 @@
   <class name="reco::PileUpPFCandidateRefVector"/>
   <class name="reco::PileUpPFCandidatePtr"/>
 
-  <class name="reco::PFCandidateFwdRef"/>
-  <class name="edm::reftobase::Holder<reco::Candidate, reco::PFCandidateFwdRef>"/>
-  <class name="edm::reftobase::RefHolder<reco::PFCandidateFwdRef>"/>
-  <class name="reco::PFCandidateFwdPtr"/>
-  <class name="std::vector<reco::PFCandidateFwdRef>"/>
-  <class name="std::vector<reco::PFCandidateFwdPtr>"/>
-
-
-
 </lcgdict>
  

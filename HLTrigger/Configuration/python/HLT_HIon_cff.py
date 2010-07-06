@@ -1,10 +1,10 @@
-# /dev/CMSSW_3_6_0/pre4/HIon/V20 (CMSSW_3_6_X_2010-04-01-0100_HLT1)
+# /dev/CMSSW_3_6_2/HIon/V21 (CMSSW_3_6_2_HLT8)
 
 import FWCore.ParameterSet.Config as cms
 
 
 HLTConfigVersion = cms.PSet(
-  tableName = cms.string('/dev/CMSSW_3_6_0/pre4/HIon/V20')
+  tableName = cms.string('/dev/CMSSW_3_6_2/HIon/V21')
 )
 
 streams = cms.PSet( 
@@ -13,71 +13,60 @@ streams = cms.PSet(
     'FEDMonitor' ),
   Calibration = cms.vstring( 'TestEnables' ),
   EcalCalibration = cms.vstring( 'EcalLaser' ),
-  ALCAP0 = cms.vstring( 'AlCaP0' ),
   ALCAPHISYM = cms.vstring( 'AlCaPhiSymEcal' ),
   RPCMON = cms.vstring( 'RPCMonitor' ),
-  EventDisplay = cms.vstring(  ),
-  A = cms.vstring( 'JetMETTauMonitor',
-    'EGMonitor',
-    'EG',
-    'RandomTriggers',
-    'HcalHPDNoise',
-    'ZeroBias',
-    'MuMonitor',
-    'Cosmics',
-    'Mu',
-    'JetMETTau',
-    'MinimumBias',
-    'HcalNZS' ),
+  ALCAP0 = cms.vstring( 'AlCaP0' ),
   DQM = cms.vstring(  ),
+  A = cms.vstring( 'MuMonitor',
+    'Cosmics',
+    'JetMETTau',
+    'EG',
+    'Mu',
+    'EGMonitor',
+    'MuOnia',
+    'RandomTriggers',
+    'ZeroBias',
+    'Commissioning',
+    'JetMETTauMonitor',
+    'HcalHPDNoise',
+    'HcalNZS',
+    'MinimumBias' ),
+  EventDisplay = cms.vstring(  ),
+  Express = cms.vstring( 'ExpressPhysics' ),
   HLTDQM = cms.vstring(  ),
-  HLTMON = cms.vstring( 'OfflineMonitor' ),
-  Express = cms.vstring( 'ExpressPhysics' )
+  HLTMON = cms.vstring( 'OfflineMonitor' )
 )
 datasets = cms.PSet( 
   LogMonitor = cms.vstring(  ),
   FEDMonitor = cms.vstring(  ),
   TestEnables = cms.vstring(  ),
   EcalLaser = cms.vstring(  ),
-  AlCaP0 = cms.vstring(  ),
   AlCaPhiSymEcal = cms.vstring(  ),
   RPCMonitor = cms.vstring(  ),
-  JetMETTauMonitor = cms.vstring(  ),
-  EGMonitor = cms.vstring(  ),
-  EG = cms.vstring(  ),
-  RandomTriggers = cms.vstring(  ),
-  HcalHPDNoise = cms.vstring(  ),
-  ZeroBias = cms.vstring(  ),
+  AlCaP0 = cms.vstring(  ),
   MuMonitor = cms.vstring(  ),
   Cosmics = cms.vstring(  ),
-  Mu = cms.vstring(  ),
   JetMETTau = cms.vstring(  ),
-  MinimumBias = cms.vstring(  ),
+  EG = cms.vstring(  ),
+  Mu = cms.vstring(  ),
+  EGMonitor = cms.vstring(  ),
+  MuOnia = cms.vstring(  ),
+  RandomTriggers = cms.vstring(  ),
+  ZeroBias = cms.vstring(  ),
+  Commissioning = cms.vstring(  ),
+  JetMETTauMonitor = cms.vstring(  ),
+  HcalHPDNoise = cms.vstring(  ),
   HcalNZS = cms.vstring(  ),
-  OfflineMonitor = cms.vstring(  ),
-  ExpressPhysics = cms.vstring(  )
+  MinimumBias = cms.vstring(  ),
+  ExpressPhysics = cms.vstring(  ),
+  OfflineMonitor = cms.vstring(  )
 )
 
-MCJetCorrectorIcone5Unit = cms.ESSource( "LXXXCorrectionService",
+BTagRecord = cms.ESSource( "EmptyESSource",
+  recordName = cms.string( "JetTagComputerRecord" ),
+  iovIsRunNotTime = cms.bool( True ),
   appendToDataLabel = cms.string( "" ),
-  level = cms.string( "L2RelativeFlat" ),
-  algorithm = cms.string( "" ),
-  section = cms.string( "" ),
-  era = cms.string( "HLT" )
-)
-MCJetCorrectorIcone5HF07 = cms.ESSource( "LXXXCorrectionService",
-  appendToDataLabel = cms.string( "" ),
-  level = cms.string( "L2Relative" ),
-  algorithm = cms.string( "" ),
-  section = cms.string( "" ),
-  era = cms.string( "HLT" )
-)
-L3AbsoluteCorrectionService = cms.ESSource( "LXXXCorrectionService",
-  appendToDataLabel = cms.string( "" ),
-  level = cms.string( "L3Absolute" ),
-  algorithm = cms.string( "IC5Calo" ),
-  section = cms.string( "" ),
-  era = cms.string( "Summer09_7TeV_ReReco332" )
+  firstValid = cms.vuint32( 1 )
 )
 L2RelativeCorrectionService = cms.ESSource( "LXXXCorrectionService",
   appendToDataLabel = cms.string( "" ),
@@ -86,17 +75,32 @@ L2RelativeCorrectionService = cms.ESSource( "LXXXCorrectionService",
   section = cms.string( "" ),
   era = cms.string( "Summer09_7TeV_ReReco332" )
 )
-BTagRecord = cms.ESSource( "EmptyESSource",
-  recordName = cms.string( "JetTagComputerRecord" ),
-  iovIsRunNotTime = cms.bool( True ),
+L3AbsoluteCorrectionService = cms.ESSource( "LXXXCorrectionService",
   appendToDataLabel = cms.string( "" ),
-  firstValid = cms.vuint32( 1 )
+  level = cms.string( "L3Absolute" ),
+  algorithm = cms.string( "IC5Calo" ),
+  section = cms.string( "" ),
+  era = cms.string( "Summer09_7TeV_ReReco332" )
 )
 MCJetCorrectorIcone5 = cms.ESSource( "JetCorrectionServiceChain",
   appendToDataLabel = cms.string( "" ),
   correctors = cms.vstring( 'L2RelativeCorrectionService',
     'L3AbsoluteCorrectionService' ),
   label = cms.string( "MCJetCorrectorIcone5" )
+)
+MCJetCorrectorIcone5HF07 = cms.ESSource( "LXXXCorrectionService",
+  appendToDataLabel = cms.string( "" ),
+  level = cms.string( "L2Relative" ),
+  algorithm = cms.string( "" ),
+  section = cms.string( "" ),
+  era = cms.string( "HLT" )
+)
+MCJetCorrectorIcone5Unit = cms.ESSource( "LXXXCorrectionService",
+  appendToDataLabel = cms.string( "" ),
+  level = cms.string( "L2RelativeFlat" ),
+  algorithm = cms.string( "" ),
+  section = cms.string( "" ),
+  era = cms.string( "HLT" )
 )
 essourceSev = cms.ESSource( "EmptyESSource",
   recordName = cms.string( "HcalSeverityLevelComputerRcd" ),
@@ -105,36 +109,6 @@ essourceSev = cms.ESSource( "EmptyESSource",
   firstValid = cms.vuint32( 1 )
 )
 
-hltMuTrackJpsiTrajectoryBuilder = cms.ESProducer( "CkfTrajectoryBuilderESProducer",
-  ComponentName = cms.string( "hltMuTrackJpsiTrajectoryBuilder" ),
-  updator = cms.string( "KFUpdator" ),
-  propagatorAlong = cms.string( "PropagatorWithMaterial" ),
-  propagatorOpposite = cms.string( "PropagatorWithMaterialOpposite" ),
-  estimator = cms.string( "Chi2" ),
-  TTRHBuilder = cms.string( "WithTrackAngle" ),
-  MeasurementTrackerName = cms.string( "" ),
-  trajectoryFilterName = cms.string( "hltMuTrackJpsiTrajectoryFilter" ),
-  maxCand = cms.int32( 1 ),
-  lostHitPenalty = cms.double( 30.0 ),
-  intermediateCleaning = cms.bool( True ),
-  alwaysUseInvalidHits = cms.bool( False ),
-  appendToDataLabel = cms.string( "" )
-)
-hltMuTrackJpsiTrajectoryFilter = cms.ESProducer( "TrajectoryFilterESProducer",
-  ComponentName = cms.string( "hltMuTrackJpsiTrajectoryFilter" ),
-  appendToDataLabel = cms.string( "" ),
-  filterPset = cms.PSet( 
-    minimumNumberOfHits = cms.int32( 5 ),
-    minHitsMinPt = cms.int32( 3 ),
-    ComponentType = cms.string( "CkfBaseTrajectoryFilter" ),
-    maxLostHits = cms.int32( 1 ),
-    maxNumberOfHits = cms.int32( 8 ),
-    maxConsecLostHits = cms.int32( 1 ),
-    chargeSignificance = cms.double( -1.0 ),
-    nSigmaMinPt = cms.double( 5.0 ),
-    minPt = cms.double( 1.0 )
-  )
-)
 AnalyticalPropagator = cms.ESProducer( "AnalyticalPropagatorESProducer",
   ComponentName = cms.string( "AnalyticalPropagator" ),
   PropagationDirection = cms.string( "alongMomentum" ),
@@ -195,7 +169,7 @@ ESUnpackerWorkerESProducer = cms.ESProducer( "ESUnpackerWorkerESProducer",
     ESMIPkeV = cms.double( 81.08 ),
     ESMIPADC = cms.double( 55.0 ),
     ESBaseline = cms.int32( 0 ),
-    ESRecoAlgo = cms.untracked.int32( 1 )
+    ESRecoAlgo = cms.int32( 0 )
   )
 )
 EcalRegionCablingESProducer = cms.ESProducer( "EcalRegionCablingESProducer",
@@ -696,9 +670,9 @@ hcalRecAlgos = cms.ESProducer( "HcalRecAlgoESProducer",
       Level = cms.int32( 0 )
     )
   ),
-  RecoveredRecHitBits = cms.vstring(  ),
+  DropChannelStatusBits = cms.vstring(  ),
   appendToDataLabel = cms.string( "" ),
-  DropChannelStatusBits = cms.vstring(  )
+  RecoveredRecHitBits = cms.vstring(  )
 )
 hltCkfTrajectoryBuilderMumu = cms.ESProducer( "CkfTrajectoryBuilderESProducer",
   ComponentName = cms.string( "hltCkfTrajectoryBuilderMumu" ),
@@ -760,6 +734,36 @@ hltKFSmoother = cms.ESProducer( "KFTrajectorySmootherESProducer",
   errorRescaling = cms.double( 100.0 ),
   minHits = cms.int32( 3 ),
   appendToDataLabel = cms.string( "" )
+)
+hltMuTrackJpsiTrajectoryBuilder = cms.ESProducer( "CkfTrajectoryBuilderESProducer",
+  ComponentName = cms.string( "hltMuTrackJpsiTrajectoryBuilder" ),
+  updator = cms.string( "KFUpdator" ),
+  propagatorAlong = cms.string( "PropagatorWithMaterial" ),
+  propagatorOpposite = cms.string( "PropagatorWithMaterialOpposite" ),
+  estimator = cms.string( "Chi2" ),
+  TTRHBuilder = cms.string( "WithTrackAngle" ),
+  MeasurementTrackerName = cms.string( "" ),
+  trajectoryFilterName = cms.string( "hltMuTrackJpsiTrajectoryFilter" ),
+  maxCand = cms.int32( 1 ),
+  lostHitPenalty = cms.double( 30.0 ),
+  intermediateCleaning = cms.bool( True ),
+  alwaysUseInvalidHits = cms.bool( False ),
+  appendToDataLabel = cms.string( "" )
+)
+hltMuTrackJpsiTrajectoryFilter = cms.ESProducer( "TrajectoryFilterESProducer",
+  ComponentName = cms.string( "hltMuTrackJpsiTrajectoryFilter" ),
+  appendToDataLabel = cms.string( "" ),
+  filterPset = cms.PSet( 
+    minimumNumberOfHits = cms.int32( 5 ),
+    minHitsMinPt = cms.int32( 3 ),
+    ComponentType = cms.string( "CkfBaseTrajectoryFilter" ),
+    maxLostHits = cms.int32( 1 ),
+    maxNumberOfHits = cms.int32( 8 ),
+    maxConsecLostHits = cms.int32( 1 ),
+    chargeSignificance = cms.double( -1.0 ),
+    nSigmaMinPt = cms.double( 5.0 ),
+    minPt = cms.double( 1.0 )
+  )
 )
 mixedlayerpairs = cms.ESProducer( "SeedingLayersESProducer",
   appendToDataLabel = cms.string( "" ),
@@ -974,12 +978,13 @@ trajFilterL3 = cms.ESProducer( "TrajectoryFilterESProducer",
 trajectoryCleanerBySharedHits = cms.ESProducer( "TrajectoryCleanerESProducer",
   ComponentName = cms.string( "TrajectoryCleanerBySharedHits" ),
   appendToDataLabel = cms.string( "" ),
-  fractionShared = cms.double( 0.5 )
+  fractionShared = cms.double( 0.5 ),
+  allowSharedFirstHit = cms.bool( False )
 )
 
 DTDataIntegrityTask = cms.Service( "DTDataIntegrityTask",
   getSCInfo = cms.untracked.bool( True ),
-  hltMode = cms.untracked.bool( True ),
+  processingMode = cms.untracked.string( "HLT" )
 )
 UpdaterService = cms.Service( "UpdaterService",
 )
@@ -1042,36 +1047,51 @@ hltL1extraParticles = cms.EDProducer( "L1ExtraParticlesProd",
 )
 hltBPTXCoincidence = cms.EDFilter( "HLTLevel1Activity",
     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    daqPartitions = cms.uint32( 1 ),
     ignoreL1Mask = cms.bool( True ),
     invert = cms.bool( False ),
     physicsLoBits = cms.uint64( 0x1 ),
     physicsHiBits = cms.uint64( 0x40000 ),
     technicalBits = cms.uint64( 0x0 ),
-    bunchCrossings = cms.vint32( 0, -1, 1, -2, 2 )
+    bunchCrossings = cms.vint32( 0, -1, 1 )
+)
+hltScalersRawToDigi = cms.EDProducer( "ScalersRawToDigi",
+    scalersInputTag = cms.InputTag( "rawDataCollector" )
+)
+hltOnlineBeamSpot = cms.EDProducer( "BeamSpotOnlineProducer",
+    label = cms.InputTag( "hltScalersRawToDigi" ),
+    changeToCMSCoordinates = cms.bool( False ),
+    maxRadius = cms.double( 2.0 ),
+    maxZ = cms.double( 40.0 ),
+    setSigmaZ = cms.double( 10.0 )
 )
 hltOfflineBeamSpot = cms.EDProducer( "BeamSpotProducer" )
-hltPreFirstPath = cms.EDFilter( "HLTPrescaler" )
+hltPreFirstPath = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" )
+)
 hltBoolFirstPath = cms.EDFilter( "HLTBool",
     result = cms.bool( False )
 )
 hltL1sHIMinBiasCalo = cms.EDFilter( "HLTLevel1GTSeed",
     L1UseL1TriggerObjectMaps = cms.bool( True ),
-    L1NrBxInEvent = cms.int32( 5 ),
+    L1NrBxInEvent = cms.int32( 3 ),
     L1TechTriggerSeeding = cms.bool( False ),
     L1UseAliasesForSeeding = cms.bool( True ),
-    L1SeedsLogicalExpression = cms.string( "L1_SingleHfBitCountsRing1_1 OR L1_SingleHfBitCountsRing2_1 OR L1_DoubleHfBitCountsRing1_P1N1 OR L1_DoubleHfBitCountsRing2_P1N1 OR L1_SingleHfRingEtSumsRing1_4 OR L1_DoubleHfRingEtSumsRing1_P4N4 OR L1_SingleHfRingEtSumsRing2_4 OR L1_DoubleHfRingEtSumsRing2_P4N4 OR L1_SingleEG2" ),
+    L1SeedsLogicalExpression = cms.string( "L1_DoubleHfBitCountsRing1_P1N1 OR L1_DoubleHfBitCountsRing2_P1N1 OR L1_SingleHfRingEtSumsRing1_4 OR L1_DoubleHfRingEtSumsRing1_P4N4 OR L1_SingleHfRingEtSumsRing2_4 OR L1_DoubleHfRingEtSumsRing2_P4N4 OR L1_SingleEG2" ),
     L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
     L1GtObjectMapTag = cms.InputTag( "hltL1GtObjectMap" ),
     L1CollectionsTag = cms.InputTag( "hltL1extraParticles" ),
     L1MuonCollectionTag = cms.InputTag( "hltL1extraParticles" )
 )
-hltPreHIMinBiasCalo = cms.EDFilter( "HLTPrescaler" )
+hltPreHIMinBiasCalo = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" )
+)
 hltBoolEnd = cms.EDFilter( "HLTBool",
     result = cms.bool( True )
 )
 hltHIL1sJet35U = cms.EDFilter( "HLTLevel1GTSeed",
     L1UseL1TriggerObjectMaps = cms.bool( True ),
-    L1NrBxInEvent = cms.int32( 5 ),
+    L1NrBxInEvent = cms.int32( 3 ),
     L1TechTriggerSeeding = cms.bool( False ),
     L1UseAliasesForSeeding = cms.bool( True ),
     L1SeedsLogicalExpression = cms.string( "L1_SingleJet30" ),
@@ -1080,7 +1100,9 @@ hltHIL1sJet35U = cms.EDFilter( "HLTLevel1GTSeed",
     L1CollectionsTag = cms.InputTag( "hltL1extraParticles" ),
     L1MuonCollectionTag = cms.InputTag( "hltL1extraParticles" )
 )
-hltHIPreJet35U = cms.EDFilter( "HLTPrescaler" )
+hltHIPreJet35U = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" )
+)
 hltEcalRawToRecHitFacility = cms.EDProducer( "EcalRawToRecHitFacility",
     sourceTag = cms.InputTag( "rawDataCollector" ),
     workerName = cms.string( "" )
@@ -1243,7 +1265,7 @@ hltHI1jet35U = cms.EDFilter( "HLT1CaloJet",
 )
 hltHIL1sPhoton15 = cms.EDFilter( "HLTLevel1GTSeed",
     L1UseL1TriggerObjectMaps = cms.bool( True ),
-    L1NrBxInEvent = cms.int32( 5 ),
+    L1NrBxInEvent = cms.int32( 3 ),
     L1TechTriggerSeeding = cms.bool( False ),
     L1UseAliasesForSeeding = cms.bool( True ),
     L1SeedsLogicalExpression = cms.string( "L1_SingleEG5" ),
@@ -1252,7 +1274,9 @@ hltHIL1sPhoton15 = cms.EDFilter( "HLTLevel1GTSeed",
     L1CollectionsTag = cms.InputTag( "hltL1extraParticles" ),
     L1MuonCollectionTag = cms.InputTag( "hltL1extraParticles" )
 )
-hltHIPrePhoton15 = cms.EDFilter( "HLTPrescaler" )
+hltHIPrePhoton15 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" )
+)
 hltIslandBasicClustersHI = cms.EDProducer( "IslandClusterProducer",
     VerbosityLevel = cms.string( "ERROR" ),
     barrelHitProducer = cms.string( "hltEcalRecHitAll" ),
@@ -1339,10 +1363,12 @@ hltHIPhoton15 = cms.EDFilter( "HLT1Photon",
     MaxEta = cms.double( 2.0 ),
     MinN = cms.int32( 1 )
 )
-hltHIPreMML1 = cms.EDFilter( "HLTPrescaler" )
+hltHIPreMML1 = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" )
+)
 hltHIMML1Seed = cms.EDFilter( "HLTLevel1GTSeed",
     L1UseL1TriggerObjectMaps = cms.bool( True ),
-    L1NrBxInEvent = cms.int32( 5 ),
+    L1NrBxInEvent = cms.int32( 3 ),
     L1TechTriggerSeeding = cms.bool( False ),
     L1UseAliasesForSeeding = cms.bool( True ),
     L1SeedsLogicalExpression = cms.string( "L1_DoubleMuOpen" ),
@@ -1470,6 +1496,7 @@ hltMuonCSCDigis = cms.EDProducer( "CSCDCCUnpacker",
 hltCsc2DRecHits = cms.EDProducer( "CSCRecHitDProducer",
     CSCUseCalibrations = cms.bool( True ),
     CSCUseStaticPedestals = cms.bool( False ),
+    CSCUseTimingCorrections = cms.bool( False ),
     stripDigiTag = cms.InputTag( 'hltMuonCSCDigis','MuonCSCStripDigi' ),
     wireDigiTag = cms.InputTag( 'hltMuonCSCDigis','MuonCSCWireDigi' ),
     CSCstripWireDeltaTime = cms.int32( 8 ),
@@ -1704,7 +1731,8 @@ hltL2Muons = cms.EDProducer( "L2MuonProducer",
         Propagator = cms.string( "FastSteppingHelixPropagatorOpposite" ),
         BeamSpotPositionErrors = cms.vdouble( 0.1, 0.1, 5.3 )
       ),
-      VertexConstraint = cms.bool( True )
+      VertexConstraint = cms.bool( True ),
+      beamSpot = cms.InputTag( "hltOfflineBeamSpot" )
     )
 )
 hltL2MuonCandidates = cms.EDProducer( "L2MuonCandidateProducer",
@@ -1761,7 +1789,7 @@ hltHIPixelTracks = cms.EDProducer( "PixelTrackProducer",
         useMultScattering = cms.bool( True ),
         ComponentName = cms.string( "PixelTripletHLTGenerator" ),
         extraHitRZtolerance = cms.double( 0.06 ),
-        maxTriplets = cms.uint32( 10000 )
+        maxElement = cms.uint32( 10000 )
       )
     ),
     FitterPSet = cms.PSet( 
@@ -1813,7 +1841,9 @@ hltHIMML3Filter = cms.EDFilter( "HLTHIMuL1L2L3Filter",
 hltTriggerSummaryAOD = cms.EDProducer( "TriggerSummaryProducerAOD",
     processName = cms.string( "@" )
 )
-hltPreTriggerSummaryRAW = cms.EDFilter( "HLTPrescaler" )
+hltPreTriggerSummaryRAW = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" )
+)
 hltTriggerSummaryRAW = cms.EDProducer( "TriggerSummaryProducerRAW",
     processName = cms.string( "@" )
 )
@@ -1829,7 +1859,9 @@ hltTrigReport = cms.EDAnalyzer( "HLTrigReport",
 )
 
 HLTL1UnpackerSequence = cms.Sequence( hltGtDigis + hltGctDigis + hltL1GtObjectMap + hltL1extraParticles )
-HLTBeginSequenceBPTX = cms.Sequence( hltTriggerType + HLTL1UnpackerSequence + hltBPTXCoincidence + hltOfflineBeamSpot )
+HLTBeamSpot = cms.Sequence( hltScalersRawToDigi + hltOnlineBeamSpot + hltOfflineBeamSpot )
+HLTBeginSequenceBPTX = cms.Sequence( hltTriggerType + HLTL1UnpackerSequence + hltBPTXCoincidence + HLTBeamSpot )
+HLTBeginSequence = cms.Sequence( hltTriggerType + HLTL1UnpackerSequence + HLTBeamSpot )
 HLTEndSequence = cms.Sequence( hltBoolEnd )
 HLTDoLocalHcalSequence = cms.Sequence( hltHcalDigis + hltHbhereco + hltHfreco + hltHoreco )
 HLTDoCaloSequence = cms.Sequence( hltEcalRawToRecHitFacility + hltEcalRegionalRestFEDs + hltEcalRecHitAll + HLTDoLocalHcalSequence + hltTowerMakerForAll )
@@ -1843,12 +1875,16 @@ HLTHIRecopixelvertexingSequence = cms.Sequence( hltHIPixelTracks + hltHIPixelVer
 HLTDoLocalStripSequence = cms.Sequence( hltSiStripRawToClustersFacility + hltSiStripClusters )
 
 HLTriggerFirstPath = cms.Path( hltGetRaw + HLTBeginSequenceBPTX + hltPreFirstPath + hltBoolFirstPath )
-HLT_HIMinBiasCalo = cms.Path( HLTBeginSequenceBPTX + hltL1sHIMinBiasCalo + hltPreHIMinBiasCalo + HLTEndSequence )
-HLT_HIJet35U = cms.Path( HLTBeginSequenceBPTX + hltHIL1sJet35U + hltHIPreJet35U + HLTDoHIJetRecoSequence + hltHI1jet35U + HLTEndSequence )
-HLT_HIPhoton15 = cms.Path( HLTBeginSequenceBPTX + hltHIL1sPhoton15 + hltHIPrePhoton15 + HLTDoCaloSequence + HLTDoHIEcalClusSequence + hltHIPhoton15 + HLTEndSequence )
-HLT_HIDoubleMu = cms.Path( HLTBeginSequenceBPTX + hltHIPreMML1 + hltHIMML1Seed + HLTL2muonrecoSequence + HLTDoLocalPixelSequence + HLTHIRecopixelvertexingSequence + HLTDoLocalStripSequence + hltHIMML3Filter + HLTEndSequence )
+HLT_HIMinBiasCalo = cms.Path( HLTBeginSequence + hltL1sHIMinBiasCalo + hltPreHIMinBiasCalo + HLTEndSequence )
+HLT_HIJet35U = cms.Path( HLTBeginSequence + hltHIL1sJet35U + hltHIPreJet35U + HLTDoHIJetRecoSequence + hltHI1jet35U + HLTEndSequence )
+HLT_HIPhoton15 = cms.Path( HLTBeginSequence + hltHIL1sPhoton15 + hltHIPrePhoton15 + HLTDoCaloSequence + HLTDoHIEcalClusSequence + hltHIPhoton15 + HLTEndSequence )
+HLT_HIDoubleMu = cms.Path( HLTBeginSequence + hltHIPreMML1 + hltHIMML1Seed + HLTL2muonrecoSequence + HLTDoLocalPixelSequence + HLTHIRecopixelvertexingSequence + HLTDoLocalStripSequence + hltHIMML3Filter + HLTEndSequence )
 HLTriggerFinalPath = cms.Path( hltTriggerSummaryAOD + hltPreTriggerSummaryRAW + hltTriggerSummaryRAW + hltBoolFinalPath )
 HLTAnalyzerEndpath = cms.EndPath( hltL1GtTrigReport + hltTrigReport )
 
 
 HLTSchedule = cms.Schedule( *(HLTriggerFirstPath, HLT_HIMinBiasCalo, HLT_HIJet35U, HLT_HIPhoton15, HLT_HIDoubleMu, HLTriggerFinalPath, HLTAnalyzerEndpath ))
+# override the preshower baseline setting for MC
+if 'ESUnpackerWorkerESProducer' in locals():
+    ESUnpackerWorkerESProducer.RHAlgo.ESBaseline = 1000
+

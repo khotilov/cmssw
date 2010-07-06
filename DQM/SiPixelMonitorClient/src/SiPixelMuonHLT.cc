@@ -14,16 +14,12 @@
 //
 // Original Author:  Dan Duggan
 //         Created:  
-// $Id: SiPixelMuonHLT.cc,v 1.4 2009/12/18 20:44:50 wmtan Exp $
+// $Id: SiPixelMuonHLT.cc,v 1.7 2010/04/27 10:51:04 duggan Exp $
 //
 //////////////////////////////////////////////////////////
 #include "DQM/SiPixelMonitorClient/interface/SiPixelMuonHLT.h"
 #include <string>
 #include <stdlib.h>
-
-using namespace std;
-using namespace edm;
-using namespace reco;
 
 SiPixelMuonHLT::SiPixelMuonHLT(const edm::ParameterSet& iConfig) :
   conf_(iConfig)
@@ -32,46 +28,23 @@ SiPixelMuonHLT::SiPixelMuonHLT(const edm::ParameterSet& iConfig) :
   parameters_ = iConfig;
 
   verbose_ = parameters_.getUntrackedParameter < bool > ("verbose", false);
-  monitorName_ = parameters_.getUntrackedParameter < string > ("monitorName", "HLT/HLTMonMuon");
+  monitorName_ = parameters_.getUntrackedParameter < std::string > ("monitorName", "HLT/HLTMonMuon");
   saveOUTput_  = parameters_.getUntrackedParameter < bool > ("saveOUTput", true);
 
   //tags
-  clusterCollectionTag_ = parameters_.getUntrackedParameter < InputTag > ("clusterCollectionTag", edm::InputTag ("hltSiPixelClusters"));
-  rechitsCollectionTag_ = parameters_.getUntrackedParameter < InputTag > ("rechitsCollectionTag", edm::InputTag ("hltSiPixelRecHits"));
-  l3MuonCollectionTag_  = parameters_.getUntrackedParameter < InputTag > ("l3MuonCollectionTag", edm::InputTag ("hltL3MuonCandidates"));
+  clusterCollectionTag_ = parameters_.getUntrackedParameter < edm::InputTag > ("clusterCollectionTag", edm::InputTag ("hltSiPixelClusters"));
+  rechitsCollectionTag_ = parameters_.getUntrackedParameter < edm::InputTag > ("rechitsCollectionTag", edm::InputTag ("hltSiPixelRecHits"));
+  l3MuonCollectionTag_  = parameters_.getUntrackedParameter < edm::InputTag > ("l3MuonCollectionTag", edm::InputTag ("hltL3MuonCandidates"));
   //////////////////////////
 
    theDMBE = edm::Service<DQMStore>().operator->();
-   LogInfo ("PixelHLTDQM") << "SiPixelMuonHLT::SiPixelMuonHLT: Got DQM BackEnd interface"<<endl;
+   edm::LogInfo ("PixelHLTDQM") << "SiPixelMuonHLT::SiPixelMuonHLT: Got DQM BackEnd interface"<<std::endl;
    outputFile_ = parameters_.getUntrackedParameter < std::string > ("outputFile", "");
    if (outputFile_.size () != 0)
-     LogWarning ("HLTMuonDQMSource") << "Muon HLT Monitoring histograms will be saved to " << outputFile_ << std::endl;
+     edm::LogWarning ("HLTMuonDQMSource") << "Muon HLT Monitoring histograms will be saved to " << outputFile_ << std::endl;
    else
      outputFile_ = "PixelHLTDQM.root";
    ///////
-   //trigger setup info...
-   //std::vector < edm::ParameterSet > filters = parameters_.getParameter < std::vector < edm::ParameterSet > >("filters");
-   //for (std::vector < edm::ParameterSet >::iterator filterconf = filters.begin (); filterconf != filters.end (); filterconf++)
-   //  {
-   //    theDirectoryName.push_back (filterconf->getParameter < std::string > ("directoryName"));
-   //    std::string _tmp_level = filterconf->getParameter < std::string > ("directoryName");
-   //    std::vector < std::string > _tmp_bits = filterconf->getParameter < std::vector < std::string > >("triggerBits");
-   //    for (size_t i = 0; i < _tmp_bits.size (); ++i)
-   //	 {
-   //	   theTriggerBits.push_back (_tmp_bits[i]);
-   //	   theHLTCollectionLevel.push_back (_tmp_level);
-   //	 }
-   //  }
-   // L1PassThrough, L2PassThrough, L3PassThrough
-   //nTrigs = theDirectoryName.size ();
-
-   //for (int trig = 0; trig < nTrigs; trig++)
-   //  striggers_[trig] = "";
-
-   //Temporary for the time being
-   //string topFolderName_ ("PixBarrel_ClustOcc");  
-   //folder_organizer.setSiStripFolderName (topFolderName_);
-   //folder_organizer.setSiStripFolder ();
    if (theDMBE != NULL) theDMBE->setCurrentFolder (monitorName_); 
    SiPixelMuonHLT::Histo_init();
    
@@ -81,13 +54,13 @@ SiPixelMuonHLT::~SiPixelMuonHLT()
 {
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
-  LogInfo ("PixelHLTDQM") << "SiPixelMuonHLT::~SiPixelMuonHLT: Destructor"<<endl;
+  edm::LogInfo ("PixelHLTDQM") << "SiPixelMuonHLT::~SiPixelMuonHLT: Destructor"<<std::endl;
 
 }
 
 void SiPixelMuonHLT::beginJob(){
 
-  LogInfo ("PixelHLTDQM") << " SiPixelMuonHLT::beginJob - Initialisation ... " << std::endl;
+  edm::LogInfo ("PixelHLTDQM") << " SiPixelMuonHLT::beginJob - Initialisation ... " << std::endl;
   eventNo = 0;
 
 }
@@ -95,7 +68,7 @@ void SiPixelMuonHLT::beginJob(){
 
 void SiPixelMuonHLT::endJob(void){
   if(saveOUTput_){
-    LogInfo ("PixelHLTDQM") << " SiPixelMuonHLT::endJob - Saving Root File " << std::endl;
+    edm::LogInfo ("PixelHLTDQM") << " SiPixelMuonHLT::endJob - Saving Root File " << std::endl;
     theDMBE->save( outputFile_.c_str() );
   }
 }
@@ -111,52 +84,33 @@ void SiPixelMuonHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   iSetup.get < TrackerDigiGeometryRecord > ().get (TG);
   const TrackerGeometry *theTrackerGeometry = TG.product ();
   const TrackerGeometry & theTracker (*theTrackerGeometry);
-  Handle < RecoChargedCandidateCollection > l3mucands;
-  RecoChargedCandidateCollection::const_iterator cand;
-  Handle <edmNew::DetSetVector<SiPixelCluster> > clusters;
-  Handle <edmNew::DetSetVector<SiPixelRecHit> > rechits;
-  //iEvent.getByLabel("hltSiPixelClusters", clusters);
-  //iEvent.getByLabel("hltSiPixelRecHits", rechits);
-  //iEvent.getByLabel (l3MuonCollectionTag_, l3mucands);
+  edm::Handle < reco::RecoChargedCandidateCollection > l3mucands;
+  reco::RecoChargedCandidateCollection::const_iterator cand;
+  edm::Handle <edmNew::DetSetVector<SiPixelCluster> > clusters;
+  edm::Handle <edmNew::DetSetVector<SiPixelRecHit> > rechits;
 
-  //Temporary fix because of framework bug...
   bool GotClusters = true;
   bool GotRecHits  = true;
   bool GotL3Muons  = true;
   
-  try
-    {
-      iEvent.getByLabel("hltSiPixelClusters", clusters);
-    }
-  catch( cms::Exception& exception ) 
-    {
-      LogDebug("PixelHLTDQM") << "No pix clusters, cannot run for event " << iEvent.eventAuxiliary ().event() <<" run: "<<iEvent.eventAuxiliary ().run()  << endl;
-      GotClusters = false;
-    }
-
-  try
-    {
-      iEvent.getByLabel("hltSiPixelRecHits", rechits);
-    }
-  catch( cms::Exception& exception ) 
-    {
-      LogDebug("PixelHLTDQM") << "No pix rechits, cannot run for event " << iEvent.eventAuxiliary ().event() <<" run: "<<iEvent.eventAuxiliary ().run()  << endl;
-      GotRecHits = false;
-    }
-
-  try
-    {
-      iEvent.getByLabel (l3MuonCollectionTag_, l3mucands);
-    }
-  catch( cms::Exception& exception ) 
-    {
-      LogDebug("PixelHLTDQM") << "No L3 Muons, cannot run for event " << iEvent.eventAuxiliary ().event() <<" run: "<<iEvent.eventAuxiliary ().run()  << endl;
-      GotL3Muons = false;
-    }
+  iEvent.getByLabel("hltSiPixelClusters", clusters);
+  if(!clusters.isValid()){
+    edm::LogInfo("PixelHLTDQM") << "No pix clusters, cannot run for event " << iEvent.eventAuxiliary ().event() <<" run: "<<iEvent.eventAuxiliary ().run()  << std::endl;
+    GotClusters = false;
+  }
+  iEvent.getByLabel("hltSiPixelRecHits", rechits);
+  if(!rechits.isValid()){
+    edm::LogInfo("PixelHLTDQM") << "No pix rechits, cannot run for event " << iEvent.eventAuxiliary ().event() <<" run: "<<iEvent.eventAuxiliary ().run()  << std::endl;
+    GotRecHits = false;
+  }
+  iEvent.getByLabel (l3MuonCollectionTag_, l3mucands);
+  if(!l3mucands.isValid()){
+    edm::LogInfo("PixelHLTDQM") << "No L3 Muons, cannot run for event " << iEvent.eventAuxiliary ().event() <<" run: "<<iEvent.eventAuxiliary ().run()  << std::endl;
+    GotL3Muons = false;
+  }
   
-  //if (!clusters.failedToGet ())
   if (GotClusters){
-    if(!clusters.failedToGet () && clusters.isValid())
+    if(!clusters.failedToGet ())
       {
 	int NBarrel[4] = {0,0,0,0};
 	int NEndcap[5] = {0,0,0,0,0};
@@ -212,33 +166,31 @@ void SiPixelMuonHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   }
   bool doRecHits = false;
   
-  //if (!rechits.failedToGet () && doRecHits)
   if (GotRecHits && doRecHits){
-    if(!rechits.failedToGet () && rechits.isValid())
+    if(!rechits.failedToGet ())
       {
 	for (size_t i = 0; i < rechits->size(); ++i){ 
 	  const SiPixelRecHit* myhit = rechits->data(i);
 	  uint detID = rechits->id(i);
 	  const PixelGeomDetUnit *PixGeom = dynamic_cast < const PixelGeomDetUnit * >(theTracker.idToDet (detID));
-	  //LogInfo("PixelHLTDQM") << "" << PixGeom->geographicalId().subdetId() << std::endl;
+	  //edm::LogInfo("PixelHLTDQM") << "" << PixGeom->geographicalId().subdetId() << std::endl;
 	  //const PixelTopology *topol = dynamic_cast < const PixelTopology * >(&(PixGeom->specificTopology ()));
 	  // get the hit position in local coordinates (cm)
 	  //LocalPoint hitlp = topol->localPosition (MeasurementPoint(myhit->x(),myhit->y()));
 	  if(PixGeom->geographicalId().subdetId() == 1 && myhit->hasPositionAndError()){
 	    GlobalPoint hitgp = PixGeom->surface ().toGlobal (myhit->localPosition());
-	    LogInfo("PixelHLTDQM") << " (From SiPixelRecHit) Hit Eta: " << hitgp.eta()   << " Hit Phi: " << hitgp.phi()  << std::endl;
+	    edm::LogInfo("PixelHLTDQM") << " (From SiPixelRecHit) Hit Eta: " << hitgp.eta()   << " Hit Phi: " << hitgp.phi()  << std::endl;
 	  }
 	}      
       }
   }
-  //if (!l3mucands.failedToGet ())
   if(GotL3Muons){
-    if(!l3mucands.failedToGet () && l3mucands.isValid())
+    if(!l3mucands.failedToGet ())
       {
 	int NBarrel[4] = {0,0,0,0};
 	int NEndcap[5] = {0,0,0,0,0};
 	for (cand = l3mucands->begin (); cand != l3mucands->end (); ++cand){
-	  TrackRef l3tk = cand->get < TrackRef > ();
+	  reco::TrackRef l3tk = cand->get < reco::TrackRef > ();
 	  for (size_t hit = 0; hit < l3tk->recHitsSize (); hit++){
 	    if (l3tk->recHit (hit)->isValid () == true && l3tk->recHit (hit)->geographicalId ().det () == DetId::Tracker){
 	      int detID = l3tk->recHit(hit)->geographicalId().rawId();
@@ -248,6 +200,8 @@ void SiPixelMuonHLT::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		const SiPixelRecHit *pixhit = dynamic_cast < const SiPixelRecHit * >(l3tk->recHit(hit).get());
 		if((*pixhit).isValid() == true){
 		  edm::Ref<edmNew::DetSetVector<SiPixelCluster>, SiPixelCluster> const& pixclust = (*pixhit).cluster();
+		  if (!(*pixhit).cluster().isAvailable()) 
+		    {continue;}
 		  const PixelGeomDetUnit *PixGeom = dynamic_cast < const PixelGeomDetUnit * >(theTracker.idToDet (detID));
 		  const PixelTopology *topol = dynamic_cast < const PixelTopology * >(&(PixGeom->specificTopology ()));
 		  LocalPoint clustlp = topol->localPosition (MeasurementPoint(pixclust->x(),pixclust->y()));
@@ -310,8 +264,8 @@ void SiPixelMuonHLT::Histo_init()
    int   NBinsY = 100;
    float XMax   = 20.;
    float YMax   = 20.;
-   string histoname;
-   string title;
+   std::string histoname;
+   std::string title;
 
    theDMBE->setCurrentFolder (monitorName_ + "/Barrel");   
    std::string layerLabel[4] = {"All_Layers", "Layer1", "Layer2", "Layer3"};
