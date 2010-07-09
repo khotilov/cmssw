@@ -1,7 +1,7 @@
 /** \file 
  *  
  *  $date   : 13/01/2006 11:46:51 CET $
- *  $Revision: 1.6 $
+ *  $Revision: 1.5 $
  *  \author Stefano Lacaprara - INFN Padova <stefano.lacaprara@pd.infn.it>
  *
  */
@@ -24,7 +24,6 @@ DTSuperLayer::DTSuperLayer(DTSuperLayerId id,
                            ReferenceCountingPointer<BoundPlane>& plane,
                            const DTChamber* ch) :
   GeomDet(plane), theId(id) , theLayers(4,(const DTLayer*)0), theCh(ch) {
-  setDetId(id);
 }
 
 /* Destructor */ 
@@ -34,6 +33,9 @@ DTSuperLayer::~DTSuperLayer() {
 }
 
 /* Operations */ 
+DetId DTSuperLayer::geographicalId() const {
+  return theId;
+}
 
 DTSuperLayerId DTSuperLayer::id() const {
   return theId;
