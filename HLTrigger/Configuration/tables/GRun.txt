@@ -26,6 +26,7 @@ HLT_L1SingleTauJet
 HLT_FwdJet20U
 HLT_QuadJet15U
 HLT_L1SumEt100
+HLT_EcalOnly_SumEt160
 HLT_L1MET20
 HLT_MET45
 HLT_MET100
@@ -59,6 +60,12 @@ HLT_Mu5_L2Mu0
 HLT_Mu0_Track0_Jpsi
 HLT_Mu3_Track0_Jpsi
 HLT_Mu5_Track0_Jpsi
+HLT_Mu0_TkMu0_Jpsi
+HLT_Mu3_TkMu0_Jpsi
+HLT_Mu5_TkMu0_Jpsi
+HLT_Mu0_TkMu0_Jpsi_NoCharge
+HLT_Mu3_TkMu0_Jpsi_NoCharge
+HLT_Mu5_TkMu0_Jpsi_NoCharge
 HLT_L1SingleEG2
 HLT_L1SingleEG5
 HLT_L1SingleEG8
