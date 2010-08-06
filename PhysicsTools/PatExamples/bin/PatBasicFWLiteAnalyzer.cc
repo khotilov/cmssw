@@ -13,8 +13,11 @@
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/FWLite/interface/Event.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "FWCore/ParameterSet/interface/ProcessDesc.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "PhysicsTools/FWLite/interface/TFileService.h"
+#include "FWCore/PythonParameterSet/interface/PythonProcessDesc.h"
+
 
 int main(int argc, char* argv[]) 
 {
@@ -29,16 +32,33 @@ int main(int argc, char* argv[])
   // load framework libraries
   gSystem->Load( "libFWCoreFWLite" );
   AutoLibraryLoader::enable();
+
+  // only allow one argument for this simple example which should be the
+  // the python cfg file
+  if ( argc < 2 ) {
+    std::cout << "Usage : " << argv[0] << " [parameters.py]" << std::endl;
+    return 0;
+  }
+
+  // get the python configuration
+  PythonProcessDesc builder(argv[1]);
+  const edm::ParameterSet& fwliteParameters = builder.processDesc()->getProcessPSet()->getParameter<edm::ParameterSet>("FWLiteParams");
+
+  // now get each parameter
+  std::string   input_ ( fwliteParameters.getParameter<std::string  >("inputFile"  ) );
+  std::string   output_( fwliteParameters.getParameter<std::string  >("outputFile" ) );
+  edm::InputTag muons_ ( fwliteParameters.getParameter<edm::InputTag>("muons"  ) );
+
   
   // book a set of histograms
-  fwlite::TFileService fs = fwlite::TFileService("analyzePatBasics.root");
+  fwlite::TFileService fs = fwlite::TFileService(output_.c_str());
   TFileDirectory theDir = fs.mkdir("analyzeBasicPat");
   TH1F* muonPt_  = theDir.make<TH1F>("muonPt", "pt",    100,  0.,300.);
   TH1F* muonEta_ = theDir.make<TH1F>("muonEta","eta",   100, -3.,  3.);
   TH1F* muonPhi_ = theDir.make<TH1F>("muonPhi","phi",   100, -5.,  5.);  
   
   // open input file (can be located on castor)
-  TFile* inFile = TFile::Open( "file:PATLayer1_Output.fromAOD_full.root" );
+  TFile* inFile = TFile::Open(input_.c_str());
 
   // ----------------------------------------------------------------------
   // Second Part: 
@@ -66,8 +86,7 @@ int main(int argc, char* argv[])
 
     // Handle to the muon collection
     edm::Handle<std::vector<pat::Muon> > muons;
-    edm::InputTag muonLabel("cleanPatMuons");
-    event.getByLabel(muonLabel, muons);
+    event.getByLabel(muons_, muons);
     
     // loop muon collection and fill histograms
     for(unsigned i=0; i<muons->size(); ++i){
