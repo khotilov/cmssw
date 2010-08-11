@@ -6,7 +6,7 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 from PhysicsTools.PatAlgos.tools.coreTools import *
 
 ## global tag for data
-process.GlobalTag.globaltag = cms.string('GR_R_35X_V8B::All')
+process.GlobalTag.globaltag = 'START38_V7::All' ## needed for CMSSW_3_8_0 due to changes in the DB access for JEC ## process.GlobalTag.globaltag = cms.string('GR_R_35X_V8B::All')
 
 # add pf met
 from PhysicsTools.PatAlgos.tools.metTools import *
@@ -118,7 +118,7 @@ process.p = cms.Path(
     )
 
 # rename output file
-process.out.fileName = cms.untracked.string('reco_7TeV_firstdata_361_pat.root')
+process.out.fileName = cms.untracked.string('reco_7TeV_firstdata_pat.root')
 
 # reduce verbosity
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
