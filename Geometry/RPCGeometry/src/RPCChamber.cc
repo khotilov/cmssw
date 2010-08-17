@@ -1,8 +1,8 @@
 /** \file
  *
- *  $Date: 2008/01/22 21:31:36 $
- *  $Revision: 1.4 $
- *  Author: Raffaello Trentadue - Universit? Bari 
+ *  $Date: 2006/11/28 10:22:01 $
+ *  $Revision: 1.3 $
+ *  Author: Raffaello Trentadue - Università Bari 
  *  Mail:     <raffaello.trentadue@ba.infn.it>
  */
 
@@ -22,14 +22,17 @@
 RPCChamber::RPCChamber(RPCDetId id, 
 		       const ReferenceCountingPointer<BoundPlane> & plane) :
   GeomDet(plane), theId(id)
-{
-setDetId(id);
-}
+{}
 
 /* Destructor */ 
 RPCChamber::~RPCChamber() {
 }
 
+DetId 
+RPCChamber::geographicalId() const
+{
+  return theId;
+}
 
 RPCDetId
 RPCChamber::id() const

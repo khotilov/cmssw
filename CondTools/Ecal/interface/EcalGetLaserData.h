@@ -2,6 +2,7 @@
 #define ECALGETLASERDATA_H
 
 #include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "CondCore/DBCommon/interface/DBSession.h"
 #include "CondCore/DBCommon/interface/Exception.h"
 #include "CondCore/DBCommon/interface/MessageLevel.h"
 

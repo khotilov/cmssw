@@ -32,9 +32,9 @@ NoiseRates::NoiseRates(const edm::ParameterSet& iConfig)
   }
 
   // set parameters
-  rbxCollName_      = iConfig.getUntrackedParameter<edm::InputTag>("rbxCollName");
-  minRBXEnergy_     = iConfig.getUntrackedParameter<double>("minRBXEnergy");
-  minHitEnergy_     = iConfig.getUntrackedParameter<double>("minHitEnergy");
+  rbxCollName_      = iConfig.getParameter<std::string>("rbxCollName");
+  minRBXEnergy_     = iConfig.getParameter<double>("minRBXEnergy");
+  minHitEnergy_     = iConfig.getParameter<double>("minHitEnergy");
 
   // book histograms
 
@@ -42,16 +42,16 @@ NoiseRates::NoiseRates(const edm::ParameterSet& iConfig)
   hLumiBlockCount_ = dbe_->book1D(histo, histo, 1, -0.5, 0.5);
 
   sprintf  (histo, "hRBXEnergy" );
-  hRBXEnergy_ = dbe_->book1D(histo, histo, 300, 0, 3000);
+  hRBXEnergy_ = dbe_->book1D(histo, histo, 100, 0, 1000);
 
   sprintf  (histo, "hRBXEnergyType1" );
-  hRBXEnergyType1_ = dbe_->book1D(histo, histo, 300, 0, 3000);
+  hRBXEnergyType1_ = dbe_->book1D(histo, histo, 100, 0, 1000);
 
   sprintf  (histo, "hRBXEnergyType2" );
-  hRBXEnergyType2_ = dbe_->book1D(histo, histo, 300, 0, 3000);
+  hRBXEnergyType2_ = dbe_->book1D(histo, histo, 100, 0, 1000);
 
   sprintf  (histo, "hRBXEnergyType3" );
-  hRBXEnergyType3_ = dbe_->book1D(histo, histo, 300, 0, 3000);
+  hRBXEnergyType3_ = dbe_->book1D(histo, histo, 100, 0, 1000);
 
   sprintf  (histo, "hRBXNHits" );
   hRBXNHits_ = dbe_->book1D(histo, histo, 73,-0.5,72.5);

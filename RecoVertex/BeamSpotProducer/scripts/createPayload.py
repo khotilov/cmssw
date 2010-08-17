@@ -22,9 +22,13 @@
    -d, --data   = DATA: Data file, or directory with data files.
    -I, --IOVbase = IOVBASE: options: runbase(default), lumibase, timebase
    -o, --overwrite : Overwrite results files when copying.
+   -O, --Output = OUTPUT: Output directory for data files (workflow directory)
+   -m, --merged : Use when data file contains combined results.
    -n, --newarchive : Create a new archive directory when copying.
    -t, --tag    = TAG: Database tag name.
+   -T, --Test   : Upload files to Test dropbox for data validation.
    -u, --upload : Upload files to offline drop box via scp.
+   -z, --zlarge : Enlarge sigmaZ to 10 +/- 0.005 cm.
    
    Francisco Yumiceva (yumiceva@fnal.gov)
    Fermilab 2010
@@ -208,16 +212,21 @@ if __name__ == '__main__':
 	#print " e.g. createPayload BeamFitResults_template.txt BeamSpotObjects_2009_v1_express 122745 \"\" \"beam spot for early collisions\" \"oracle://cms_orcon_prod/CMS_COND_31X_BEAMSPOT\"\n"
 	#sys.exit()
 
-    workflowdir             = os.getenv("CMSSW_BASE") + "/src/RecoVertex/BeamSpotProducer/test/workflow/"
-    workflowdirLastPayloads = workflowdir + "lastPayloads/"
-    workflowdirTmp          = workflowdir + "tmp/"
-    workflowdirArchive      = workflowdir + "archive/"
-     
+    
      # COMMAND LINE OPTIONS
     #################################
     option,args = parse(__doc__)
     if not args and not option: exit()
 
+    workflowdir             = os.getenv("CMSSW_BASE") + "/src/RecoVertex/BeamSpotProducer/test/workflow/"
+    if option.Output:
+        workflowdir = option.Output
+        if workflowdir[len(workflowdir)-1] != '/':
+ 	    workflowdir = workflowdir + '/'
+    workflowdirLastPayloads = workflowdir + "lastPayloads/"
+    workflowdirTmp          = workflowdir + "tmp/"
+    workflowdirArchive      = workflowdir + "archive/"
+    
     if ( (option.data and option.tag) or (option.data and option.copy)):
         mkWorkflowdir()
     
@@ -241,7 +250,7 @@ if __name__ == '__main__':
         elif tagname.find("hlt") != -1:
             tagType = "hlt"
         else:
-            print "I am assuming your tag ifs for the offline database..."
+            print "I am assuming your tag is for the offline database..."
             tagType = "offline"
 
     else:	
@@ -249,6 +258,7 @@ if __name__ == '__main__':
 	exit()
 
     IOVbase = 'runbase'
+    timetype = 'runnumber'
     if option.IOVbase:
         if option.IOVbase != "runbase" and option.IOVbase != "lumibase" and option.IOVbase != "timebase":
             print "\n\n unknown iov base option: "+ option.IOVbase +" \n\n\n"
@@ -256,12 +266,23 @@ if __name__ == '__main__':
 	IOVbase = option.IOVbase
     
     listoffiles = copyToWorkflowdir(option.data)
-
+        
     # sort list of data files in chronological order
     sortedlist = {}
 
     for beam_file in listoffiles:
 
+        if len(listoffiles)==1 and option.merged:
+            mergedfile = open(beam_file)
+            alllines = mergedfile.readlines()
+            npayloads = len(alllines)/23
+            for i in range(0,npayloads):
+                block = alllines[i * 23, (i+1)*23]
+                line = block[2]
+                atime = time.strptime(line.split()[1] +  " " + line.split()[2] + " " + line.split()[3],"%Y.%m.%d %H:%M:%S %Z")
+                sortedlist[atime] = block
+            break
+        
 	tmpfile = open(beam_file)
 	atime = ''
 	arun = ''
@@ -296,14 +317,22 @@ if __name__ == '__main__':
     allfile = open( allbeam_file, 'a')
     print " merging all results into file: " + allbeam_file
 
+    # check if merged sqlite file exists
+    if os.path.exists(workflowdirArchive+"payloads/Combined.db"):
+        os.system("rm "+workflowdirArchive+"payloads/Combined.db")
+    
     
     nfile = 0
+    iov_since_first = '1'
+    
     for key in keys:
 	
 	iov_since = '1'
 	iov_till = ''
 	iov_comment = ''
 	destDB = 'oracle://cms_orcon_prod/CMS_COND_31X_BEAMSPOT'
+        if option.Test:
+            destDB = 'oracle://cms_orcoff_prep/CMS_COND_BEAMSPOT'
 	iov_comment = 'Beam spot position'
 	
 	suffix = "_" + str(nfile)
@@ -317,32 +346,45 @@ if __name__ == '__main__':
     #### WRITE sqlite file
 	
 	beam_file = sortedlist[key]
-
+        tmp_datafilename = workflowdirTmp+"tmp_datafile.txt"
+        if option.merged:
+            tmpfile = file(tmp_datafilename,'w')
+            tmpfile.write(sortedlist[key])
+            tmpfile.close()
+            beam_file = tmp_datafilename
+            
 	print "read input beamspot file: " + beam_file
 	tmpfile = open(beam_file)
         beam_file_tmp = workflowdirTmp + beam_file[beam_file.rfind('/')+1:] + ".tmp"
 	newtmpfile = open(beam_file_tmp,"w")
 	tmp_run = ""
-	tmp_lumi = ""
+	tmp_lumi_since = ""
+        tmp_lumi_till = ""
 	for line in tmpfile:
 	    if line.find("Runnumber") != -1:
 		iov_since = line.split()[1]
 		iov_till = iov_since
 		tmp_run = line.split()[1]
 	    elif line.find("LumiRange") != -1:
-		tmp_lumi = line.split()[1]
+		tmp_lumi_since = line.split()[1]
+                tmp_lumi_till = line.split()[3]
 	    elif line.find("BeginTimeOfFit") == -1 and line.find("EndTimeOfFit") == -1 and line.find("LumiRange") == -1:
-                if line.find("sigmaZ0") != -1:
+                if line.find("sigmaZ0") != -1 and option.zlarge:
                     line = "sigmaZ0 10\n"
-                if line.find("Cov(3,j)") != -1:
+                if line.find("Cov(3,j)") != -1 and option.zlarge:
                     line = "Cov(3,j) 0 0 0 2.5e-05 0 0 0\n"
 		newtmpfile.write(line)
             allfile.write(line)
-	
-	# pack run number and lumi section
-	if IOVbase = "lumibase":
-	    iov_since = iov_till = pack(tmp_run, tmp_lumi)
 
+	# pack run number and lumi section
+	if IOVbase == "lumibase":
+            timetype = "lumiid"
+	    iov_since = str( pack(int(tmp_run), int(tmp_lumi_since)) )
+            iov_till = str( pack(int(tmp_run), int(tmp_lumi_till)) )
+        # keep first iov for merged output metafile
+        if nfile == 1:
+            iov_since_first = iov_since
+        
 	tmpfile.close()
 	newtmpfile.close()
         if option.copy:
@@ -356,6 +398,7 @@ if __name__ == '__main__':
 	
 	writedb_tags = [('SQLITEFILE','sqlite_file:' + sqlite_file),
 			('TAGNAME',tagname),
+                        ('TIMETYPE',timetype),
 			('BEAMSPOTFILE',beam_file)]
     
 	for line in wfile:
@@ -368,18 +411,9 @@ if __name__ == '__main__':
 
 	wnewfile.close()
 	print "writing sqlite file ..."
-    #os.system("cmsRun "+ writedb_out)
+    	status_wDB = commands.getstatusoutput('cmsRun '+ writedb_out)
+        #print status_wDB[1]
         
-	status_wDB = commands.getstatusoutput('cmsRun '+ writedb_out)
-
-        #### Merge sqlite files
-        print " merge sqlite file ..."
-        acmd = "cmscond_export_iov -d sqlite_file:"+workflowdirArchive+"payloads/Combined.db -s sqlite_file:"+sqlite_file+ " -i "+tagname+" -t "+tagname+" -l sqlite_file:"+workflowdirTmp+"log.db"+" -b "+iov_since+" -e "+iov_since
-        print acmd
-        std = commands.getstatusoutput(acmd)
-        print std[1]
-                                        
-    #print status_wDB[1]
 	commands.getstatusoutput('rm -f ' + beam_file)
 	os.system("rm "+ writedb_out)
     ##### READ and check sqlite file
@@ -408,55 +442,60 @@ if __name__ == '__main__':
 	outtext = status_rDB[1]
 	print outtext
 	os.system("rm "+ readdb_out)
+	
+        #### Merge sqlite files
+        if not os.path.isdir(workflowdirArchive + 'payloads'):
+            os.mkdir(workflowdirArchive + 'payloads')
+        
+        print " merge sqlite file ..."
+        acmd = "cmscond_export_iov -d sqlite_file:"+workflowdirArchive+"payloads/Combined.db -s sqlite_file:"+sqlite_file+ " -i "+tagname+" -t "+tagname+" -l sqlite_file:"+workflowdirTmp+"log.db"+" -b "+iov_since+" -e "+iov_till
+        print acmd
+        std = commands.getstatusoutput(acmd)
+        print std[1]
+        
+	os.system("rm "+sqlite_file)
 
     #### CREATE payload files for dropbox
             
-        print " create payload card for dropbox ..."
-        dfile = open(metadata_file,'w')
+        #print " create payload card for dropbox ..."
+        #dfile = open(metadata_file,'w')
         
-        dfile.write('destDB '+ destDB +'\n')
-        dfile.write('tag '+ tagname +'\n')
-        dfile.write('inputtag' +'\n')
-        dfile.write('since ' + iov_since +'\n')
-#        dfile.write('till ' + iov_till +'\n')
-        dfile.write('Timetype runnumber\n')
-        checkType = tagType
-        if tagType == "express":
-            checkType = "prompt"
-        dfile.write('IOVCheck ' + checkType + '\n')
-        dfile.write('usertext ' + iov_comment +'\n')
+        #dfile.write('destDB '+ destDB +'\n')
+        #dfile.write('tag '+ tagname +'\n')
+        #dfile.write('inputtag' +'\n')
+        #dfile.write('since ' + iov_since +'\n')
+        #if IOVbase == "runbase":
+        #    dfile.write('Timetype runnumber\n')
+        #elif IOVbase == "lumibase":
+        #    dfile.write('Timetype lumiid\n')
+        #checkType = tagType
+        #if tagType == "express":
+        #    checkType = "hlt"
+        #dfile.write('IOVCheck ' + checkType + '\n')
+        #dfile.write('usertext ' + iov_comment +'\n')
         
-        dfile.close()
+        #dfile.close()
         
-        uuid = commands.getstatusoutput('uuidgen -t')[1]
-        final_sqlite_file_name = tagname + '@' + uuid
+        #uuid = commands.getstatusoutput('uuidgen -t')[1]
+        #final_sqlite_file_name = tagname + '@' + uuid
         
-        if not os.path.isdir(workflowdirArchive + 'payloads'):
-            os.mkdir(workflowdirArchive + 'payloads')
-        commands.getstatusoutput('cp ' + sqlite_file   + ' ' + workflowdirArchive + 'payloads/' + final_sqlite_file_name + '.db')
-        commands.getstatusoutput('cp ' + metadata_file + ' ' + workflowdirArchive + 'payloads/' + final_sqlite_file_name + '.txt')
+        #if not os.path.isdir(workflowdirArchive + 'payloads'):
+        #    os.mkdir(workflowdirArchive + 'payloads')
+        #commands.getstatusoutput('cp ' + sqlite_file   + ' ' + workflowdirArchive + 'payloads/' + final_sqlite_file_name + '.db')
+        #commands.getstatusoutput('cp ' + metadata_file + ' ' + workflowdirArchive + 'payloads/' + final_sqlite_file_name + '.txt')
 
-        commands.getstatusoutput('mv ' + sqlite_file   + ' ' + workflowdirLastPayloads + final_sqlite_file_name + '.db')
-        commands.getstatusoutput('mv ' + metadata_file + ' ' + workflowdirLastPayloads + final_sqlite_file_name + '.txt')
+        #commands.getstatusoutput('mv ' + sqlite_file   + ' ' + workflowdirLastPayloads + final_sqlite_file_name + '.db')
+        #commands.getstatusoutput('mv ' + metadata_file + ' ' + workflowdirLastPayloads + final_sqlite_file_name + '.txt')
 
-        print workflowdirLastPayloads + final_sqlite_file_name + '.db'
-        print workflowdirLastPayloads + final_sqlite_file_name + '.txt'
+        #print workflowdirLastPayloads + final_sqlite_file_name + '.db'
+        #print workflowdirLastPayloads + final_sqlite_file_name + '.txt'
         
-        if option.upload:
-            print " scp files to offline Drop Box"
-#            shellScriptName = 'dropBoxOffline_test.sh'
-#            shellScript     = os.getenv("CMSSW_BASE") + "/src/RecoVertex/BeamSpotProducer/scripts/" + shellScriptName
-#            if not os.path.exists(shellScript) :
-#                wgetStatus = commands.getstatusoutput("wget http://condb.web.cern.ch/condb/DropBoxOffline/" + shellScriptName )
-#                if os.path.exists(shellScriptName) :
-#                    if not os.path.exists(shellScript):
-#                        os.system("mv -f " + shellScriptName + " " + shellScript)
-#                else:
-#                    exit("Can't get the shell script to upload payloads. Check this twiki page: https://twiki.cern.ch/twiki/bin/viewauth/CMS/DropBoxOffline")
-            commands.getstatusoutput("scp " + workflowdirLastPayloads + final_sqlite_file_name + ".db  webcondvm.cern.ch:/DropBox")
-            commands.getstatusoutput("scp " + workflowdirLastPayloads + final_sqlite_file_name + ".txt webcondvm.cern.ch:/DropBox")
+        #if option.upload:
+        #    print " scp files to offline Drop Box"
+        #    commands.getstatusoutput("scp " + workflowdirLastPayloads + final_sqlite_file_name + ".db  webcondvm.cern.ch:/DropBox")
+        #    commands.getstatusoutput("scp " + workflowdirLastPayloads + final_sqlite_file_name + ".txt webcondvm.cern.ch:/DropBox")
 
-        print " done. Clean up."
+        print " clean up done."
     #### CLEAN up
 	
 	#print "DONE.\n"
@@ -465,5 +504,71 @@ if __name__ == '__main__':
 	#print tagname+"@"+uuid+".txt"
     
     allfile.close()
+            
+    #### CREATE payload for merged output
+            
+    print " create MERGED payload card for dropbox ..."
     
+    sqlite_file   = workflowdirArchive+'payloads/Combined.db'
+    metadata_file = workflowdirArchive+'payloads/Combined.txt'
+    dfile = open(metadata_file,'w')
         
+    dfile.write('destDB '+ destDB +'\n')
+    dfile.write('tag '+ tagname +'\n')
+    dfile.write('inputtag' +'\n')
+    dfile.write('since ' + iov_since_first +'\n')
+    #        dfile.write('till ' + iov_till +'\n')
+    if IOVbase == "runbase":
+        dfile.write('Timetype runnumber\n')
+    elif IOVbase == "lumibase":
+        dfile.write('Timetype lumiid\n')
+    checkType = tagType
+    if tagType == "express":
+        checkType = "hlt"
+    dfile.write('IOVCheck ' + checkType + '\n')
+    dfile.write('usertext ' + iov_comment +'\n')
+        
+    dfile.close()
+        
+    uuid = commands.getstatusoutput('uuidgen -t')[1]
+    final_sqlite_file_name = tagname + '@' + uuid
+        
+    if not os.path.isdir(workflowdirArchive + 'payloads'):
+        os.mkdir(workflowdirArchive + 'payloads')
+    commands.getstatusoutput('cp ' + sqlite_file   + ' ' + workflowdirArchive + 'payloads/' + final_sqlite_file_name + '.db')
+    commands.getstatusoutput('cp ' + metadata_file + ' ' + workflowdirArchive + 'payloads/' + final_sqlite_file_name + '.txt')
+
+    commands.getstatusoutput('mv ' + sqlite_file   + ' ' + workflowdirLastPayloads + final_sqlite_file_name + '.db')
+    commands.getstatusoutput('mv ' + metadata_file + ' ' + workflowdirLastPayloads + final_sqlite_file_name + '.txt')
+
+    print workflowdirLastPayloads + final_sqlite_file_name + '.db'
+    print workflowdirLastPayloads + final_sqlite_file_name + '.txt'
+        
+    if option.upload:
+        print " scp files to offline Drop Box"
+        dropbox = "/DropBox"
+        if option.Test:
+            dropbox = "/DropBox_test"
+
+        acmd = "chmod a+w " + workflowdirLastPayloads + final_sqlite_file_name + ".txt"
+        outcmd = commands.getstatusoutput(acmd)
+        print acmd
+        print outcmd[1]
+        acmd = "scp -p" + workflowdirLastPayloads + final_sqlite_file_name + ".db  webcondvm.cern.ch:/tmp"
+        outcmd = commands.getstatusoutput(acmd)
+        print acmd
+        print outcmd[1]
+        acmd = "scp -p" + workflowdirLastPayloads + final_sqlite_file_name + ".txt webcondvm.cern.ch:/tmp"
+        outcmd = commands.getstatusoutput(acmd)
+        print acmd
+        print outcmd[1]
+        acmd = "ssh webcondvm.cern.ch \"mv /tmp/" + final_sqlite_file_name + ".db "+dropbox +"\""
+        outcmd = commands.getstatusoutput(acmd)
+        print acmd
+        print outcmd[1]
+        acmd = "ssh webcondvm.cern.ch \"mv /tmp/" + final_sqlite_file_name + ".txt "+dropbox +"\""
+        outcmd = commands.getstatusoutput(acmd)
+        print acmd
+        print outcmd[1]
+        
+

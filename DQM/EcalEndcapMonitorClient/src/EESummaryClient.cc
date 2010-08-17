@@ -1,8 +1,8 @@
 /*
  * \file EESummaryClient.cc
  *
- * $Date: 2010/03/28 09:21:49 $
- * $Revision: 1.196 $
+ * $Date: 2010/05/04 12:35:08 $
+ * $Revision: 1.199 $
  * \author G. Della Ricca
  *
 */
@@ -306,7 +306,7 @@ void EESummaryClient::setup(void) {
   meIntegrity_[0]->setAxisTitle("jx", 1);
   meIntegrity_[0]->setAxisTitle("jy", 2);
 
-  if ( meIntegrity_[1] ) dqmStore_->removeElement( meIntegrity_[0]->getName() );
+  if ( meIntegrity_[1] ) dqmStore_->removeElement( meIntegrity_[1]->getName() );
   sprintf(histo, "EEIT EE + integrity quality summary");
   meIntegrity_[1] = dqmStore_->book2D(histo, histo, 100, 0., 100., 100, 0., 100.);
   meIntegrity_[1]->setAxisTitle("jx", 1);
@@ -2028,14 +2028,21 @@ void EESummaryClient::analyze(void) {
 
           if ( eesfc ) {
 
+            me = dqmStore_->get(prefixME_ + "/EcalInfo/EEMM DCC");
+
+            float xval = 6;
+
+            if ( me ) {
+
+              xval = 2;
+              if ( me->getBinContent( ism ) > 0 ) xval = 1;
+
+            }
+
             me = eesfc->meh01_[ism-1];
 
             if ( me ) {
 
-              float xval = 6;
-
-              if ( me->getBinContent( ix, iy ) < 0 ) xval = 2;
-              if ( me->getBinContent( ix, iy ) == 0 ) xval = 1;
               if ( me->getBinContent( ix, iy ) > 0 ) xval = 0;
 
               if ( ism >= 1 && ism <= 9 ) {
@@ -2129,7 +2136,9 @@ void EESummaryClient::analyze(void) {
 
               if ( h2 && h3 ) {
 
-                float emulErrorVal = h2->GetBinContent( ix, iy ) + h3->GetBinContent( ix, iy );
+                // float emulErrorVal = h2->GetBinContent( ix, iy ) + h3->GetBinContent( ix, iy );
+                float emulErrorVal = h2->GetBinContent( ix, iy );
+
                 if( emulErrorVal!=0 && hadNonZeroInterest ) xval = 0;
 
               }
