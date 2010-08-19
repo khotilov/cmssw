@@ -7,9 +7,7 @@
 
 StripGeomDetUnit::StripGeomDetUnit( BoundPlane* sp, StripGeomDetType* type,const GeometricDet* gd) : 
    GeomDetUnit(sp),theType( type), theGD(gd)
-{
-  setDetId(theGD->geographicalID());
-}
+{}
 
 
 
@@ -22,3 +20,4 @@ const StripTopology& StripGeomDetUnit::specificTopology() const {
   return specificType().specificTopology();
 }
 
+DetId StripGeomDetUnit::geographicalId() const {return theGD->geographicalID();}

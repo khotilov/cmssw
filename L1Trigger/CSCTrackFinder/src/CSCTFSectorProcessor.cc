@@ -96,7 +96,7 @@ CSCTFSectorProcessor::CSCTFSectorProcessor(const unsigned& endcap,
   trigger_on_MB1a = -1;
   trigger_on_MB1d = -1;
   singlesTrackPt  = -1;
-  singlesTrackOutput = 999;
+  singlesTrackOutput = -1;
   rescaleSinglesPhi  = -1;
 
   if(initializeFromPSet) readParameters(pset);
@@ -181,7 +181,7 @@ void CSCTFSectorProcessor::initialize(const edm::EventSetup& c){
   if( trigger_on_ME1a>0 || trigger_on_ME1b>0 ||trigger_on_ME2>0  ||
       trigger_on_ME3>0  || trigger_on_ME4>0  ||trigger_on_MB1a>0 ||trigger_on_MB1d>0 ){
       if(singlesTrackPt<0) throw cms::Exception("CSCTFTrackBuilder")<<"singlesTrackPt parameter left uninitialized";
-      if(singlesTrackOutput==999) throw cms::Exception("CSCTFTrackBuilder")<<"singlesTrackOutput parameter left uninitialized";
+      if(singlesTrackOutput<0) throw cms::Exception("CSCTFTrackBuilder")<<"singlesTrackOutput parameter left uninitialized";
       if(rescaleSinglesPhi<0)  throw cms::Exception("CSCTFTrackBuilder")<<"rescaleSinglesPhi parameter left uninitialized";
   }
   if(QualityEnableME1a<0) throw cms::Exception("CSCTFTrackBuilder")<<"QualityEnableME1a parameter left uninitialized";
@@ -414,7 +414,7 @@ bool CSCTFSectorProcessor::run(const CSCTriggerContainer<csctf::TrackStub>& stub
 										m_mindeta113_accp,  m_maxdeta113_accp, m_maxdphi113_accp,
 										m_mindphip_halo, m_mindetap_halo,
 										m_straightp, m_curvedp,
-										m_mbaPhiOff, m_mbbPhiOff,
+										m_mbaPhiOff, m_mbaPhiOff,
 										m_bxa_depth, m_allowALCTonly, m_allowCLCTonly, m_preTrigger, m_widePhi,
 										m_minBX, m_maxBX) )
       {
@@ -457,21 +457,18 @@ bool CSCTFSectorProcessor::run(const CSCTriggerContainer<csctf::TrackStub>& stub
     if( trigger_on_ME1a || trigger_on_ME1b || trigger_on_ME2 || trigger_on_ME3 || trigger_on_ME4 || trigger_on_MB1a || trigger_on_MB1d )
         for(std::vector<csctf::TrackStub>::iterator itr=stub_vec_filtered.begin(); itr!=stub_vec_filtered.end(); itr++){
               int station = itr->station()-1;
-							if(station != 4)
-              {
-								int subSector = CSCTriggerNumbering::triggerSubSectorFromLabels(CSCDetId(itr->getDetId().rawId()));
-              	int mpc = ( subSector ? subSector-1 : station+1 );
-              	if( (mpc==0&&trigger_on_ME1a) || (mpc==1&&trigger_on_ME1b) ||
-                	  (mpc==2&&trigger_on_ME2)  || (mpc==3&&trigger_on_ME3)  ||
-                	  (mpc==4&&trigger_on_ME4)  ||
-                	  (mpc==5&& ( (trigger_on_MB1a&&subSector%2==1) || (trigger_on_MB1d&&subSector%2==0) ) ) ){
-                	  int bx = itr->getBX() - m_minBX;
-                	  if( bx<0 || bx>=7 ) edm::LogWarning("CSCTFTrackBuilder::buildTracks()") << " LCT BX is out of ["<<m_minBX<<","<<m_maxBX<<") range: "<<itr->getBX();
-                	  else
-                	     if( itr->isValid() ) myStubContainer[bx].push_back(*itr);
-              	}
-        			}
-				}
+              int subSector = CSCTriggerNumbering::triggerSubSectorFromLabels(CSCDetId(itr->getDetId().rawId()));
+              int mpc = ( subSector ? subSector-1 : station+1 );
+              if( (mpc==0&&trigger_on_ME1a) || (mpc==1&&trigger_on_ME1b) ||
+                  (mpc==2&&trigger_on_ME2)  || (mpc==3&&trigger_on_ME3)  ||
+                  (mpc==4&&trigger_on_ME4)  ||
+                  (mpc==5&& ( (trigger_on_MB1a&&subSector%2==1) || (trigger_on_MB1d&&subSector%2==0) ) ) ){
+                  int bx = itr->getBX() - m_minBX;
+                  if( bx<0 || bx>=7 ) edm::LogWarning("CSCTFTrackBuilder::buildTracks()") << " LCT BX is out of ["<<m_minBX<<","<<m_maxBX<<") range: "<<itr->getBX();
+                  else
+                     if( itr->isValid() ) myStubContainer[bx].push_back(*itr);
+              }
+        }
 
     // Core's input was loaded in a relative time window BX=[0-7)
     // To relate it to time window of tracks (centred at BX=0) we introduce a shift:
@@ -487,7 +484,7 @@ bool CSCTFSectorProcessor::run(const CSCTriggerContainer<csctf::TrackStub>& stub
           std::vector<csc::L1Track> tracks = l1_tracks.get();
           for(std::vector<csc::L1Track>::iterator trk=tracks.begin(); trk<tracks.end(); trk++)
              if( trk->BX()         == bx-shift &&
-                 trk->outputLink() == singlesTrackOutput ){
+                 static_cast<int>(trk->outputLink()) == singlesTrackOutput ){
                  coreTrackExists = true;
                  break;
              }

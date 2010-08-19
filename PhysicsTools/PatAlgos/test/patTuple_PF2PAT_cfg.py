@@ -8,12 +8,22 @@ from PhysicsTools.PatAlgos.patTemplate_cfg import *
 #     fileNames = cms.untracked.vstring('file:myAOD.root')
 #)
 
+run36xOn35xInput = False
+runOnData = False
+
+if run36xOn35xInput:
+    from PhysicsTools.PatAlgos.tools.cmsswVersionTools import *
+    run36xOn35xInput(process)
+
+
+if runOnData:
+    process.source.fileNames = cms.untracked.vstring('/store/data/Commissioning10/MinimumBias/RAW-RECO/v8/000/132/601/F85204EE-EB40-DF11-8F71-001A64789D1C.root')
 
 # process.load("PhysicsTools.PFCandProducer.Sources.source_ZtoMus_DBS_cfi")
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False))
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
-process.out.fileName = cms.untracked.string('patLayer1_fromAOD_PF2PAT_full.root')
+process.out.fileName = cms.untracked.string('patTuple_PF2PAT.root')
 
 # load the PAT config
 process.load("PhysicsTools.PatAlgos.patSequences_cff")
@@ -24,11 +34,10 @@ process.load("PhysicsTools.PatAlgos.patSequences_cff")
 from PhysicsTools.PatAlgos.tools.pfTools import *
 
 postfix = "PFlow"
-usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5', runOnMC=True, postfix=postfix) 
+usePF2PAT(process,runPF2PAT=True, jetAlgo='AK5', runOnMC= not runOnData, postfix=postfix) 
 
-# turn to false when running on data
-getattr(process, "patElectrons"+postfix).embedGenMatch = True
-getattr(process, "patMuons"+postfix).embedGenMatch = True
+if runOnData:
+    removeMCMatching(process, ['All'] )
 
 # Let it run
 process.p = cms.Path(

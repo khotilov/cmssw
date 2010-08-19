@@ -1,34 +1,40 @@
 // ROOT includes
-#include "TGLFontManager.h"
+#include "TEveStraightLineSet.h"
+#include "TEvePointSet.h"
 #include "TEveScene.h"
+#include "TEveViewer.h"
+#include "TGLEmbeddedViewer.h"
 #include "TEveManager.h"
 #include "TEveTrack.h"
 #include "TEveTrackPropagator.h"
-#include "TEveTrans.h"
 #include "TEveText.h"
 #include "TEveGeoShape.h"
+#include "TGLFontManager.h"
+#include "TGPack.h"
+#include "TGeoBBox.h"
 #include "TGSlider.h"
 #include "TGButton.h"
 #include "TGLabel.h"
-#include "TGLViewer.h"
 #include "TCanvas.h"
 #include "TLatex.h"
 
 // CMSSW includes
 #include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
 
 // Fireworks includes
 #include "Fireworks/Core/interface/FWModelId.h"
-//#include "Fireworks/Core/src/CmsShowMain.h"
+#include "Fireworks/Core/src/CmsShowMain.h"
 #include "Fireworks/Core/interface/FWColorManager.h"
 
 #include "Fireworks/Core/interface/FWEventItem.h"
 #include "Fireworks/Core/interface/CSGAction.h"
-//#include "Fireworks/Core/interface/FWGUISubviewArea.h"
+#include "Fireworks/Core/interface/FWGUISubviewArea.h"
 #include "Fireworks/Core/interface/FWIntValueListener.h"
 #include "Fireworks/Core/interface/FWMagField.h"
 
 #include "Fireworks/Tracks/plugins/FWTrackHitsDetailView.h"
+#include "Fireworks/Tracks/plugins/TracksRecHitsUtil.h"
 #include "Fireworks/Tracks/interface/TrackUtils.h"
 
 FWTrackHitsDetailView::FWTrackHitsDetailView ():
@@ -85,10 +91,10 @@ FWTrackHitsDetailView::build (const FWModelId &id, const reco::Track* track)
    m_eveScene->AddElement(m_modules);
    m_moduleLabels = new TEveElementList("Modules");
    m_eveScene->AddElement(m_moduleLabels);
-   fireworks::addModules(*track, id.item(), m_modules, true);
+   TracksRecHitsUtil::addModules(*track, id.item(), m_modules, true);
    m_hits = new TEveElementList("Hits");
    m_eveScene->AddElement(m_hits);
-   fireworks::addHits(*track, id.item(), m_hits, true);
+   TracksRecHitsUtil::addHits(*track, id.item(), m_hits, true);
    for (TEveElement::List_i i=m_modules->BeginChildren(); i!=m_modules->EndChildren(); ++i)
    {
       TEveGeoShape* gs = dynamic_cast<TEveGeoShape*>(*i);
@@ -117,7 +123,8 @@ FWTrackHitsDetailView::build (const FWModelId &id, const reco::Track* track)
    prop->SetMaxR(123);
    prop->SetMaxZ(300);
    prop->SetMaxStep(1);
-   TEveTrack* trk = fireworks::prepareTrack( *track, prop );
+   TEveTrack* trk = fireworks::prepareTrack( *track, prop,
+                                             id.item()->defaultDisplayProperties().color() );
    trk->MakeTrack();
    trk->SetLineWidth(2);
    prop->SetRnrDaughters(kTRUE);

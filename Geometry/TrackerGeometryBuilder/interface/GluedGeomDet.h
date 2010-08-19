@@ -12,6 +12,7 @@ public:
   
   virtual ~GluedGeomDet();
 
+  virtual DetId geographicalId() const;
   virtual std::vector<const GeomDet*> components() const;
 
   // Which subdetector

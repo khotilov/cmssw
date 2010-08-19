@@ -256,7 +256,7 @@ FUEventProcessor::FUEventProcessor(xdaq::ApplicationStub *s)
   pthread_mutex_init(&pickup_lock_,0);
 
   std::ostringstream ost;
-  ost  << "<div id=\"ve\">2.2.3 (" << edm::getReleaseVersion() <<")</div>"
+  ost  << "<div id=\"ve\">2.2.7 (" << edm::getReleaseVersion() <<")</div>"
        << "<div id=\"ou\">" << outPut_.toString() << "</div>"
        << "<div id=\"sh\">" << hasShMem_.toString() << "</div>"
        << "<div id=\"mw\">" << hasModuleWebRegistry_.toString() << "</div>"
@@ -904,7 +904,7 @@ bool FUEventProcessor::supervisor(toolbox::task::WorkLoop *)
       else ost << " process stopped ";
       subs_[i].countdown()=slaveRestartDelaySecs_.value_;
       subs_[i].setReasonForFailed(ost.str());
-      spMStates_[i] = edm::event_processor::sInvalid;
+      spMStates_[i] = evtProcessor_.notstarted_state_code();
       spmStates_[i] = 0;
       std::ostringstream ost1;
       ost1 << "-E- Slave " << subs_[i].pid() << ost.str();
@@ -1026,37 +1026,55 @@ bool FUEventProcessor::supervisor(toolbox::task::WorkLoop *)
 	      if(subs_[i].alive()>0)
 		{
 		  nblive_++;
-		  subs_[i].post(msg1,true);
-		  
-		    subs_[i].rcvNonBlocking(msg2,true);
-
-		    prg* p = (struct prg*)(msg2->mtext);
-		    subs_[i].setParams(p);
-		    spMStates_[i] = p->Ms;
-		    spmStates_[i] = p->ms;
-		    ((xdata::UnsignedInteger32*)nbProcessed)->value_ += p->nbp;
-		    ((xdata::UnsignedInteger32*)nbAccepted)->value_  += p->nba;
-		    if(dqm)dqm->value_ += p->dqm;
-		    nbTotalDQM_ +=  p->dqm;
-		    scalersUpdates_ += p->trp;
-		    if(p->ls > ls->value_) ls->value_ = p->ls;
-		    if(p->ps != ps->value_) ps->value_ = p->ps;
+		  try{
+		    subs_[i].post(msg1,true);
+		    
+		    unsigned long retval = subs_[i].rcvNonBlocking(msg2,true);
+		    if(retval == (unsigned long) msg2->mtype){
+		      prg* p = (struct prg*)(msg2->mtext);
+		      subs_[i].setParams(p);
+		      spMStates_[i] = p->Ms;
+		      spmStates_[i] = p->ms;
+		      if(p->Ms == edm::event_processor::sError || p->Ms == edm::event_processor::sInvalid
+			 || p->Ms == edm::event_processor::sStopping){
+			std::ostringstream ost;
+			ost << "edm::eventprocessor slot " << i << " process id " 
+			    << subs_[i].pid() << " not in Running state : Mstate=" 
+			    << evtProcessor_.stateNameFromIndex(p->Ms) << " mstate="
+			    << evtProcessor_.moduleNameFromIndex(p->ms) 
+			    << " - this will likely cause a problem at Stop";
+			XCEPT_DECLARE(evf::Exception,
+				      sentinelException, ost.str());
+			notifyQualified("error",sentinelException);
+		      }
+		      ((xdata::UnsignedInteger32*)nbProcessed)->value_ += p->nbp;
+		      ((xdata::UnsignedInteger32*)nbAccepted)->value_  += p->nba;
+		      if(dqm)dqm->value_ += p->dqm;
+		      nbTotalDQM_ +=  p->dqm;
+		      scalersUpdates_ += p->trp;
+		      if(p->ls > ls->value_) ls->value_ = p->ls;
+		      if(p->ps != ps->value_) ps->value_ = p->ps;
+		    }
+		  } 
+		  catch(evf::Exception &e){
+		    LOG4CPLUS_INFO(getApplicationLogger(),
+				   "could not send/receive msg on slot " 
+				   << i << " - " << e.what());    
 		  }
-		else
-		  nbdead_++;
-	      }
-	  }
-
-      }
-      catch(evf::Exception &e){
-	LOG4CPLUS_INFO(getApplicationLogger(),"could not send/receive msg - " << e.what());    
-      }
-      catch(std::exception &e){
-	LOG4CPLUS_INFO(getApplicationLogger(),"std exception - " << e.what());    
-      }
-      catch(...){
-	LOG4CPLUS_INFO(getApplicationLogger(),"unknown exception ");    
-      }
+		    
+		}
+	      else
+		nbdead_++;
+	    }
+	}
+      
+    }
+    catch(std::exception &e){
+      LOG4CPLUS_INFO(getApplicationLogger(),"std exception - " << e.what());    
+    }
+    catch(...){
+      LOG4CPLUS_INFO(getApplicationLogger(),"unknown exception ");    
+    }
   }
   else{
     for(unsigned int i = 0; i < subs_.size(); i++)
@@ -1170,7 +1188,7 @@ bool FUEventProcessor::summarize(toolbox::task::WorkLoop* wl)
 	  catch(evf::Exception &e)
 	    {
 	      std::cout << "exception in msgrcv on " << i 
-			<< " " << subs_[i].alive() << " " << errno << std::endl;
+			<< " " << subs_[i].alive() << " " << strerror(errno) << std::endl;
 	      continue;
 	      //do nothing special
 	    }
@@ -1195,7 +1213,7 @@ bool FUEventProcessor::summarize(toolbox::task::WorkLoop* wl)
     evtProcessor_.fireScalersUpdate();
   }
   else{
-    LOG4CPLUS_WARN(getApplicationLogger(),"Summarize loop: no process updated successfull ");          
+    LOG4CPLUS_WARN(getApplicationLogger(),"Summarize loop: no process updated successfully ");          
     evtProcessor_.withdrawLumiSectionIncrement();
   }
   if(fsm_.stateName()->toString()!="Enabled"){
@@ -1638,8 +1656,10 @@ void FUEventProcessor::updater(xgi::Input *in,xgi::Output *out)
       *out << "<div id=\"tt\">" << 0 << "</div>"
 	   << "<div id=\"ac\">" << 0 << "</div>";
     }
-
-  *out<< "<div id=\"swl\">" << (wlScalersActive_ ? "Active" : "Inactive") << "</div>";
+  if(!isChildProcess_)
+    *out<< "<div id=\"swl\">" << (wlSummarizeActive_ ? "Active" : "Inactive") << "</div>";
+  else
+    *out<< "<div id=\"swl\">" << (wlScalersActive_ ? "Active" : "Inactive") << "</div>";
   *out<< "<div id=\"idi\">" << iDieUrl_.value_ << "</div>";
   if(vp_!=0){
     *out << "<div id=\"vpi\">" << (unsigned int) vp_ << "</div>";

@@ -2,10 +2,8 @@
 <use   name="rootrflx"/>
 <use   name="FWCore/MessageLogger"/>
 <use   name="FWCore/Utilities"/>
-<use   name="FWCore/ServiceRegistry"/>
 <use   name="FWCore/Framework"/>
 <use   name="FWCore/ParameterSet"/>
-<use   name="CommonTools/UtilAlgos"/>
 <use   name="DataFormats/Provenance"/>
 <use   name="DataFormats/SiStripDigi"/>
 <use   name="DataFormats/Scalers"/>
@@ -15,7 +13,4 @@
 <use   name="CondFormats/SiStripObjects"/>
 <export>
   <lib   name="1"/>
-  <use   name="FWCore/MessageLogger"/>
-  <use   name="FWCore/Framework"/>
-  <use   name="CommonTools/UtilAlgos"/>
 </export>
