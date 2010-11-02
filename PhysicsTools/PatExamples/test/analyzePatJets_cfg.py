@@ -1,43 +1,23 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("Jets")
+process = cms.Process("Exercise1")
 
 process.source = cms.Source("PoolSource",
   fileNames = cms.untracked.vstring(
-    'file:patTuple.root'
+    'file:PATLayer1_Output.fromAOD_full.root'
   )
 )
 
 process.MessageLogger = cms.Service("MessageLogger")
-
-## prepare jet collections
-from PhysicsTools.PatAlgos.selectionLayer1.jetSelector_cfi import selectedPatJets
-process.goodCaloJets = selectedPatJets.clone(src='cleanPatJets', cut='pt>30 & abs(eta)<3')
-
-## monitor jet collections
-from PhysicsTools.PatExamples.PatJetAnalyzer_cfi import analyzePatJets
-## modules for jet response
-process.rawJets     = analyzePatJets.clone(corrLevel='raw')
-process.relJets     = analyzePatJets.clone(corrLevel='rel')
-process.absJets     = analyzePatJets.clone(corrLevel='abs')
-## modules to compare calo and pflow jets
-process.caloJets    = analyzePatJets.clone(src='goodCaloJets')
-process.pflowJets   = analyzePatJets.clone(src='goodCaloJets')
-## modules for shift in JES
-process.shiftedJets = analyzePatJets.clone(src='goodCaloJets')
-
+process.load("PhysicsTools/PatExamples/PatJetAnalyzer_cff")
 
 process.TFileService = cms.Service("TFileService",
-  fileName = cms.string('analyzePatJets.root')
-)
+                                   fileName = cms.string('analyzePatJets.root')
+                                   )
 
-## process path
-process.p = cms.Path(
-    process.goodCaloJets * 
-    process.rawJets   *
-    process.relJets   *
-    process.absJets   *
-    process.caloJets  *
-    process.pflowJets *
-    process.shiftedJets
-)
+## do Exercise 1(c)
+process.p = cms.Path(process.comparePatAndReco)
+
+## do Exercise 1(d)
+## process.p = cms.Path(process.doJetResponse)
+
