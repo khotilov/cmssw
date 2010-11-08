@@ -90,6 +90,8 @@ process.analyzePatMCMatching = cms.EDAnalyzer("PatMCMatching",
 )
 
 process.out.outputCommands = cms.untracked.vstring('keep *') 
+process.outpath.remove(process.out)
+
 
 process.p = cms.Path(process.inFlightMuons + process.patDefaultSequence + process.analyzePatMCMatching)
 
@@ -97,9 +99,12 @@ process.p = cms.Path(process.inFlightMuons + process.patDefaultSequence + proces
 #----------------------------------------------------------------------
 # Change the input file to compare
 #----------------------------------------------------------------------
+process.maxEvents.input = -1
 
-process.source.fileNames +=[
+process.source.fileNames =[
 # 'rfio:///castor/cern.ch/cms/store/relval/CMSSW_3_6_2/RelValJpsiMM/GEN-SIM-RECO/START36_V10-v1/0002/04DF42BB-F970-DF11-9B1D-00304867C1B0.root'
 
 'rfio:///castor/cern.ch/cms/store/relval/CMSSW_3_6_2/RelValZMM/GEN-SIM-RECO/START36_V10-v1/0002/16F4C9D1-1B71-DF11-B488-0018F3D095FE.root'
  ]
+del(process.out)
+del(process.outpath)
