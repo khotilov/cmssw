@@ -14,20 +14,18 @@ process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(1000)
 )
 
-from PhysicsTools.PatExamples.samplesCERN_cff import *
-##process.source.fileNames = muonSKIM        ## ATTENTION these samoek are NOT available on castor
-##process.source.fileNames = simulationQCD
+from PhysicsTools.PatExamples.topSamples_cff import *
+process.source.fileNames = simulationQCD
 ##process.source.fileNames = simulationWjets
 ##process.source.fileNames = simulationZjets
-process.source.fileNames = simulationTtbar
+##process.source.fileNames = simulationTtbar
 
 ## Define the TFileService
 process.TFileService = cms.Service("TFileService",
-##fileName = cms.string('analyzePatTopSelection.root')
-##fileName = cms.string('analyzePatTopSelection_qcd.root')
+  fileName = cms.string('analyzePatTopSelection_qcd.root')
 ##fileName = cms.string('analyzePatTopSelection_wjets.root')
 ##fileName = cms.string('analyzePatTopSelection_zjets.root')
-fileName = cms.string('analyzePatTopSelection_ttbar.root')
+##fileName = cms.string('analyzePatTopSelection_ttbar.root')
 )
 
 ## ----------------------------------------------------------------
@@ -89,6 +87,7 @@ process.monStart  = analyzePatTopSelection.clone(jets='goodJets')
 process.monStep1  = analyzePatTopSelection.clone(jets='goodJets')
 process.monStep2  = analyzePatTopSelection.clone(jets='goodJets')
 process.monStep3a = analyzePatTopSelection.clone(muons='tightMuons', jets='goodJets')
+process.monStep3b = analyzePatTopSelection.clone(muons='looseMuons', jets='goodJets')
 process.monStep4  = analyzePatTopSelection.clone(muons='vetoMuons' , jets='goodJets')
 process.monStep5  = analyzePatTopSelection.clone(muons='vetoMuons', elecs='vetoElecs', jets='goodJets')
 process.monStep6a = analyzePatTopSelection.clone(muons='vetoMuons', elecs='vetoElecs', jets='goodJets')
@@ -111,25 +110,13 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 ## Define loose event selection path
 process.looseEventSelection = cms.Path(
-    process.step1      *
-    process.step2      *
-    process.step3b     *
-    process.step4      *
-    process.step5      *
-    process.step6a     *
-    process.step6b     *
-    process.step6c
-    )
-
-## Define tight event selection path
-process.tightEventSelection = cms.Path(
     process.monStart   * 
     process.step1      *
-    process.monStep1   *         
+    process.monStep1   *     
     process.step2      *
     process.monStep2   * 
-    process.step3a     *
-    process.monStep3a  *     
+    process.step3b     *
+    process.monStep3b  *     
     process.step4      *
     process.monStep4   *     
     process.step5      *
@@ -139,7 +126,20 @@ process.tightEventSelection = cms.Path(
     process.step6b     *
     process.monStep6b  *     
     process.step6c     *
-    process.monStep6c  *
+    process.monStep6c
+    )
+
+## Define tight event selection path
+process.tightEventSelection = cms.Path(
+    process.step1      *
+    process.step2      *
+    process.step3a     *
+    process.monStep3a  *     
+    process.step4      *
+    process.step5      *
+    process.step6a     *
+    process.step6b     *
+    process.step6c     *
     process.step7      *
     process.monStep7     
     )
