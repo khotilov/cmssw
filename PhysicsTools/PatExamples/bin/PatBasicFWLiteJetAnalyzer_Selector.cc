@@ -21,6 +21,7 @@ This example creates a histogram of Jet Pt, using Jets with Pt above 30 and ETA 
 #include "PhysicsTools/SelectorUtils/interface/Selector.h"
 #include "PhysicsTools/SelectorUtils/interface/JetIDSelectionFunctor.h"
 #include "PhysicsTools/SelectorUtils/interface/PFJetIDSelectionFunctor.h"
+#include "PhysicsTools/SelectorUtils/interface/RunLumiSelector.h"
 #include "FWCore/FWLite/interface/AutoLibraryLoader.h"
 #include "PhysicsTools/FWLite/interface/TFileService.h"
 #include "DataFormats/FWLite/interface/ChainEvent.h"
@@ -82,6 +83,16 @@ public:
     set("PF Kin Cuts", !useCalo);
     set("PF Delta Phi", !useCalo);    
     set("PF Jet ID", !useCalo);
+
+    // Indices for fast caching
+    caloCuts_      = index_type(&bits_, std::string("Calo Cuts") );
+    caloKin_       = index_type(&bits_, std::string("Calo Kin Cuts"));
+    caloDeltaPhi_  = index_type(&bits_, std::string("Calo Delta Phi"));
+    caloJetID_     = index_type(&bits_, std::string("Calo Jet ID"));
+    pfCuts_        = index_type(&bits_, std::string("PF Cuts"));
+    pfKin_         = index_type(&bits_, std::string("PF Kin Cuts"));
+    pfDeltaPhi_    = index_type(&bits_, std::string("PF Delta Phi"));
+    pfJetID_       = index_type(&bits_, std::string("PF Jet ID"));
     
   }
 
@@ -93,27 +104,27 @@ public:
     pat::strbitset retPFJet = pfJetSel_->getBitTemplate();
 
 
-    if ( considerCut("Calo Cuts") ) {
-      passCut(ret, "Calo Cuts");
+    if ( considerCut(caloCuts_) ) {
+      passCut(ret, caloCuts_);
       event.getByLabel( jetSrc_, h_jets_ );
       // Calo Cuts
-      if ( h_jets_->size() >= 2 || ignoreCut("Calo Kin Cuts") ) {
-	passCut(ret, "Calo Kin Cuts");
+      if ( h_jets_->size() >= 2 || ignoreCut(caloKin_) ) {
+	passCut(ret, caloKin_);
 	pat::Jet const & jet0 = h_jets_->at(0);
 	pat::Jet const & jet1 = h_jets_->at(1);
 	double dphi = fabs(deltaPhi<double>( jet0.phi(),
 					     jet1.phi() ) );
 	  
-	if ( fabs(dphi - TMath::Pi()) < 1.0 || ignoreCut("Calo Delta Phi") ) {
-	  passCut(ret, "Calo Delta Phi");
+	if ( fabs(dphi - TMath::Pi()) < 1.0 || ignoreCut(caloDeltaPhi_) ) {
+	  passCut(ret, caloDeltaPhi_);
 
 	    
 	  retCaloJet.set(false);
 	  bool pass0 = (*jetSel_)( jet0, retCaloJet );
 	  retCaloJet.set(false);
 	  bool pass1 = (*jetSel_)( jet1, retCaloJet );
-	  if ( (pass0 && pass1) || ignoreCut("Calo Jet ID") ) {
-	    passCut(ret, "Calo Jet ID");
+	  if ( (pass0 && pass1) || ignoreCut(caloJetID_) ) {
+	    passCut(ret, caloJetID_);
 	    caloJet0_ = edm::Ptr<pat::Jet>( h_jets_, 0);
 	    caloJet1_ = edm::Ptr<pat::Jet>( h_jets_, 1);
 
@@ -124,28 +135,28 @@ public:
     }// end if calo cuts
 
 
-    if ( considerCut("PF Cuts") ) {
+    if ( considerCut(pfCuts_) ) {
 
-      passCut(ret, "PF Cuts");
+      passCut(ret, pfCuts_);
       event.getByLabel( pfJetSrc_, h_pfjets_ );
       // PF Cuts
-      if ( h_pfjets_->size() >= 2 || ignoreCut("PF Kin Cuts") ) {
-	passCut( ret, "PF Kin Cuts");
+      if ( h_pfjets_->size() >= 2 || ignoreCut(pfKin_) ) {
+	passCut( ret, pfKin_);
 	pat::Jet const & jet0 = h_pfjets_->at(0);
 	pat::Jet const & jet1 = h_pfjets_->at(1);
 	double dphi = fabs(deltaPhi<double>( jet0.phi(),
 					     jet1.phi() ) );
 	  
-	if ( fabs(dphi - TMath::Pi()) < 1.0 || ignoreCut("PF Delta Phi") ) {
-	  passCut(ret, "PF Delta Phi");
+	if ( fabs(dphi - TMath::Pi()) < 1.0 || ignoreCut(pfDeltaPhi_) ) {
+	  passCut(ret, pfDeltaPhi_);
 
 	    
 	  retPFJet.set(false);
 	  bool pass0 = (*pfJetSel_)( jet0, retPFJet );
 	  retPFJet.set(false);
 	  bool pass1 = (*pfJetSel_)( jet1, retPFJet );
-	  if ( (pass0 && pass1) || ignoreCut("PF Jet ID") ) {
-	    passCut(ret, "PF Jet ID");
+	  if ( (pass0 && pass1) || ignoreCut(pfJetID_) ) {
+	    passCut(ret, pfJetID_);
 	    pfJet0_ = edm::Ptr<pat::Jet>( h_pfjets_, 0);
 	    pfJet1_ = edm::Ptr<pat::Jet>( h_pfjets_, 1);
 
@@ -174,6 +185,17 @@ public:
   pat::Jet                    const &   pfJet1() const { return *pfJet1_; }
 
 
+  // Fast caching indices
+  index_type const &   caloCuts()        const {return caloCuts_;}      
+  index_type const &   caloKin()         const {return caloKin_;}       
+  index_type const &   caloDeltaPhi()    const {return caloDeltaPhi_;}  
+  index_type const &   caloJetID()       const {return caloJetID_;}     
+  index_type const &   pfCuts()          const {return pfCuts_;}        
+  index_type const &   pfKin()           const {return pfKin_;}         
+  index_type const &   pfDeltaPhi()      const {return pfDeltaPhi_;}    
+  index_type const &   pfJetID()         const {return pfJetID_;}       
+
+
 protected:
   boost::shared_ptr<JetIDSelectionFunctor>   jetSel_;
   boost::shared_ptr<PFJetIDSelectionFunctor> pfJetSel_;
@@ -188,6 +210,16 @@ protected:
 
   edm::Ptr<pat::Jet>                         pfJet0_;
   edm::Ptr<pat::Jet>                         pfJet1_;
+
+  // Fast caching indices
+  index_type   caloCuts_;      
+  index_type   caloKin_;       
+  index_type   caloDeltaPhi_;  
+  index_type   caloJetID_;     
+  index_type   pfCuts_;        
+  index_type   pfKin_;         
+  index_type   pfDeltaPhi_;    
+  index_type   pfJetID_;       
 
 };
 
@@ -228,6 +260,9 @@ int main (int argc, char* argv[])
   edm::ParameterSet const& plotParameters      = parameters->getParameter<edm::ParameterSet>("plotParameters");
   edm::ParameterSet const& inputs              = parameters->getParameter<edm::ParameterSet>("inputs");
   edm::ParameterSet const& outputs             = parameters->getParameter<edm::ParameterSet>("outputs");
+
+  cout << "Making RunLumiSelector" << endl;
+  RunLumiSelector runLumiSel( inputs );
   
   cout << "setting up TFileService" << endl;
   // book a set of histograms
@@ -334,7 +369,6 @@ int main (int argc, char* argv[])
 				    pfJetIDParameters,
 				    pfJetStudiesParams );
 
-   vector<int> const & runs = plotParameters.getParameter<std::vector<int> >("runs");
    bool doTracks = plotParameters.getParameter<bool>("doTracks");
    bool useMC    = plotParameters.getParameter<bool>("useMC");
 
@@ -347,10 +381,12 @@ int main (int argc, char* argv[])
 
     edm::EventBase const & event = ev;
 
-    int run = event.id().run();
-    if ( runs.size() > 0 && find( runs.begin(), runs.end(), run ) == runs.end() ) continue;
+    if ( runLumiSel(ev) == false ) continue;
 
-    if ( nev % 10000 == 0 ) cout << "Processing run " << event.id().run() << ", event " << event.id().event() << endl;
+    if ( nev % 100 == 0 ) cout << "Processing run " << event.id().run() << ", lumi " << event.id().luminosityBlock() << ", event " << event.id().event() << endl;
+
+
+
 
     pat::strbitset retCalo = caloSelector.getBitTemplate();
     caloSelector( event, retCalo );
@@ -362,8 +398,8 @@ int main (int argc, char* argv[])
     ///------------------
     /// CALO JETS
     ///------------------
-    if ( retCalo.test("Calo Kin Cuts") ) {
-      if ( retCalo.test("Calo Delta Phi") ) {
+    if ( retCalo.test( caloSelector.caloKin() ) ) {
+      if ( retCalo.test( caloSelector.caloDeltaPhi() ) ) {
 	vector<pat::Jet>  const & allCaloJets = caloSelector.allCaloJets();
 
 	for ( std::vector<pat::Jet>::const_iterator jetBegin = allCaloJets.begin(),
@@ -381,7 +417,7 @@ int main (int argc, char* argv[])
 	  hists["hist_jetNTracks"]->Fill( jetTracks.size() );
 	  hists["hist_jetNTracksVsPt"]->Fill( pt, jetTracks.size() );
 	  hists["hist_jetEMF"]->Fill( jet.emEnergyFraction() );	
-	  hists["hist_jetCorr"]->Fill( jet.corrFactor("raw") );
+	  hists["hist_jetCorr"]->Fill( jet.jecFactor("Uncorrected") );
 	  hists["hist_n90Hits"]->Fill( static_cast<int>(jet.jetID().n90Hits) );
 	  hists["hist_fHPD"]->Fill( jet.jetID().fHPD );
 	  hists["hist_nConstituents"]->Fill( jet.nConstituents() );
@@ -410,7 +446,7 @@ int main (int argc, char* argv[])
 
     
 
-	if ( retCalo.test("Calo Jet ID") ) {
+	if ( retCalo.test( caloSelector.caloJetID() ) ) {
 	  pat::Jet const & jet0 = caloSelector.caloJet0();
 	  pat::Jet const & jet1 = caloSelector.caloJet1();
 
@@ -429,7 +465,7 @@ int main (int argc, char* argv[])
 	  hists["hist_good_jetNTracks"]->Fill( jet0.associatedTracks().size() );
 	  hists["hist_good_jetNTracksVsPt"]->Fill( jet0.pt(), jet0.associatedTracks().size() );
 	  hists["hist_good_jetEMF"]->Fill( jet0.emEnergyFraction() );	
-	  hists["hist_good_jetCorr"]->Fill( jet0.corrFactor("raw") );
+	  hists["hist_good_jetCorr"]->Fill( jet0.jecFactor("Uncorrected") );
 	  hists["hist_good_n90Hits"]->Fill( static_cast<int>(jet0.jetID().n90Hits) );
 	  hists["hist_good_fHPD"]->Fill( jet0.jetID().fHPD );
 	  hists["hist_good_nConstituents"]->Fill( jet0.nConstituents() );
@@ -440,7 +476,7 @@ int main (int argc, char* argv[])
 	  hists["hist_good_jetNTracks"]->Fill( jet1.associatedTracks().size() );
 	  hists["hist_good_jetNTracksVsPt"]->Fill( jet1.pt(), jet1.associatedTracks().size() );
 	  hists["hist_good_jetEMF"]->Fill( jet1.emEnergyFraction() );	
-	  hists["hist_good_jetCorr"]->Fill( jet1.corrFactor("raw") );
+	  hists["hist_good_jetCorr"]->Fill( jet1.jecFactor("Uncorrected") );
 	  hists["hist_good_n90Hits"]->Fill( static_cast<int>(jet1.jetID().n90Hits) );
 	  hists["hist_good_fHPD"]->Fill( jet1.jetID().fHPD );
 	  hists["hist_good_nConstituents"]->Fill( jet1.nConstituents() );
@@ -453,7 +489,7 @@ int main (int argc, char* argv[])
     ///------------------
     /// PF JETS
     ///------------------
-    if ( retPF.test("PF Delta Phi") ) {
+    if ( retPF.test( pfSelector.pfDeltaPhi() ) ) {
 
       vector<pat::Jet> const & allPFJets = pfSelector.allPFJets();
 
@@ -486,7 +522,7 @@ int main (int argc, char* argv[])
 
     
 
-      if ( retPF.test("PF Jet ID") ) {
+      if ( retPF.test( pfSelector.pfJetID() ) ) {
 	pat::Jet const & jet0 = pfSelector.pfJet0();
 	pat::Jet const & jet1 = pfSelector.pfJet1();
 
