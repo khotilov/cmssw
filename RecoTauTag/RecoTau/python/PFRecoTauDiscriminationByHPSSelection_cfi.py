@@ -30,8 +30,6 @@ hpsSelectionDiscriminator = cms.EDProducer(
             nPiZeros = cms.uint32(2),
             minMass = cms.double(0.4),
             maxMass = cms.double(1.2),
-            minPi0Mass = cms.double(0.05),
-            maxPi0Mass = cms.double(0.2),
         ),
         cms.PSet(
             nCharged = cms.uint32(3),

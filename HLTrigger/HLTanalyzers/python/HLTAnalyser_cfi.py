@@ -64,6 +64,8 @@ hltanalysis = cms.EDAnalyzer("HLTAnalyzer",
     SpikeCleaningNonIsol            = cms.InputTag("hltL1NonIsoR9shape"),            
     HcalForHoverEIsol               = cms.InputTag("hltL1IsolatedPhotonHcalForHE"),
     HcalForHoverENonIsol            = cms.InputTag("hltL1NonIsolatedPhotonHcalForHE"),
+    R9IDIsol                        = cms.InputTag("hltL1IsoR9ID"),
+    R9IDNonIsol                     = cms.InputTag("hltL1NonIsoR9ID"),
                              
     ### egamma - standard or startup windows                         
     IsoElectrons                    = cms.InputTag("hltPixelMatchElectronsL1Iso"),
@@ -141,7 +143,7 @@ hltanalysis = cms.EDAnalyzer("HLTAnalyzer",
     Jets                        = cms.untracked.bool( False ),
 
     ## reco vertices
-    PrimaryVertices             = cms.InputTag("hltPixelVerticesForMultiVertex"),
+    PrimaryVertices             = cms.InputTag("hltPixelVertices"),
                              
     ### Run parameters
     RunParameters = cms.PSet(

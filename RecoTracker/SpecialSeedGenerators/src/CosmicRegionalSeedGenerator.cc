@@ -60,6 +60,7 @@ CosmicRegionalSeedGenerator::CosmicRegionalSeedGenerator(edm::ParameterSet const
   edm::ParameterSet regionInJetsCheckPSet = conf_.getParameter<edm::ParameterSet>("RegionInJetsCheckPSet");
   doJetsExclusionCheck_         = regionInJetsCheckPSet.getParameter<bool>("doJetsExclusionCheck");
   deltaRExclusionSize_          = regionInJetsCheckPSet.getParameter<double>("deltaRExclusionSize");
+  jetsPtMin_                    = regionInJetsCheckPSet.getParameter<double>("jetsPtMin");
   recoCaloJetsCollection_       = regionInJetsCheckPSet.getParameter<edm::InputTag>("recoCaloJetsCollection");
 
 
@@ -125,6 +126,9 @@ std::vector<TrackingRegion*, std::allocator<TrackingRegion*> > CosmicRegionalSee
 	continue;
       }
       
+      //bit 25 as a coverage -1.4 < eta < 1.4
+      if ( abs( staMuon->standAloneMuon()->eta() ) > 1.5 ) continue;
+
       //debug
       nmuons++;
       LogDebug("CosmicRegionalSeedGenerator") << "Muon stand alone found in the collection - in muons chambers: \n " 
@@ -181,23 +185,13 @@ std::vector<TrackingRegion*, std::allocator<TrackingRegion*> > CosmicRegionalSee
       GlobalPoint  center = regionPosition + stepBack * regionMom.unit();
       GlobalVector v = stepBack * regionMom.unit();
       LogDebug("CosmicRegionalSeedGenerator") << "Step back vector =  " << v << "\n";
-      
-	
-      //definition of the region
-      CosmicTrackingRegion *etaphiRegion = new CosmicTrackingRegion((-1)*regionMom,
-								    center,
-								    ptMin_,
-								    rVertex_,
-								    zVertex_,
-								    deltaEta_,
-								    deltaPhi_,
-								    regionPSet
-								    );
 
       //exclude region built in jets
       if ( doJetsExclusionCheck_ ) {
 	double delta_R_min = 1000.;
 	for ( CaloJetCollection::const_iterator jet = caloJetsHandle->begin (); jet != caloJetsHandle->end(); jet++ ) {
+	  if ( jet->pt() < jetsPtMin_ ) continue;
+	  
 	  double deta = center.eta() - jet->eta();
 	  double dphi = fabs( center.phi() - jet->phi() );
 	  if ( dphi > TMath::Pi() ) dphi = 2*TMath::Pi() - dphi;
@@ -212,6 +206,20 @@ std::vector<TrackingRegion*, std::allocator<TrackingRegion*> > CosmicRegionalSee
 	  continue;
 	}
       }//end if doJetsExclusionCheck
+      
+	
+      //definition of the region
+      CosmicTrackingRegion *etaphiRegion = new CosmicTrackingRegion((-1)*regionMom,
+								    center,
+								    ptMin_,
+								    rVertex_,
+								    zVertex_,
+								    deltaEta_,
+								    deltaPhi_,
+								    regionPSet
+								    );
+
+
 
       //return the result
       result.push_back(etaphiRegion);      
@@ -275,11 +283,13 @@ std::vector<TrackingRegion*, std::allocator<TrackingRegion*> > CosmicRegionalSee
 
     int nmuons = 0;
     for (reco::TrackCollection::const_iterator cosmicMuon = cosmicMuonsHandle->begin();  cosmicMuon != cosmicMuonsHandle->end();  ++cosmicMuon) {
+      
+      //bit 25 as a coverage -1.4 < eta < 1.4
+      if ( abs( cosmicMuon->eta() ) > 1.5 ) continue;
 
       nmuons++;
             
       //initial position, momentum, charge
-      
       GlobalPoint initialRegionPosition(cosmicMuon->referencePoint().x(), cosmicMuon->referencePoint().y(), cosmicMuon->referencePoint().z());
       GlobalVector initialRegionMomentum(cosmicMuon->momentum().x(), cosmicMuon->momentum().y(), cosmicMuon->momentum().z());
       int charge = (int) cosmicMuon->charge();
@@ -331,22 +341,12 @@ std::vector<TrackingRegion*, std::allocator<TrackingRegion*> > CosmicRegionalSee
       GlobalVector v = stepBack * regionMom.unit();
       LogDebug("CosmicRegionalSeedGenerator") << "Step back vector =  " << v << "\n";
       
-	
-      //definition of the region
-      CosmicTrackingRegion *etaphiRegion = new CosmicTrackingRegion((-1)*regionMom,
-								    center,
-								    ptMin_,
-								    rVertex_,
-								    zVertex_,
-								    deltaEta_,
-								    deltaPhi_,
-								    regionPSet
-								    );
-      
       //exclude region built in jets
       if ( doJetsExclusionCheck_ ) {	
 	double delta_R_min = 1000.;
 	for ( CaloJetCollection::const_iterator jet = caloJetsHandle->begin (); jet != caloJetsHandle->end(); jet++ ) {
+	  if ( jet->pt() < jetsPtMin_ ) continue;
+	  
 	  double deta = center.eta() - jet->eta();
 	  double dphi = fabs( center.phi() - jet->phi() );
 	  if ( dphi > TMath::Pi() ) dphi = 2*TMath::Pi() - dphi;
@@ -361,6 +361,18 @@ std::vector<TrackingRegion*, std::allocator<TrackingRegion*> > CosmicRegionalSee
 	  continue;
 	}
       }// end if doJetsExclusionCheck
+
+      //definition of the region
+      CosmicTrackingRegion *etaphiRegion = new CosmicTrackingRegion((-1)*regionMom,
+								    center,
+								    ptMin_,
+								    rVertex_,
+								    zVertex_,
+								    deltaEta_,
+								    deltaPhi_,
+								    regionPSet
+								    );
+      
 
       //return the result
       result.push_back(etaphiRegion);      
@@ -418,13 +430,13 @@ std::vector<TrackingRegion*, std::allocator<TrackingRegion*> > CosmicRegionalSee
     for (reco::RecoChargedCandidateCollection::const_iterator L2Muon = L2MuonsHandle->begin();  L2Muon != L2MuonsHandle->end();  ++L2Muon) {
       reco::TrackRef tkL2Muon = L2Muon->get<reco::TrackRef>();
 
+      //bit 25 as a coverage -1.4 < eta < 1.4
+      if ( abs( tkL2Muon->eta() ) > 1.5 ) continue;
+
       nmuons++;
             
       //initial position, momentum, charge
-      
       GlobalPoint initialRegionPosition(tkL2Muon->referencePoint().x(), tkL2Muon->referencePoint().y(), tkL2Muon->referencePoint().z());
-
-
       GlobalVector initialRegionMomentum(tkL2Muon->momentum().x(), tkL2Muon->momentum().y(), tkL2Muon->momentum().z());
       int charge = (int) tkL2Muon->charge();
    

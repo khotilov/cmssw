@@ -5,20 +5,38 @@ import FWCore.ParameterSet.Config as cms
 #from HLTrigger.Configuration.HLT_1E31_cff import *
 from HLTrigger.Configuration.HLT_FULL_cff import *
 
+
+#
+# Temporarily add EGamma R9-ID here until it goes in the full HLT configuration
+# 
+hltL1IsoR9ID = cms.EDProducer( "EgammaHLTR9IDProducer",
+                                          recoEcalCandidateProducer = cms.InputTag( "hltL1IsoRecoEcalCandidate" ),
+                                          ecalRechitEB = cms.InputTag( 'hltEcalRegionalEgammaRecHit','EcalRecHitsEB' ),
+                                          ecalRechitEE = cms.InputTag( 'hltEcalRegionalEgammaRecHit','EcalRecHitsEE' )
+                               )
+hltL1NonIsoR9ID = cms.EDProducer( "EgammaHLTR9IDProducer",
+                                             recoEcalCandidateProducer = cms.InputTag( "hltL1NonIsoRecoEcalCandidate" ),
+                                             ecalRechitEB = cms.InputTag( 'hltEcalRegionalEgammaRecHit','EcalRecHitsEB' ),
+                                             ecalRechitEE = cms.InputTag( 'hltEcalRegionalEgammaRecHit','EcalRecHitsEE' )
+                                )
+
+HLTEgammaR9IDSequence  = cms.Sequence( HLTDoRegionalEgammaEcalSequence + HLTL1IsolatedEcalClustersSequence +
+                                       HLTL1NonIsolatedEcalClustersSequence + hltL1IsoRecoEcalCandidate + hltL1NonIsoRecoEcalCandidate +
+                                       hltL1IsoR9ID + hltL1NonIsoR9ID ) 
+
 # create the jetMET HLT reco path
 DoHLTJets = cms.Path(HLTBeginSequence + 
     HLTBeginSequence +
-    HLTRecoJetSequenceU +
-    HLTRecoJetRegionalSequence +
+    HLTRecoJetSequenceAK5Corrected +
+    HLTRegionalRecoJetSequenceAK5Corrected +
     HLTRecoMETSequence +                 
-    HLTDoJet20UHTRecoSequence
+    HLTDoJet30HTRecoSequence
 )
 DoHLTJetsU = cms.Path(HLTBeginSequence +
     HLTBeginSequence +
-    HLTRecoJetSequenceU +
+    HLTRecoJetSequenceAK5Uncorrected +
     hltMet +
-    HLTRecoJetRegionalSequence +
-    HLTDoJet20UHTRecoSequence
+    HLTDoJet30HTRecoSequence
 )
 
 # create the muon HLT reco path
@@ -42,6 +60,7 @@ DoHLTPhoton = cms.Path(
     hltL1IsoRecoEcalCandidate + 
     hltL1NonIsoRecoEcalCandidate + 
     HLTEgammaR9ShapeSequence +
+    HLTEgammaR9IDSequence +
     hltL1IsolatedPhotonEcalIsol + 
     hltL1NonIsolatedPhotonEcalIsol + 
     HLTDoLocalHcalWithoutHOSequence + 
@@ -55,8 +74,8 @@ DoHLTPhoton = cms.Path(
     hltL1NonIsoEgammaRegionalPixelSeedGenerator +
     hltL1NonIsoEgammaRegionalCkfTrackCandidates +
     hltL1NonIsoEgammaRegionalCTFFinalFitWithMaterial +
-    hltL1IsoPhotonHollowTrackIsol + 
-    hltL1NonIsoPhotonHollowTrackIsol )
+    hltL1IsolatedPhotonHollowTrackIsol +
+    hltL1NonIsolatedPhotonHollowTrackIsol )
 
 DoHLTElectron = cms.Path(
     HLTBeginSequence +
@@ -66,6 +85,7 @@ DoHLTElectron = cms.Path(
     hltL1IsoRecoEcalCandidate +
     hltL1NonIsoRecoEcalCandidate +
     HLTEgammaR9ShapeSequence +
+    HLTEgammaR9IDSequence +
     hltL1IsoHLTClusterShape +
     hltL1NonIsoHLTClusterShape +
     hltL1IsolatedPhotonEcalIsol +
@@ -128,16 +148,13 @@ DoHLTBTag = cms.Path(
 
 DoHLTAlCaPi0Eta1E31 = cms.Path(
     HLTBeginSequence +
-    hltL1sAlCaEcalPi0Eta8E29 +
+    hltL1sAlCaEcalPi0Eta +
     HLTDoRegionalPi0EtaSequence +
     HLTEndSequence )
 
 DoHLTAlCaPi0Eta8E29 = cms.Path(
     HLTBeginSequence +
-    hltL1sAlCaEcalPi0Eta8E29 +
-    #hltPreAlCaEcalPi08E29 +
-    #HLTDoRegionalPi0EtaESSequence +
-    #HLTDoRegionalPi0EtaEcalSequence +
+    hltL1sAlCaEcalPi0Eta +
     HLTDoRegionalPi0EtaSequence +
     HLTEndSequence )
 
@@ -145,56 +162,15 @@ DoHLTAlCaPi0Eta8E29 = cms.Path(
 DoHLTAlCaECALPhiSym = cms.Path(
     HLTBeginSequence +
     hltEcalRawToRecHitFacility + hltESRawToRecHitFacility + hltEcalRegionalRestFEDs + hltEcalRecHitAll +
-##    hltAlCaPhiSymStream +
-##    HLTDoLocalHcalSequence +
     HLTEndSequence )
-
-#hltIsolPixelTrackProd1E31.MaxVtxDXYSeed = cms.double(101)
-#hltIsolPixelTrackL2Filter1E31.MaxPtNearby = cms.double(3.0)
-#hltIsolPixelTrackL2Filter1E31.MinPtTrack = cms.double(3.0)
-
-#DoHLTIsoTrack = cms.Path(
-#    HLTBeginSequence +
-#    hltL1sIsoTrack1E31 +
-    # hltPreIsoTrack1E31 +
-#    HLTL2HcalIsolTrackSequence +
-#    hltIsolPixelTrackProd1E31 +
-#    hltIsolPixelTrackL2Filter1E31 +
-#    HLTDoLocalStripSequence +
-#    hltHITPixelPairSeedGenerator1E31 +
-#    hltHITPixelTripletSeedGenerator1E31 +
-#    hltHITSeedCombiner1E31 +
-#    hltHITCkfTrackCandidates1E31 +
-#    hltHITCtfWithMaterialTracks1E31 +
-#    hltHITIPTCorrector1E31 +
-#    HLTEndSequence)
-
-#DoHLTIsoTrack8E29 = cms.Path(
-#    HLTBeginSequence +
-#    hltL1sIsoTrack8E29 +
-    # hltPreIsoTrack8E29 +
-#    HLTL2HcalIsolTrackSequence +
-#    hltIsolPixelTrackProd8E29 +
-#    hltIsolPixelTrackL2Filter8E29 +
-#    HLTDoLocalStripSequence +
-#    hltHITPixelPairSeedGenerator8E29 +
-#    hltHITPixelTripletSeedGenerator8E29 +
-#    hltHITSeedCombiner8E29 +
-#    hltHITCkfTrackCandidates8E29 +
-#    hltHITCtfWithMaterialTracks8E29 +
-#    hltHITIPTCorrector8E29 +
-#    HLTEndSequence)
 
 
 DoHLTMinBiasPixelTracks = cms.Path(
     HLTBeginSequence +
     HLTDoLocalPixelSequence +
-    HLTPixelTrackingForMinBiasSequence +
-    hltPixelCandsForMinBias +
+    HLTPixelTrackingForHITrackTrigger + 
+    hltPixelCandsForHITrackTrigger +
     hltPixelTracks +
-    hltPixelVertices +
-    hltPixelVerticesForMultiVertex)
+    hltPixelVertices)
 
 hltPixelVertices.beamSpot = cms.InputTag( "hltOnlineBeamSpot" )
-hltBLifetimeRegionalCtfWithMaterialTracksStartupU.beamSpot = cms.InputTag("hltOnlineBeamSpot")
-hltBLifetimeRegionalCtfWithMaterialTracksStartup.beamSpot = cms.InputTag("hltOnlineBeamSpot")

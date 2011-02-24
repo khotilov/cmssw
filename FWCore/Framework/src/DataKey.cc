@@ -21,9 +21,6 @@
 //
 // constants, enums and typedefs
 //
-
-static const char kBlank[] = {'\0'};
-
 namespace edm {
    namespace eventsetup {
 //
@@ -72,38 +69,20 @@ DataKey::swap(DataKey& iOther)
    swap(name_, iOther.name_);
 }
 
-      namespace {
-         //used for exception safety
-         class ArrayHolder {
-         public:
-            ArrayHolder():ptr_(0){}
-            
-            void swap(ArrayHolder& iOther) {
-               const char* t = iOther.ptr_;
-               iOther.ptr_ = ptr_;
-               ptr_ = t;
-            }
-            ArrayHolder(const char* iPtr): ptr_(iPtr) {}
-            ~ArrayHolder() { delete [] ptr_; }
-            void release() { ptr_=0;}
-         private:
-            const char* ptr_;
-         };
-      }
 void 
 DataKey::makeCopyOfMemory()
 {
    //empty string is the most common case, so handle it special
+   static const char kBlank = '\0';
    
-   char* pName = const_cast<char*>(kBlank);
+   char* pName = const_cast<char*>(&kBlank);
    //NOTE: if in the future additional tags are added then 
    // I should make sure that pName gets deleted in the case
    // where an exception is thrown
-   ArrayHolder pNameHolder;
-   if(kBlank[0] != name().value()[0]) {
+   std::auto_ptr<char> pNameHolder;
+   if(kBlank != name().value()[0]) {
       pName = new char[ std::strlen(name().value()) + 1];
-      ArrayHolder t(pName);
-      pNameHolder.swap(t);
+      pNameHolder = std::auto_ptr<char>(pName);
       std::strcpy(pName, name().value());
    }
    name_ = NameTag(pName);
@@ -114,7 +93,9 @@ DataKey::makeCopyOfMemory()
 void
 DataKey::deleteMemory()
 {
-   if(kBlank[0] != name().value()[0]) {
+   static const char kBlank = '\0';
+   
+   if(kBlank != name().value()[0]) {
       delete [] const_cast<char*>(name().value());
    }
 }

@@ -25,6 +25,7 @@
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
+#include "DetectorDescription/Parser/interface/DDLParser.h"
 #include "DetectorDescription/Parser/interface/FIPConfiguration.h"
 #include "DetectorDescription/Core/src/DDCheck.h"
 #include "DetectorDescription/Core/src/DDCheckMaterials.cc"
@@ -33,6 +34,7 @@
 #include "DetectorDescription/Core/interface/DDExpandedNode.h"
 #include "DetectorDescription/Core/interface/DDCompactView.h"
 #include "DetectorDescription/Core/interface/adjgraph.h"
+#include "DetectorDescription/Core/src/Material.h"
 
 int main(int argc, char *argv[])
 {

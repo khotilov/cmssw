@@ -144,14 +144,14 @@ class HLTProcess(object):
       if self.config.type in ('HIon', ):
         self.data += """
 # HIon paths in smart prescalers
-if 'hltPreHLTDQMSmart' in %(dict)s:
-    %(process)shltPreHLTDQMSmart.throw  = cms.bool( False )
-if 'hltPreHLTMONSmart' in %(dict)s:
-    %(process)shltPreHLTMONSmart.throw  = cms.bool( False )
-if 'hltPreExpressSmart' in %(dict)s:
-    %(process)shltPreExpressSmart.throw = cms.bool( False )
-if 'hltPreDQMSmart' in %(dict)s:
-    %(process)shltPreDQMSmart.throw     = cms.bool( False )
+if 'hltPreDQMOutputSmart' in %(dict)s:
+    %(process)shltPreDQMOutputSmart.throw     = cms.bool( False )
+if 'hltPreExpressOutputSmart' in %(dict)s:
+    %(process)shltPreExpressOutputSmart.throw = cms.bool( False )
+if 'hltPreHLTDQMOutputSmart' in %(dict)s:
+    %(process)shltPreHLTDQMOutputSmart.throw  = cms.bool( False )
+if 'hltPreHLTMONOutputSmart' in %(dict)s:
+    %(process)shltPreHLTMONOutputSmart.throw  = cms.bool( False )
 """
 
       # override the output modules to output root files
@@ -549,17 +549,7 @@ if 'GlobalTag' in %%(dict)s:
       if not self.config.fastsim:
         self.options['services'].append( "-DQMStore" )
 
-      self.options['paths'].append( "-HLTOutput" )
-      self.options['paths'].append( "-ExpressOutput" )
-      self.options['paths'].append( "-EventDisplayOutput" )
-      self.options['paths'].append( "-AlCaOutput" )
-      self.options['paths'].append( "-AlCaPPOutput" )
-      self.options['paths'].append( "-AlCaHIOutput" )
-      self.options['paths'].append( "-DQMOutput" )
-      self.options['paths'].append( "-HLTDQMOutput" )
-      self.options['paths'].append( "-HLTDQMResultsOutput" )
-      self.options['paths'].append( "-HLTMONOutput" )
-      self.options['paths'].append( "-NanoDSTOutput" )
+      self.options['paths'].append( "-*Output" )
 
       self.options['psets'].append( "-maxEvents" )
       self.options['psets'].append( "-options" )

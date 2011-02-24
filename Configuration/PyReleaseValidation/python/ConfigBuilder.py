@@ -162,12 +162,9 @@ class ConfigBuilder(object):
         if self._options.filein:
            if self._options.filetype == "EDM":
                self.process.source=cms.Source("PoolSource",
-                                              fileNames = cms.untracked.vstring())
-	       for entry in self._options.filein.split(','):
-		       self.process.source.fileNames.append(entry)
+                                              fileNames = cms.untracked.vstring(self._options.filein))
                if self._options.secondfilein:
-		       for entry in self._options.secondfilein.split(','):
-			       self.process.source.secondaryFileNames = cms.untracked.vstring(entry)
+                       self.process.source.secondaryFileNames = cms.untracked.vstring(self._options.secondfilein)
            elif self._options.filetype == "LHE":
                self.process.source=cms.Source("LHESource", fileNames = cms.untracked.vstring(self._options.filein))
            elif self._options.filetype == "MCDB":
@@ -184,15 +181,10 @@ class ConfigBuilder(object):
                        if line.count(".root")>=2:
                                #two files solution...
                                entries=line.replace("\n","").split()
-			       if not entries[0] in self.process.source.fileNames.value():
-				       self.process.source.fileNames.append(entries[0])
-			       if not entries[1] in self.process.source.secondaryFileNames.value():
-				       self.process.source.secondaryFileNames.append(entries[1])
-				       
+                               self.process.source.fileNames.append(entries[0])
+                               self.process.source.secondaryFileNames.append(entries[1])
                        elif (line.find(".root")!=-1):
-			       entry=line.replace("\n","")
-			       if not entry in self.process.source.fileNames.value():
-				       self.process.source.fileNames.append(entry)
+                               self.process.source.fileNames.append(line.replace("\n",""))
                print "found files: ",self.process.source.fileNames.value()
                if self.process.source.secondaryFileNames.__len__()!=0:
                        print "found parent files:",self.process.source.secondaryFileNames.value()
@@ -317,6 +309,7 @@ class ConfigBuilder(object):
             return "\n"
 
         for i,(streamType,tier) in enumerate(zip(streamTypes,tiers)):
+		if streamType=='': continue
                 theEventContent = getattr(self.process, streamType+"EventContent")
                 if i==0:
                         theFileName=self._options.outfile_name
