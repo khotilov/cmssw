@@ -140,11 +140,11 @@ L1GctChannelMaskOnlineProd::newObject( const std::string& objectKey )
   esumMaskResults.fillVariable( "GCT_HT_MASK", htMask ) ;
   esumMaskResults.fillVariable( "GCT_MHT_MASK", mhtMask ) ;
 
-  for (int ieta=0; ieta<18; ieta++) {
-    if ((tetMask & (1<<ieta)) != 0) masks->totalEtMask(ieta);  
-    if ((metMask & (1<<ieta)) != 0) masks->missingEtMask(ieta);  
-    if ((htMask & (1<<ieta)) != 0) masks->totalHtMask(ieta);  
-    if ((mhtMask & (1<<ieta)) != 0) masks->missingHtMask(ieta);  
+  for (int ieta=0; ieta<22; ieta++) {
+    if ((tetMask & (1<<ieta)) != 0) masks->maskTotalEt(ieta);  
+    if ((metMask & (1<<ieta)) != 0) masks->maskMissingEt(ieta);  
+    if ((htMask & (1<<ieta)) != 0) masks->maskTotalHt(ieta);  
+    if ((mhtMask & (1<<ieta)) != 0) masks->maskMissingHt(ieta);  
   }
     
   return masks;

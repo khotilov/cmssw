@@ -13,7 +13,7 @@
 //
 // Original Author:  Jean-Roch Vlimant,40 3-A28,+41227671209,
 //         Created:  Thu Nov  4 22:17:56 CET 2010
-// $Id$
+// $Id: HcalHitSelection.cc,v 1.3 2011/03/18 12:57:51 abdullin Exp $
 //
 //
 
@@ -55,18 +55,19 @@ class HcalHitSelection : public edm::EDProducer {
       virtual void endJob() ;
   
   edm::InputTag hbheTag,hoTag,hfTag;
+  int hoSeverityLevel;
   std::vector<edm::InputTag> interestingDetIdCollections;
   
   //hcal severity ES
   edm::ESHandle<HcalChannelQuality> theHcalChStatus;
   edm::ESHandle<HcalSeverityLevelComputer> theHcalSevLvlComputer;
   std::set<DetId> toBeKept;
-  template <typename CollectionType> void skim( const edm::Handle<CollectionType> & input, std::auto_ptr<CollectionType> & output);
+  template <typename CollectionType> void skim( const edm::Handle<CollectionType> & input, std::auto_ptr<CollectionType> & output,int severityThreshold=0);
   
       // ----------member data ---------------------------
 };
 
-template <class CollectionType> void HcalHitSelection::skim( const edm::Handle<CollectionType> & input, std::auto_ptr<CollectionType> & output){
+template <class CollectionType> void HcalHitSelection::skim( const edm::Handle<CollectionType> & input, std::auto_ptr<CollectionType> & output,int severityThreshold){
   output->reserve(input->size());
   typename CollectionType::const_iterator begin=input->begin();
   typename CollectionType::const_iterator end=input->end();
@@ -81,7 +82,7 @@ template <class CollectionType> void HcalHitSelection::skim( const edm::Handle<C
     const uint32_t & dbStatusFlag = theHcalChStatus->getValues(id)->getValue();
     int severityLevel = theHcalSevLvlComputer->getSeverityLevel(id, recHitFlag, dbStatusFlag); 
     //anything that is not "good" goes in
-    if (severityLevel!=0){
+    if (severityLevel>severityThreshold){
       output->push_back(*hit);
     }else{
       //chek on the detid list
@@ -110,7 +111,9 @@ HcalHitSelection::HcalHitSelection(const edm::ParameterSet& iConfig)
   hoTag=iConfig.getParameter<edm::InputTag>("hoTag");
 
   interestingDetIdCollections = iConfig.getParameter< std::vector<edm::InputTag> >("interestingDetIds");
-    
+
+  hoSeverityLevel=iConfig.getParameter<int>("hoSeverityLevel");
+
   produces<HBHERecHitCollection>(hbheTag.label());
   produces<HFRecHitCollection>(hfTag.label());
   produces<HORecHitCollection>(hoTag.label());
@@ -151,8 +154,10 @@ HcalHitSelection::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for( unsigned int t = 0; t < interestingDetIdCollections.size(); ++t )
     {
       iEvent.getByLabel(interestingDetIdCollections[t],detId);
-      if (!detId.isValid())
+      if (!detId.isValid()){
+	edm::LogError("MissingInput")<<"the collection of interesting detIds:"<<interestingDetIdCollections[t]<<" is not found.";
 	continue;
+      }
       toBeKept.insert(detId->begin(),detId->end());
     }
 
@@ -165,10 +170,8 @@ HcalHitSelection::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.put(hf_out,hfTag.label());
 
   std::auto_ptr<HORecHitCollection> ho_out(new HORecHitCollection());
-  skim(ho,ho_out);
+  skim(ho,ho_out,hoSeverityLevel);
   iEvent.put(ho_out,hoTag.label());
-
-
   
 }
 

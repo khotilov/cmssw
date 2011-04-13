@@ -77,15 +77,7 @@ kinematicSelectedTauValDenominator = cms.EDFilter("GenJetSelector",
      filter = cms.bool(False)
 )
 
-kinematicSelectedTauValDenominatorForRealData = cms.EDFilter("PtMinPFJetSelector",
-     src = cms.InputTag("objectTypeSelectedTauValDenominator"),
-     ptMin = cms.double(5.)
-)
-
-if options.eventType == 'RealData':
-   denominator = cms.InputTag("kinematicSelectedTauValDenominatorForRealData")
-else:
-   denominator = cms.InputTag("kinematicSelectedTauValDenominator")
+denominator = cms.InputTag("kinematicSelectedTauValDenominator")
 
 """
 
@@ -152,24 +144,32 @@ RunHPSValidation = copy.deepcopy(PFTausHighEfficiencyBothProngs)
 RunHPSValidation.ExtensionName = ""
 RunHPSValidation.TauProducer   = cms.InputTag('hpsPFTauProducer')
 RunHPSValidation.discriminators = cms.VPSet(
-    cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByDecayModeFinding"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByLooseIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByMediumIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByTightIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationAgainstElectron"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)), #not plotted
-    cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationAgainstMuon"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)) #not plotted
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByDecayModeFinding"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByVLooseIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByLooseIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByMediumIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByTightIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByLooseElectronRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByMediumElectronRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByTightElectronRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByLooseMuonRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsPFTauDiscriminationByTightMuonRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(False))
 )
 
 RunHPSTanc_HPSValidation = copy.deepcopy(PFTausHighEfficiencyBothProngs)
 RunHPSTanc_HPSValidation.ExtensionName = "_HPS"
 RunHPSTanc_HPSValidation.TauProducer   = cms.InputTag('hpsTancTaus')
 RunHPSTanc_HPSValidation.discriminators = cms.VPSet(
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByDecayModeSelection"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByLooseIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByMediumIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByTightIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationAgainstElectron"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)), #not plotted
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationAgainstMuon"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)) #not plotted
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByDecayModeSelection"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByVLooseIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByLooseIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByMediumIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByTightIsolation"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByLooseElectronRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByMediumElectronRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByTightElectronRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByLooseMuonRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
+   cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByTightMuonRejection"),selectionCut = cms.double(0.5),plotStep = cms.bool(False))
 )
 
 RunHPSTanc_TANCValidation = copy.deepcopy(PFTausHighEfficiencyBothProngs)
@@ -186,8 +186,6 @@ RunHPSTanc_TANCValidation.discriminators = cms.VPSet(
     cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByTancMedium"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)),
     cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByTancRaw"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)),
     cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationByTancTight"),selectionCut = cms.double(0.5),plotStep = cms.bool(True)),
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationAgainstElectron"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)), #not plotted
-    cms.PSet( discriminator = cms.string("hpsTancTausDiscriminationAgainstMuon"),selectionCut = cms.double(0.5),plotStep = cms.bool(False)) #not plotted
 )
 
 CaloTausBothProngs = cms.EDAnalyzer("TauTagValidation",
@@ -467,48 +465,6 @@ plotTauValidation = cms.Sequence(
       +plotPFTauHighEfficiencyEfficienciesLeadingPion
       +plotHPSEfficiencies
       )
-
-if options.eventType == 'QCD':
-   from Validation.RecoTau.ValidateTausOnQCD_cff import ValueMapTypeList
-
-   for name in ValueMapTypeList:
-      if name == 'DiJetHighPt':
-         plotTauValidation += plotSCEstimatedBGDiJetHighPt
-         plotTauValidation += plotSCLPEstimatedBGDiJetHighPt      
-      if name == 'DiJetSecondPt':
-         plotTauValidation += plotSCEstimatedBGDiJetSecondPt
-         plotTauValidation += plotSCLPEstimatedBGDiJetSecondPt
-      if name == 'MuEnrichedQCD':
-         plotTauValidation += plotSCEstimatedBGMuEnrichedQCD
-         plotTauValidation += plotSCLPEstimatedBGMuEnrichedQCD
-      if name == 'WJets':
-         plotTauValidation += plotSCEstimatedBGWJets
-         plotTauValidation += plotSCLPEstimatedBGWJets      
-
-      
-   
-if options.eventType == 'RealData':
-   from Validation.RecoTau.ValidateTausOnRealData_cff import ValueMapTypeList
-
-   for name in ValueMapTypeList:
-      if name == 'DiJetHighPt':
-         plotTauValidation += plotSCEstimatedBGDiJetHighPt
-         plotTauValidation += plotSCLPEstimatedBGDiJetHighPt      
-      if name == 'DiJetSecondPt':
-         plotTauValidation += plotSCEstimatedBGDiJetSecondPt
-         plotTauValidation += plotSCLPEstimatedBGDiJetSecondPt
-      if name == 'MuEnrichedQCD':
-         plotTauValidation += plotSCEstimatedBGMuEnrichedQCD
-         plotTauValidation += plotSCLPEstimatedBGMuEnrichedQCD
-      if name == 'WJets':
-         plotTauValidation += plotSCEstimatedBGWJets
-         plotTauValidation += plotSCLPEstimatedBGWJets      
-      
-   
-#if options.eventType == 'ZTT':      
-#   plotTauValidation += plotSCEstimatedEffZTT
-#   plotTauValidation += plotSCLPEstimatedEffZTT
-      
 
 loadAndPlotTauValidation = cms.Sequence(
       loadTau
