@@ -21,10 +21,7 @@ void EgCutValues::setup(const edm::ParameterSet& iConfig)
   maxHadEnergy = iConfig.getParameter<double>("maxHadEnergy");
   maxSigmaIEtaIEta = iConfig.getParameter<double>("maxSigmaIEtaIEta"); 
   maxSigmaEtaEta = iConfig.getParameter<double>("maxSigmaEtaEta"); 
-  //----Morse------
   minR9 = iConfig.getParameter<double>("minR9");
-  maxR9 = iConfig.getParameter<double>("maxR9");
-  //---------------
 
   //std isolation cuts
   isolEmConstTerm = iConfig.getParameter<double>("isolEmConstTerm");
