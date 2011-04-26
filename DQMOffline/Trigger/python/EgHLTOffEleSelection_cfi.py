@@ -2,26 +2,18 @@
 import FWCore.ParameterSet.Config as cms
 
 egHLTOffEleBarrelCuts = cms.PSet (
-    #---Morse-----
-    #cuts set to WP80
-    #cuts=cms.string("et:detEta:dEtaIn:dPhiIn:hadem:sigmaIEtaIEta:e2x5Over5x5:isolEm:isolHad:isolPtTrks:hltIsolHad:hltIsolTrksEle:hltIsolEm"),
-    cuts=cms.string("et:detEta:dEtaIn:dPhiIn:hadem:sigmaIEtaIEta:minr9:maxr9:e2x5Over5x5:isolEm:isolHad:isolPtTrks:hltIsolHad:hltIsolTrksEle:hltIsolEm"),
-    #------------
+    cuts=cms.string("et:detEta:dEtaIn:dPhiIn:hadem:sigmaIEtaIEta:e2x5Over5x5:isolEm:isolHad:isolPtTrks:hltIsolHad:hltIsolTrksEle:hltIsolEm"),
     minEt=cms.double(15),
     minEta=cms.double(0.),
     maxEta=cms.double(1.442),
-    maxDEtaIn=cms.double(0.004),
-    maxDPhiIn=cms.double(0.06),
+    maxDEtaIn=cms.double(0.1),
+    maxDPhiIn=cms.double(0.09),
     maxInvEInvP=cms.double(0.1),
-    maxHadem=cms.double(0.04),
+    maxHadem=cms.double(0.05),
     maxHadEnergy=cms.double(0),
-    maxSigmaIEtaIEta=cms.double(0.01),
-    maxSigmaEtaEta=cms.double(0.01),
-    #----Morse------
-    #minR9=cms.double(0.9),
-    minR9=cms.double(0.0),
-    maxR9=cms.double(0.98),
-    #---------------
+    maxSigmaIEtaIEta=cms.double(0.015),
+    maxSigmaEtaEta=cms.double(0.015),
+    minR9=cms.double(0.9),
     isolEmConstTerm=cms.double(3),
     isolEmGradTerm=cms.double(0.03),
     isolEmGradStart=cms.double(0.),
@@ -59,25 +51,18 @@ egHLTOffEleBarrelCuts = cms.PSet (
     )
 
 egHLTOffEleEndcapCuts = cms.PSet (
-    #-----Morse-----
-    #cuts=cms.string("et:detEta:dEtaIn:dPhiIn:hadem:sigmaIEtaIEta:isolEm:isolHad:isolPtTrks:hltIsolHad:hltIsolTrksEle:hltIsolEm"),
-    cuts=cms.string("et:detEta:dEtaIn:dPhiIn:hadem:sigmaIEtaIEta:minr9:maxr9:isolEm:isolHad:isolPtTrks:hltIsolHad:hltIsolTrksEle:hltIsolEm"),
-    #--------------
+    cuts=cms.string("et:detEta:dEtaIn:dPhiIn:hadem:sigmaIEtaIEta:isolEm:isolHad:isolPtTrks:hltIsolHad:hltIsolTrksEle:hltIsolEm"),
     minEt=cms.double(15),
     minEta=cms.double(1.56),
     maxEta=cms.double(2.5),
-    maxDEtaIn=cms.double(0.007),
-    maxDPhiIn=cms.double(0.03),
+    maxDEtaIn=cms.double(0.1),
+    maxDPhiIn=cms.double(0.09),
     maxInvEInvP=cms.double(0.1),
-    maxHadem=cms.double(0.025),
+    maxHadem=cms.double(0.05),
     maxHadEnergy=cms.double(0),
     maxSigmaIEtaIEta=cms.double(0.03),
     maxSigmaEtaEta=cms.double(0.03),
-    #----Morse------
-    #minR9=cms.double(0.9),
-    minR9=cms.double(0.0),
-    maxR9=cms.double(999.),
-    #---------------
+    minR9=cms.double(0.9),
     isolEmConstTerm=cms.double(3),
     isolEmGradTerm=cms.double(0.03),
     isolEmGradStart=cms.double(0.),

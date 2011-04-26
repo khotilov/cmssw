@@ -20,12 +20,7 @@
 #include "DQMOffline/Trigger/interface/EgHLTTrigCodes.h"
 #include "DQMOffline/Trigger/interface/EgHLTTrigTools.h"
 #include "DQMOffline/Trigger/interface/EgHLTErrCodes.h"
-
-#include <iostream>
-
 using namespace egHLT;
-
-
 
 OffHelper::~OffHelper()
 {
@@ -115,7 +110,6 @@ void OffHelper::setupTriggers(const HLTConfigProvider& hltConfig,const std::vect
     std::string trigName = trigCutParams_[trigNr].getParameter<std::string>("trigName");
     if(std::find(hltFiltersUsed_.begin(),hltFiltersUsed_.end(),trigName)!=hltFiltersUsed_.end()){ //perhaps I should sort hltFiltersUsed_....
       trigCuts_.push_back(std::make_pair(TrigCodes::getCode(trigName),OffEgSel(trigCutParams_[trigNr])));
-      //   std::cout<<trigName<<std::endl<<"between"<<std::endl<<trigCutParams_[trigNr]<<std::endl<<"after"<<std::endl;
     }
   }
   trigCutParams_.clear();//dont need it any more, get rid of it
@@ -140,9 +134,7 @@ void OffHelper::setupTriggers(const HLTConfigProvider& hltConfig,const std::vect
     for(size_t pathNr=0;pathNr<l1PreScaledPaths_.size();pathNr++){
      
       std::string l1SeedFilter =egHLT::trigTools::getL1SeedFilterOfPath(hltConfig,l1PreScaledPaths_[pathNr]);
-      //---Morse====
-      //std::cout<<l1PreScaledFilters_[pathNr]<<"  "<<l1PreScaledPaths_[pathNr]<<"  "<<l1SeedFilter<<std::endl;
-      //------------
+     
       l1PreAndSeedFilters_.push_back(std::make_pair(l1PreScaledFilters_[pathNr],l1SeedFilter));
     }
   }
@@ -165,7 +157,7 @@ int OffHelper::getHandles(const edm::Event& event,const edm::EventSetup& setup)
   try { 
     setup.get<CaloGeometryRecord>().get(caloGeom_);
     setup.get<CaloTopologyRecord>().get(caloTopology_);
-    //setup.get<EcalSeverityLevelAlgoRcd>().get(ecalSeverityLevel_);
+    setup.get<EcalSeverityLevelAlgoRcd>().get(ecalSeverityLevel_);
   }catch(...){
     return errCodes::Geom;
   }
@@ -221,6 +213,7 @@ int OffHelper::fillOffEleVec(std::vector<OffEle>& egHLTOffEles)
     
     std::vector<std::pair<TrigCodes::TrigBitSet,int> >trigCutsCutCodes;
     for(size_t i=0;i<trigCuts_.size();i++) trigCutsCutCodes.push_back(std::make_pair(trigCuts_[i].first,trigCuts_[i].second.getCutCode(ele)));
+   
     ele.setTrigCutsCutCodes(trigCutsCutCodes);
   }//end loop over gsf electron collection
   return 0;
