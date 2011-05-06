@@ -8,7 +8,7 @@
 //
 // Original Author:  Chris Jones
 //         Created:  Tue Feb 19 10:33:25 EST 2008
-// $Id: FWRPZView.cc,v 1.43 2011/03/25 18:02:46 amraktad Exp $
+// $Id: FWRPZView.cc,v 1.41 2011/03/17 12:02:44 amraktad Exp $
 //
 
 // system include files
@@ -58,7 +58,6 @@ FWRPZView::FWRPZView(TEveWindowSlot* iParent, FWViewType::EType id) :
    m_caloDistortion(this,"Calo compression",1.0,0.01,10.),
    m_muonDistortion(this,"Muon compression",0.2,0.01,10.),
    m_showProjectionAxes(this,"Show projection axis", false),
-   m_projectionAxesLabelSize(this,"Projection axis label size", 0.015, 0.001, 0.2),
    m_compressMuon(this,"Compress detectors",false),
    m_showHF(0),
    m_showEndcaps(0)
@@ -97,9 +96,8 @@ FWRPZView::FWRPZView(TEveWindowSlot* iParent, FWViewType::EType id) :
 
    m_axes = new TEveProjectionAxes(m_projMgr);
    m_axes->SetRnrState(m_showProjectionAxes.value());
-   m_axes->SetLabelSize(m_projectionAxesLabelSize.value());
+   m_axes->SetLabelSize(0.015);
    m_showProjectionAxes.changed_.connect(boost::bind(&FWRPZView::showProjectionAxes,this));
-   m_projectionAxesLabelSize.changed_.connect(boost::bind(&FWRPZView::projectionAxesLabelSize,this));
    eventScene()->AddElement(m_axes);
 
    if ( id != FWViewType::kRhoZ ) {
@@ -109,7 +107,7 @@ FWRPZView::FWRPZView(TEveWindowSlot* iParent, FWViewType::EType id) :
       m_showHF->changed_.connect(  boost::bind(&FWRPZView::setEtaRng, this) );
    }
 
-   m_shiftOrigin.changed_.connect(boost::bind(&FWRPZView::doShiftOriginToBeamSpot,this));
+   m_shiftOrigin.changed_.connect(boost::bind(&FWRPZView::doShiftOrigin,this));
 
    m_fishEyeDistortion.changed_.connect(boost::bind(&FWRPZView::doFishEyeDistortion,this));
    m_fishEyeR.changed_.connect(boost::bind(&FWRPZView::doFishEyeDistortion,this));
@@ -191,7 +189,7 @@ FWRPZView::eventBegin()
 }
 
 void
-FWRPZView::doShiftOriginToBeamSpot()
+FWRPZView::doShiftOrigin()
 { 
 #ifdef TEVEPROJECTIONS_DISPLACE_ORIGIN_MODE
 
@@ -204,40 +202,6 @@ FWRPZView::doShiftOriginToBeamSpot()
    }
 #endif
 }
-
-void
-FWRPZView::shiftOrigin(TEveVector& center)
-{ 
-#ifdef TEVEPROJECTIONS_DISPLACE_ORIGIN_MODE
-   // re-project with new center
-   m_projMgr->GetProjection()->SetCenter(center);
-   m_projMgr->ProjectChildren();
-
-   // draw projected center
-   float* pc =  m_projMgr->GetProjection()->GetProjectedCenter();
-   viewerGL()->CurrentCamera().SetExternalCenter(true);
-   viewerGL()->CurrentCamera().SetCenterVec(pc[0], pc[1], pc[2]);
-   viewerGL()->SetDrawCameraCenter(true);
-
-   gEve->Redraw3D();
-#endif
-}
-
-void
-FWRPZView::resetOrigin()
-{ 
-   // set center back to beam spot
-
-#ifdef TEVEPROJECTIONS_DISPLACE_ORIGIN_MODE
-   FWBeamSpot& b = *(context().getBeamSpot());
-   TEveVector center(b.x0(),  b.y0(), b.z0());
-   m_projMgr->GetProjection()->SetCenter(center);
-
-   m_projMgr->ProjectChildren();
-   gEve->Redraw3D();
-#endif
-}
-
 
 void
 FWRPZView::doFishEyeDistortion()
@@ -364,15 +328,11 @@ FWRPZView::voteCaloMaxVal()
 
 void FWRPZView::showProjectionAxes( )
 {   
-   m_axes->SetRnrState(m_showProjectionAxes.value());
+   if ( m_showProjectionAxes.value() )
+      m_axes->SetRnrState(kTRUE);
+   else
+      m_axes->SetRnrState(kFALSE);
    gEve->Redraw3D();
-   viewerGL()->RequestDraw();
-}
-
-void FWRPZView::projectionAxesLabelSize( )
-{   
-   m_axes->SetLabelSize(m_projectionAxesLabelSize.value());
-   viewerGL()->RequestDraw();
 }
 
 void 
@@ -384,10 +344,7 @@ FWRPZView::populateController(ViewerParameterGUI& gui) const
    gui.requestTab("Projection").addParam(&m_shiftOrigin);
 #endif
 
-   gui.requestTab("Projection").
-   addParam(&m_showProjectionAxes).
-   addParam(&m_projectionAxesLabelSize).
-   separator();
+   gui.requestTab("Projection").addParam(&m_showProjectionAxes).separator();
 
    TGCompositeFrame* f = gui.getTabContainer();
 
