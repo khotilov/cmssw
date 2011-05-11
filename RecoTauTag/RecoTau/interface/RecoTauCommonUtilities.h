@@ -13,7 +13,6 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/TauReco/interface/PFTau.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -34,12 +33,6 @@ class SortPFCandsDescendingPt {
       return a->pt() > b->pt();
     }
 };
-
-// Find the vertex in [vertices] that is closest in Z to the lead track of the
-// jet.
-reco::VertexRef closestVertex(
-    const edm::Handle<reco::VertexCollection>& vertices,
-    const reco::PFJet& jet);
 
 /// Filter a collection of objects that are convertible to PFCandidatePtrs
 /// by PFCandidate ID
