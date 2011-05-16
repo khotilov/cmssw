@@ -7,8 +7,6 @@
 #include "RecoTracker/TkDetLayers/interface/TECWedge.h"
 #include "RecoTracker/TkDetLayers/interface/SubLayerCrossings.h"
 
-#include "FWCore/Utilities/interface/Visibility.h"
-
 
 /** A concrete implementation for TEC petals
  */
@@ -39,7 +37,7 @@ class CompositeTECPetal : public TECPetal{
  private:
   // private methods for the implementation of groupedCompatibleDets()
   SubLayerCrossings computeCrossings(const TrajectoryStateOnSurface& tsos,
-				     PropagationDirection propDir) const dso_internal;
+				     PropagationDirection propDir) const;
 
 
   
@@ -47,7 +45,7 @@ class CompositeTECPetal : public TECPetal{
 		   const Propagator& prop,
 		   const MeasurementEstimator& est,
 		   const SubLayerCrossing& crossing,
-		   std::vector<DetGroup>& result) const dso_internal;
+		   std::vector<DetGroup>& result) const;
 
   void searchNeighbors( const TrajectoryStateOnSurface& tsos,
 			const Propagator& prop,
@@ -55,21 +53,21 @@ class CompositeTECPetal : public TECPetal{
 			const SubLayerCrossing& crossing,
 			float window, 
 			std::vector<DetGroup>& result,
-			bool checkClosest) const dso_internal;
+			bool checkClosest) const;
 
   static
-  bool overlap( const GlobalPoint& gpos, const GeometricSearchDet& rod, float window) dso_internal;
+  bool overlap( const GlobalPoint& gpos, const GeometricSearchDet& rod, float window);
 
   static
   float computeWindowSize( const GeomDet* det, 
 			   const TrajectoryStateOnSurface& tsos, 
-			   const MeasurementEstimator& est) dso_internal;
+			   const MeasurementEstimator& est);
 
-  int findBin( float R,int layer) const dso_internal;
+  int findBin( float R,int layer) const;
   
-  GlobalPoint findPosition(int index,int diskSectorIndex) const  dso_internal;
+  GlobalPoint findPosition(int index,int diskSectorIndex) const ;
 
-  const std::vector<const GeometricSearchDet*>& subLayer( int ind) const  dso_internal {
+  const std::vector<const GeometricSearchDet*>& subLayer( int ind) const {
     return (ind==0 ? theFrontComps : theBackComps);
   }
 

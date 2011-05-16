@@ -8,7 +8,7 @@
 //
 // Original Author:  Chris Jones
 //         Created:  Mon Nov  2 13:46:48 CST 2009
-// $Id: FWViewContextMenuHandlerBase.cc,v 1.3 2009/11/03 14:01:51 amraktad Exp $
+// $Id: FWViewContextMenuHandlerBase.cc,v 1.1 2009/11/02 23:59:49 chrjones Exp $
 //
 
 // system include files
@@ -25,13 +25,13 @@
 // static data member definitions
 //
 FWViewContextMenuHandlerBase::MenuEntryAdder::MenuEntryAdder(FWModelContextMenuHandler& iHandler):
-m_handler(&iHandler){}
+m_handler(&iHandler),m_lastIndex(0) {}
    
 int 
-FWViewContextMenuHandlerBase::MenuEntryAdder::addEntry(const char* iEntryName, int idx, bool enabled)
+FWViewContextMenuHandlerBase::MenuEntryAdder::addEntry(const char* iEntryName)
 {
-   m_handler->addViewEntry(iEntryName, idx, enabled);
-   return idx;
+   m_handler->addViewEntry(iEntryName,m_lastIndex);
+   return m_lastIndex++;
 }
 
 
@@ -67,8 +67,8 @@ FWViewContextMenuHandlerBase::~FWViewContextMenuHandlerBase()
 // member functions
 //
 void 
-FWViewContextMenuHandlerBase::addTo(FWModelContextMenuHandler& iHandle, const FWModelId &id)
+FWViewContextMenuHandlerBase::addTo(FWModelContextMenuHandler& iHandler)
 {
-   MenuEntryAdder adder(iHandle);
-   init(adder, id);
+   MenuEntryAdder adder(iHandler);
+   init(adder);
 }

@@ -36,7 +36,6 @@ strips = cms.PSet(
     plugin = cms.string("RecoTauPiZeroStripPlugin"),
     qualityCuts = PFTauQualityCuts.signalQualityCuts,
     primaryVertexSrc = cms.InputTag("offlinePrimaryVertices"),
-    useClosestPV = cms.bool(True),
     # Clusterize photons and electrons (PF numbering)
     stripCandidatesParticleIds   = cms.vint32(2, 4),
     stripEtaAssociationDistance  = cms.double(0.05),
@@ -49,7 +48,6 @@ comboStrips = cms.PSet(
     plugin = cms.string("RecoTauPiZeroStripPlugin"),
     qualityCuts = PFTauQualityCuts.signalQualityCuts,
     primaryVertexSrc = cms.InputTag("offlinePrimaryVertices"),
-    useClosestPV = cms.bool(True),
     # Clusterize photons and electrons (PF numbering)
     stripCandidatesParticleIds   = cms.vint32(2, 4),
     stripEtaAssociationDistance  = cms.double(0.05),
