@@ -67,8 +67,7 @@ namespace edm {
     // Default constructor/destructor:
     // --------------------------------------------------
 
-    value_ptr() : myP(0) { }
-    explicit value_ptr(T* p) : myP(p) { }
+    explicit value_ptr(T* p = 0) : myP(p) { }
     ~value_ptr() { delete myP; }
 
     // --------------------------------------------------
@@ -84,21 +83,6 @@ namespace edm {
       swap(temp);
       return *this;
     }
-
-#if defined( __GXX_EXPERIMENTAL_CXX0X__)
-    value_ptr(value_ptr && orig) :
-      myP(orig.myP) { orig.myP=0; }
-
-    value_ptr& operator=(value_ptr && orig) {
-      if (myP!=orig.myP) {
-        delete myP;
-        myP=orig.myP;
-        orig.myP=0;
-      } 
-      return *this;
-    }
-#endif
-
 
     // --------------------------------------------------
     // Access mechanisms:
@@ -166,8 +150,8 @@ namespace edm {
     // --------------------------------------------------
 
     template <typename U>
-    static T*
-    createFrom(U const* p) {
+    T*
+    createFrom(U const* p) const {
       return p
 	? value_ptr_traits<U>::clone(p)
 	: 0;
@@ -199,25 +183,25 @@ namespace edm {
   // private, so compilation will fail if there is an attempt to
   // instantiate these 4 operators.
   template <typename T, typename U>
-  inline bool operator==(value_ptr<T> const& lhs, U const& rhs) {
+  bool operator==(value_ptr<T> const& lhs, U const& rhs) {
     lhs.this_type_does_not_support_comparisons();	
     return false;	
   }
 
   template <typename T, typename U>
-  inline bool operator!=(value_ptr<T> const& lhs, U const& rhs) {
+  bool operator!=(value_ptr<T> const& lhs, U const& rhs) {
     lhs.this_type_does_not_support_comparisons();	
     return false;	
   }
 
   template <typename T, typename U>
-  inline bool operator==(U const& lhs, value_ptr<T> const& rhs) {
+  bool operator==(U const& lhs, value_ptr<T> const& rhs) {
     rhs.this_type_does_not_support_comparisons();	
     return false;	
   }
 
   template <typename T, typename U>
-  inline bool operator!=(U const& lhs, value_ptr<T> const& rhs) {
+  bool operator!=(U const& lhs, value_ptr<T> const& rhs) {
     rhs.this_type_does_not_support_comparisons();	
     return false;	
   }
