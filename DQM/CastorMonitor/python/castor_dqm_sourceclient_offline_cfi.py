@@ -13,14 +13,10 @@ castorOfflineMonitor = cms.EDAnalyzer("CastorMonitorModule",
                            showTiming          = cms.untracked.bool(False),
                            dump2database       = cms.untracked.bool(False),
                            pedestalsInFC = cms.untracked.bool(False),
-                           digiLabel = cms.InputTag("castorDigis"),
                            rawLabel = cms.InputTag("source"),
-                           unpackerReport=cms.InputTag("castorDigis"),
+                           digiLabel = cms.InputTag("castorDigis"),
                            CastorRecHitLabel = cms.InputTag("castorreco"),
-			   
-                           DataIntMonitor= cms.untracked.bool(True),
-                           TowerJetMonitor= cms.untracked.bool(True),
-
+                          
                            DigiMonitor = cms.untracked.bool(True),
                            DigiPerChannel = cms.untracked.bool(True), 
                            DigiInFC = cms.untracked.bool(False),
