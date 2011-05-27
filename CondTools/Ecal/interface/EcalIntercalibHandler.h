@@ -82,7 +82,6 @@ namespace popcon
                         std::string m_name;
                         std::string m_file_lowfield;
                         std::string m_file_highfield;
-                        double      m_value_highfield;
 
 
 	};
