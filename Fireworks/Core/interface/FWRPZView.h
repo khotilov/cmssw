@@ -16,7 +16,7 @@
 //
 // Original Author:  Chris Jones
 //         Created:  Tue Feb 19 10:33:21 EST 2008
-// $Id: FWRPZView.h,v 1.21 2011/03/25 18:02:45 amraktad Exp $
+// $Id: FWRPZView.h,v 1.19 2011/03/08 11:42:26 amraktad Exp $
 //
 
 // system include files
@@ -27,7 +27,6 @@
 #include "Fireworks/Core/interface/FWDoubleParameter.h"
 #include "Fireworks/Core/interface/FWBoolParameter.h"
 #include "Fireworks/Core/interface/FWEvePtr.h"
-#include "TEveVector.h"
 
 // forward declarations
 class TEveProjectionManager;
@@ -60,8 +59,6 @@ public:
    //returns the new element created from this import
    void importElements(TEveElement* iProjectableChild, float layer, TEveElement* iProjectedParent=0);
  
-   void shiftOrigin(TEveVector& center);
-   void resetOrigin();
 private:
    FWRPZView(const FWRPZView&);    // stop default
    const FWRPZView& operator=(const FWRPZView&);    // stop default 
@@ -69,13 +66,11 @@ private:
    void doPreScaleDistortion();
    void doFishEyeDistortion();
    void doCompression(bool);
-   void doShiftOriginToBeamSpot();
-
-
-   void setEtaRng();
+   void doShiftOrigin();
    
+   void setEtaRng();
+
    void showProjectionAxes( );
-   void projectionAxesLabelSize( );
 
    // ---------- member data --------------------------------
    static FWRPZViewGeometry* s_geometryList;
@@ -95,7 +90,6 @@ private:
    FWDoubleParameter  m_caloDistortion;
    FWDoubleParameter  m_muonDistortion;
    FWBoolParameter    m_showProjectionAxes;
-   FWDoubleParameter  m_projectionAxesLabelSize;
    FWBoolParameter    m_compressMuon;
 
    FWBoolParameter*   m_showHF;
