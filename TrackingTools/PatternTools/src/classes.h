@@ -6,7 +6,6 @@
 #include "Math/Polar3D.h" 
 #include "Math/CylindricalEta3D.h" 
 #include <boost/cstdint.hpp> 
-#include "DataFormats/TrackCandidate/interface/TrackCandidate.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h" 
 #include "TrackingTools/PatternTools/interface/Trajectory.h"
 #include "TrackingTools/TrajectoryState/interface/FreeTrajectoryState.h" 
@@ -16,10 +15,7 @@
 #include "boost/intrusive_ptr.hpp" 
 #include "DataFormats/GeometryVector/interface/LocalVector.h" 
 #include "TrackingTools/TrajectoryState/interface/TrajectoryStateOnSurface.h" 
-#include "DataFormats/Common/interface/AssociationMap.h" 
-#include "DataFormats/Common/interface/OneToOne.h" 
 #include "DataFormats/Common/interface/OwnVector.h" 
-#include "DataFormats/Common/interface/Wrapper.h" 
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHitFwd.h" 
 #include "TrackingTools/PatternTools/interface/TrajTrackAssociation.h"
 #include "TrackingTools/PatternTools/interface/TrackConstraintAssociation.h"
@@ -28,7 +24,7 @@
 namespace {
   struct dictionary {
     std::vector<Trajectory> kk;
-    edm::Wrapper<std::vector<Trajectory> > trajCollWrapper;
+    edm::Wrapper< std::vector<Trajectory> > trajCollWrapper;
     
     TrajTrackAssociationCollection ttam;
     edm::Wrapper<TrajTrackAssociationCollection> wttam;
@@ -57,17 +53,5 @@ namespace {
     TrackVtxConstraintAssociationRefProd ii5;
     TrackVtxConstraintAssociationRefVector ii6;
   
-    edm::helpers::KeyVal<edm::RefProd<std::vector<Trajectory> >,edm::RefProd<std::vector<Trajectory> > > x1;
-    edm::AssociationMap<edm::OneToOne<std::vector<Trajectory>,std::vector<Trajectory>,unsigned int> > x2;
-    edm::Wrapper<edm::AssociationMap<edm::OneToOne<std::vector<Trajectory>,std::vector<Trajectory>,unsigned int> > > x3;
-    edm::helpers::KeyVal<edm::RefProd<std::vector<reco::Track> >,edm::RefProd<std::vector<Trajectory> > > x4;
-    edm::AssociationMap<edm::OneToOne<std::vector<reco::Track>,std::vector<Trajectory>,unsigned int> > x5;
-    edm::Wrapper<edm::AssociationMap<edm::OneToOne<std::vector<reco::Track>,std::vector<Trajectory>,unsigned int> > > x6;
-    edm::helpers::KeyVal<edm::RefProd<std::vector<Trajectory> >,edm::RefProd<std::vector<TrajectorySeed> > > x7;
-    edm::AssociationMap<edm::OneToMany<std::vector<Trajectory>,std::vector<TrajectorySeed>,unsigned int> > x8;
-    edm::Wrapper<edm::AssociationMap<edm::OneToMany<std::vector<Trajectory>,std::vector<TrajectorySeed>,unsigned int> > > x9;
-    edm::helpers::KeyVal<edm::RefProd<std::vector<TrackCandidate> >,edm::RefProd<std::vector<Trajectory> > > x10;
-    edm::AssociationMap<edm::OneToOne<std::vector<TrackCandidate>,std::vector<Trajectory>,unsigned int> > x11;
-    edm::Wrapper<edm::AssociationMap<edm::OneToOne<std::vector<TrackCandidate>,std::vector<Trajectory>,unsigned int> > > x12;
   };
 }
