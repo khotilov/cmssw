@@ -24,22 +24,26 @@
 #include <boost/shared_ptr.hpp>
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h" 
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
+#include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/Provenance/interface/ProcessHistory.h"
+#include "DataFormats/Provenance/interface/Provenance.h"
+#include "FWCore/Common/interface/EventBase.h"
 
 using namespace edm;
 
 LumiReWeighting::LumiReWeighting( std::string generatedFile,
 		   std::string dataFile,
-		   std::string histName1 = "pileup",
-		   std::string histName2 = "pileup" ) :
+		   std::string GenHistName = "pileup",
+		   std::string DataHistName = "pileup" ) :
       generatedFileName_( generatedFile), 
       dataFileName_     ( dataFile ), 
-      histName1_        ( histName1 ), 
-      histName2_        ( histName2 )
+      GenHistName_        ( GenHistName ), 
+      DataHistName_        ( DataHistName )
       {
 	generatedFile_ = boost::shared_ptr<TFile>( new TFile(generatedFileName_.c_str()) ); //MC distribution
 	dataFile_      = boost::shared_ptr<TFile>( new TFile(dataFileName_.c_str()) );      //Data distribution
 
-	weights_ = boost::shared_ptr<TH1F> ( new TH1F( *(static_cast<TH1F*>(dataFile_->Get( histName1_.c_str() )->Clone() ))));
+	weights_ = boost::shared_ptr<TH1F> ( new TH1F( *(static_cast<TH1F*>(dataFile_->Get( DataHistName_.c_str() )->Clone() ))));
 
 	// MC * data/MC = data, so the weights are data/MC:
 
@@ -48,7 +52,7 @@ LumiReWeighting::LumiReWeighting( std::string generatedFile,
 	weights_->Scale( 1.0/ weights_->Integral() );
 	weights_->SetName("lumiWeights");
 
-	TH1F* den = dynamic_cast<TH1F*>(generatedFile_->Get( histName2_.c_str() ));
+	TH1F* den = dynamic_cast<TH1F*>(generatedFile_->Get( GenHistName_.c_str() ));
 
 	den->Scale(1.0/ den->Integral());
 
@@ -64,7 +68,9 @@ LumiReWeighting::LumiReWeighting( std::string generatedFile,
 
 
 	weightOOT_init();
-      
+
+	FirstWarning_ = true;
+	OldLumiSection_ = -1;
 }
 
 LumiReWeighting::LumiReWeighting( std::vector< float > MC_distr, std::vector< float > Lumi_distr) {
@@ -112,9 +118,11 @@ LumiReWeighting::LumiReWeighting( std::vector< float > MC_distr, std::vector< fl
 
   weightOOT_init();
 
+  FirstWarning_ = true;
+  OldLumiSection_ = -1;
 }
 
-double LumiReWeighting::weight( int npv ) const {
+double LumiReWeighting::weight( int npv ) {
   int bin = weights_->GetXaxis()->FindBin( npv );
   return weights_->GetBinContent( bin );
 }
@@ -123,7 +131,31 @@ double LumiReWeighting::weight( int npv ) const {
 // using the true number of interactions in the in-time beam crossing.
 
 
-double LumiReWeighting::weight( const edm::Event &e ) const {
+double LumiReWeighting::weight( const edm::EventBase &e ) {
+
+  // find provenance of event objects, just to check at the job beginning if there might be an issue  
+
+  if(FirstWarning_) {
+
+    edm::ReleaseVersion TargetRelease = edm::ReleaseVersion("\"CMSSW_4_2_2_patch2\"");
+    edm::ProcessHistory PHist = e.processHistory();
+    edm::ProcessHistory::const_iterator PHist_iter = PHist.begin();
+
+    for(; PHist_iter<PHist.end() ;++PHist_iter) {
+      edm::ProcessConfiguration PConf = *(PHist_iter);
+      edm::ReleaseVersion Release =  PConf.releaseVersion() ;
+      const std::string Process =  PConf.processName();
+
+      if((Process=="HLT") && (Release==TargetRelease)) {
+	std::cout << " **** Warning! You are using in-time-only pileup reweighting for Release " << Release << " **** " << std::endl;
+	std::cout << " **** There is a weightOOT() function available if needed ****  " << std::endl;
+      }
+    }
+    //    SetFirstFalse();
+    FirstWarning_ = false;
+  }
+
+  // get pileup summary information
 
   Handle<std::vector< PileupSummaryInfo > >  PupInfo;
   e.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
@@ -139,17 +171,12 @@ double LumiReWeighting::weight( const edm::Event &e ) const {
       npv = PVI->getPU_NumInteractions();
       continue;
     }
-    //std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
 
   }
-
-  //  std::cout << "  NPV " << npv << std::endl;
 
   if(npv < 0) std::cerr << " no in-time beam crossing found\n! " ;
 
   int bin = weights_->GetXaxis()->FindBin( npv );
-
-  //  std::cout << " NPV, bin " << npv << "  " << bin << std::endl;
 
   return weights_->GetBinContent( bin );
  
@@ -917,7 +944,7 @@ void LumiReWeighting::weightOOT_init() {
 // As of May 2011, CMS is only sensitive to a bunch that is 50ns "late", which corresponds to
 // BunchCrossing +1.  So, we use that here for re-weighting.
 
-double LumiReWeighting::weightOOT( const edm::Event &e ) const {
+double LumiReWeighting::weightOOT( const edm::EventBase &e ) {
 
 
   static double Correct_Weights2011[25] = { // residual correction to match lumi spectrum
@@ -948,7 +975,43 @@ double LumiReWeighting::weightOOT( const edm::Event &e ) const {
     0
   };                        
 
+  //int Run = e.run();
+  int LumiSection = e.luminosityBlock();
+  
+  // do some caching here, attempt to catch file boundaries
 
+  if(LumiSection != OldLumiSection_) {
+
+    Reweight_4_2_2p2_ = false;
+
+    static edm::ReleaseVersion TargetRelease = edm::ReleaseVersion("\"CMSSW_4_2_2_patch2\"");
+    edm::ProcessHistory PHist = e.processHistory();
+    edm::ProcessHistory::const_iterator PHist_iter = PHist.begin();
+
+    // check to see if we need to do the special out-of-time poisson weighting for CMSSW_4_2_2_patch2 MC:
+
+    for(; PHist_iter<PHist.end() ;++PHist_iter) {
+      edm::ProcessConfiguration PConf = *(PHist_iter);
+      edm::ReleaseVersion Release =  PConf.releaseVersion() ;
+      const std::string Process =  PConf.processName();
+
+      if((Process=="HLT") && (Release==TargetRelease)) {
+
+	Reweight_4_2_2p2_ = true;
+
+	if(FirstWarning_) {
+
+	  std::cout << " **** Warning: Out-of-time pileup reweighting appropriate for Release " << Release << " **** " << std::endl;
+	  std::cout << " **** will be applied  ****  " << std::endl;
+
+	  FirstWarning_ = false;
+	}
+      }
+    }
+    OldLumiSection_ = LumiSection;
+  }
+
+  // find the pileup summary information
 
   Handle<std::vector< PileupSummaryInfo > >  PupInfo;
   e.getByLabel(edm::InputTag("addPileupInfo"), PupInfo);
@@ -969,21 +1032,36 @@ double LumiReWeighting::weightOOT( const edm::Event &e ) const {
     if(BX == 1) { 
       npv50ns = PVI->getPU_NumInteractions();
     }
-    //std::cout << " Pileup Information: bunchXing, nvtx: " << PVI->getBunchCrossing() << " " << PVI->getPU_NumInteractions() << std::endl;
 
   }
 
-  //  std::cout << "  NPV " << npv << std::endl;
+  // Note: for the "uncorrelated" out-of-time pileup, reweighting is only done on the 50ns
+  // "late" bunch (BX=+1), since that is basically the only one that matters in terms of 
+  // energy deposition.  
 
-  if(npv < 0) std::cerr << " no in-time beam crossing found\n! " ;
+  if(npv < 0) {
+    std::cerr << " no in-time beam crossing found\n! " ;
+    std::cerr << " Returning event weight=0\n! ";
+    return 0.;
+  }
+  if(npv50ns < 0) {
+    std::cerr << " no out-of-time beam crossing found\n! " ;
+    std::cerr << " Returning event weight=0\n! ";
+    return 0.;
+  }
 
   int bin = weights_->GetXaxis()->FindBin( npv );
 
-  //  std::cout << " NPV, bin " << npv << "  " << bin << std::endl;
-
   double inTimeWeight = weights_->GetBinContent( bin );
 
-  double TotalWeight = inTimeWeight * WeightOOTPU_[bin-1][npv50ns-1] * Correct_Weights2011[bin-1];
+  double TotalWeight = 1.0;
+
+  if(Reweight_4_2_2p2_) {
+    TotalWeight = inTimeWeight * WeightOOTPU_[bin-1][npv50ns] * Correct_Weights2011[bin-1];
+  }
+  else {
+    TotalWeight = inTimeWeight;
+  }
 
   return TotalWeight;
  
