@@ -53,8 +53,6 @@ class RecoTauPiZeroStripPlugin : public RecoTauPiZeroBuilderPlugin {
   private:
     // PV needed for quality cuts
     edm::InputTag pvSrc_;
-    edm::Handle<reco::VertexCollection> pvs_;
-    bool useClosestPV_;
     RecoTauQualityCuts qcuts_;
 
     std::vector<int> inputPdgIds_; //type of candidates to clusterize
@@ -74,7 +72,6 @@ RecoTauPiZeroStripPlugin::RecoTauPiZeroStripPlugin(
     qcuts_(pset.getParameter<edm::ParameterSet>("qualityCuts"))
 {
   pvSrc_ = pset.getParameter<edm::InputTag>("primaryVertexSrc");
-  useClosestPV_ = pset.getParameter<bool>("useClosestPV");
   inputPdgIds_ = pset.getParameter<std::vector<int> >(
       "stripCandidatesParticleIds");
   etaAssociationDistance_ = pset.getParameter<double>(
@@ -91,7 +88,11 @@ RecoTauPiZeroStripPlugin::RecoTauPiZeroStripPlugin(
 
 // Update the primary vertex
 void RecoTauPiZeroStripPlugin::beginEvent() {
-  evt()->getByLabel(pvSrc_, pvs_);
+  edm::Handle<reco::VertexCollection> pvHandle;
+  evt()->getByLabel(pvSrc_, pvHandle);
+  if (pvHandle->size()) {
+    qcuts_.setPV(reco::VertexRef(pvHandle, 0));
+  }
 }
 
 RecoTauPiZeroStripPlugin::return_type RecoTauPiZeroStripPlugin::operator()(
@@ -102,7 +103,6 @@ RecoTauPiZeroStripPlugin::return_type RecoTauPiZeroStripPlugin::operator()(
   PiZeroVector output;
 
   // Get the candidates passing our quality cuts
-  qcuts_.setPV(reco::tau::closestVertex(pvs_, jet));
   PFCandPtrs candsVector = qcuts_.filterRefs(pfCandidates(jet, inputPdgIds_));
   //PFCandPtrs candsVector = qcuts_.filterRefs(pfGammas(jet));
 
