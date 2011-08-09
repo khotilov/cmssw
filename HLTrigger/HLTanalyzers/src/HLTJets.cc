@@ -37,6 +37,8 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
         else if ( (*iParam) == "GenJetMin" ) _GenJetMin =  myJetParams.getParameter<double>( *iParam );
     }
 
+    jetID = new reco::helper::JetIDHelper(pSet.getParameter<edm::ParameterSet>("JetIDParams"));
+
     const int kMaxRecoPFJet = 10000;
     jpfrecopt=new float[kMaxRecoPFJet];
     jpfrecophi=new float[kMaxRecoPFJet];
@@ -49,20 +51,38 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     jpfrecochargedMultiplicity=new int[kMaxRecoPFJet];
     
     const int kMaxJetCal = 10000;
-    jcalpt = new float[kMaxJetCal];
-    jcalphi = new float[kMaxJetCal];
-    jcaleta = new float[kMaxJetCal];
-    jcale = new float[kMaxJetCal];
-    jcalemf = new float[kMaxJetCal]; 
-    jcaln90 = new float[kMaxJetCal]; 
+    jhcalpt = new float[kMaxJetCal];
+    jhcalphi = new float[kMaxJetCal];
+    jhcaleta = new float[kMaxJetCal];
+    jhcale = new float[kMaxJetCal];
+    jhcalemf = new float[kMaxJetCal]; 
+    jhcaln90 = new float[kMaxJetCal]; 
+    jhcaln90hits = new float[kMaxJetCal]; 
     
-    jcorcalpt = new float[kMaxJetCal]; 
-    jcorcalphi = new float[kMaxJetCal]; 
-    jcorcaleta = new float[kMaxJetCal]; 
-    jcorcale = new float[kMaxJetCal]; 
-    jcorcalemf = new float[kMaxJetCal]; 
-    jcorcaln90 = new float[kMaxJetCal]; 
+    jhcorcalpt = new float[kMaxJetCal]; 
+    jhcorcalphi = new float[kMaxJetCal]; 
+    jhcorcaleta = new float[kMaxJetCal]; 
+    jhcorcale = new float[kMaxJetCal]; 
+    jhcorcalemf = new float[kMaxJetCal]; 
+    jhcorcaln90 = new float[kMaxJetCal]; 
+    jhcorcaln90hits = new float[kMaxJetCal]; 
     
+    jrcalpt = new float[kMaxJetCal];
+    jrcalphi = new float[kMaxJetCal];
+    jrcaleta = new float[kMaxJetCal];
+    jrcale = new float[kMaxJetCal];
+    jrcalemf = new float[kMaxJetCal]; 
+    jrcaln90 = new float[kMaxJetCal]; 
+    jrcaln90hits = new float[kMaxJetCal]; 
+
+    jrcorcalpt = new float[kMaxJetCal];
+    jrcorcalphi = new float[kMaxJetCal];
+    jrcorcaleta = new float[kMaxJetCal];
+    jrcorcale = new float[kMaxJetCal];
+    jrcorcalemf = new float[kMaxJetCal]; 
+    jrcorcaln90 = new float[kMaxJetCal]; 
+    jrcorcaln90hits = new float[kMaxJetCal]; 
+
     const int kMaxJetgen = 10000;
     jgenpt = new float[kMaxJetgen];
     jgenphi = new float[kMaxJetgen];
@@ -86,6 +106,7 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     
     const int kMaxPFTau = 500;
     ohpfTauEta         =  new float[kMaxPFTau];
+    ohpfTauProngs      =  new int[kMaxPFTau];
     ohpfTauPhi         =  new float[kMaxPFTau];
     ohpfTauPt          =  new float[kMaxPFTau];
     ohpfTauJetPt       =  new float[kMaxPFTau];
@@ -94,6 +115,7 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     ohpfTauTrkIso      =  new float[kMaxPFTau];
     ohpfTauGammaIso    =  new float[kMaxPFTau];
 
+    ohpfTauTightConeProngs	=  new int[kMaxPFTau];
     ohpfTauTightConeEta         =  new float[kMaxPFTau];
     ohpfTauTightConePhi         =  new float[kMaxPFTau];
     ohpfTauTightConePt          =  new float[kMaxPFTau];
@@ -106,6 +128,7 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     recopfTauEta 	 =  new float[kMaxPFTau];
     recopfTauPhi 	 =  new float[kMaxPFTau];
     recopfTauPt  	 =  new float[kMaxPFTau];
+    recopfTauJetPt	 =  new float[kMaxPFTau];
     recopfTauLeadTrackPt =  new float[kMaxPFTau];
     recopfTauLeadPionPt  =  new float[kMaxPFTau];
     recopfTauTrkIso	 =  new int[kMaxPFTau];
@@ -118,7 +141,8 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     recopfTauDiscrAgainstMuon  =  new float[kMaxPFTau];
     recopfTauDiscrAgainstElec  =  new float[kMaxPFTau];
     
-    pfMHT   = -100;    
+    pfHT    = -100.;
+    pfMHT   = -100.;    
     const int kMaxPFJet = 500;
     pfJetEta         = new float[kMaxPFJet];
     pfJetPhi         = new float[kMaxPFJet];
@@ -136,7 +160,6 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     recoPFTauIsoTrDz = new float[kMaxTauIso];
     recoPFTauIsoTrPt = new float[kMaxTauIso];
 
-
     // HLT pf taus
     hltpftauSignalTrToPFTauMatch = new int[kMaxTauIso]; // index of HLTPF tau in tau collection
     HLTPFTauSignalTrDz = new float[kMaxTauIso];
@@ -145,10 +168,6 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     hltpftauIsoTrToPFTauMatch = new int[kMaxTauIso]; // index of HLTPF tau in tau collection
     HLTPFTauIsoTrDz = new float[kMaxTauIso];
     HLTPFTauIsoTrPt = new float[kMaxTauIso];
-
-
-
-
 
     // offline pftau isolation and signal cands
     HltTree->Branch("NoRecoPFTausSignal",&noRecoPFTausSignal,"NoRecoPFTausSignal/I");
@@ -173,26 +192,56 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
                     hltpftauIsoTrToPFTauMatch,"hltpftauIsoTrToPFTauMatch[NoHLTPFTausIso]/I");
     HltTree->Branch("HLTPFTauIsoTrDz", HLTPFTauIsoTrDz,"HLTPFTauIsoTrDz[NoHLTPFTausIso]/F");
     HltTree->Branch("HLTPFTauIsoTrPt", HLTPFTauIsoTrPt,"HLTPFTauIsoTrPt[NoHLTPFTausIso]/F");
-
-
-
-
     
     // Jet- MEt-specific branches of the tree 
-    HltTree->Branch("NrecoJetCal",&njetcal,"NrecoJetCal/I");
+
     HltTree->Branch("NrecoJetGen",&njetgen,"NrecoJetGen/I");
     HltTree->Branch("NrecoTowCal",&ntowcal,"NrecoTowCal/I");
-    HltTree->Branch("recoJetCalPt",jcalpt,"recoJetCalPt[NrecoJetCal]/F");
-    HltTree->Branch("recoJetCalPhi",jcalphi,"recoJetCalPhi[NrecoJetCal]/F");
-    HltTree->Branch("recoJetCalEta",jcaleta,"recoJetCalEta[NrecoJetCal]/F");
-    HltTree->Branch("recoJetCalE",jcale,"recoJetCalE[NrecoJetCal]/F");
-    HltTree->Branch("recoJetCalEMF",jcalemf,"recoJetCalEMF[NrecoJetCal]/F");
-    HltTree->Branch("recoJetCalN90",jcaln90,"recoJetCalN90[NrecoJetCal]/F");
-    
+
+    //ccla RECO JETs
+    HltTree->Branch("NrecoJetCal",&nrjetcal,"NrecoJetCal/I");
+    HltTree->Branch("recoJetCalPt",jrcalpt,"recoJetCalPt[NrecoJetCal]/F");
+    HltTree->Branch("recoJetCalPhi",jrcalphi,"recoJetCalPhi[NrecoJetCal]/F");
+    HltTree->Branch("recoJetCalEta",jrcaleta,"recoJetCalEta[NrecoJetCal]/F");
+    HltTree->Branch("recoJetCalE",jrcale,"recoJetCalE[NrecoJetCal]/F");
+    HltTree->Branch("recoJetCalEMF",jrcalemf,"recoJetCalEMF[NrecoJetCal]/F");
+    HltTree->Branch("recoJetCalN90",jrcaln90,"recoJetCalN90[NrecoJetCal]/F");
+    HltTree->Branch("recoJetCalN90hits",jrcaln90hits,"recoJetCalN90hits[NrecoJetCal]/F");
+
+    HltTree->Branch("NrecoJetCorCal",&nrcorjetcal,"NrecoJetCorCal/I"); 
+    HltTree->Branch("recoJetCorCalPt",jrcorcalpt,"recoJetCorCalPt[NrecoJetCorCal]/F"); 
+    HltTree->Branch("recoJetCorCalPhi",jrcorcalphi,"recoJetCorCalPhi[NrecoJetCorCal]/F"); 
+    HltTree->Branch("recoJetCorCalEta",jrcorcaleta,"recoJetCorCalEta[NrecoJetCorCal]/F"); 
+    HltTree->Branch("recoJetCorCalE",jrcorcale,"recoJetCorCalE[NrecoJetCorCal]/F"); 
+    HltTree->Branch("recoJetCorCalEMF",jrcorcalemf,"recoJetCorCalEMF[NrecoJetCorCal]/F");
+    HltTree->Branch("recoJetCorCalN90",jrcorcaln90,"recoJetCorCalN90[NrecoJetCorCal]/F");
+    HltTree->Branch("recoJetCorCalN90hits",jrcorcaln90hits,"recoJetCorCalN90hits[NrecoJetCorCal]/F");
+ 
+    //ccla HLTJETS
+    HltTree->Branch("NohJetCal",&nhjetcal,"NohJetCal/I");
+    HltTree->Branch("ohJetCalPt",jhcalpt,"ohJetCalPt[NohJetCal]/F");
+    HltTree->Branch("ohJetCalPhi",jhcalphi,"ohJetCalPhi[NohJetCal]/F");
+    HltTree->Branch("ohJetCalEta",jhcaleta,"ohJetCalEta[NohJetCal]/F");
+    HltTree->Branch("ohJetCalE",jhcale,"ohJetCalE[NohJetCal]/F");
+    HltTree->Branch("ohJetCalEMF",jhcalemf,"ohJetCalEMF[NohJetCal]/F");
+    HltTree->Branch("ohJetCalN90",jhcaln90,"ohJetCalN90[NohJetCal]/F");
+    HltTree->Branch("ohJetCalN90hits",jhcaln90hits,"ohJetCalN90hits[NohJetCal]/F");
+
+    HltTree->Branch("NohJetCorCal",&nhcorjetcal,"NohJetCorCal/I");
+    HltTree->Branch("ohJetCorCalPt",jhcorcalpt,"ohJetCorCalPt[NohJetCorCal]/F");
+    HltTree->Branch("ohJetCorCalPhi",jhcorcalphi,"ohJetCorCalPhi[NohJetCorCal]/F");
+    HltTree->Branch("ohJetCorCalEta",jhcorcaleta,"ohJetCorCalEta[NohJetCorCal]/F");
+    HltTree->Branch("ohJetCorCalE",jhcorcale,"ohJetCorCalE[NohJetCorCal]/F");
+    HltTree->Branch("ohJetCorCalEMF",jhcorcalemf,"ohJetCorCalEMF[NohJetCorCal]/F");
+    HltTree->Branch("ohJetCorCalN90",jhcorcaln90,"ohJetCorCalN90[NohJetCorCal]/F");
+    HltTree->Branch("ohJetCorCalN90hits",jhcorcaln90hits,"ohJetCorCalN90hits[NohJetCorCal]/F");
+
+    //ccla GenJets
     HltTree->Branch("recoJetGenPt",jgenpt,"recoJetGenPt[NrecoJetGen]/F");
     HltTree->Branch("recoJetGenPhi",jgenphi,"recoJetGenPhi[NrecoJetGen]/F");
     HltTree->Branch("recoJetGenEta",jgeneta,"recoJetGenEta[NrecoJetGen]/F");
     HltTree->Branch("recoJetGenE",jgene,"recoJetGenE[NrecoJetGen]/F");
+
     HltTree->Branch("recoTowEt",towet,"recoTowEt[NrecoTowCal]/F");
     HltTree->Branch("recoTowEta",toweta,"recoTowEta[NrecoTowCal]/F");
     HltTree->Branch("recoTowPhi",towphi,"recoTowPhi[NrecoTowCal]/F");
@@ -211,15 +260,9 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     HltTree->Branch("recoHTCalSum",&htcalsum,"recoHTCalSum/F");
     //for(int ieta=0;ieta<NETA;ieta++){std::cout << " ieta " << ieta << " eta min " << CaloTowerEtaBoundries[ieta] <<std::endl;}
     
-    HltTree->Branch("NrecoJetCorCal",&ncorjetcal,"NrecoJetCorCal/I"); 
-    HltTree->Branch("recoJetCorCalPt",jcorcalpt,"recoJetCorCalPt[NrecoJetCorCal]/F"); 
-    HltTree->Branch("recoJetCorCalPhi",jcorcalphi,"recoJetCorCalPhi[NrecoJetCorCal]/F"); 
-    HltTree->Branch("recoJetCorCalEta",jcorcaleta,"recoJetCorCalEta[NrecoJetCorCal]/F"); 
-    HltTree->Branch("recoJetCorCalE",jcorcale,"recoJetCorCalE[NrecoJetCorCal]/F"); 
-    HltTree->Branch("recoJetCorCalEMF",jcorcalemf,"recoJetCorCalEMF[NrecoJetCorCal]/F");
-    HltTree->Branch("recoJetCorCalN90",jcorcaln90,"recoJetCorCalN90[NrecoJetCorCal]/F");
     
     // Taus
+    nohtau = 0;
     HltTree->Branch("NohTau",&nohtau,"NohTau/I");
     HltTree->Branch("ohTauEta",tauEta,"ohTauEta[NohTau]/F");
     HltTree->Branch("ohTauPhi",tauPhi,"ohTauPhi[NohTau]/F");
@@ -229,8 +272,10 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     HltTree->Branch("ohTauL3Tiso",l3tautckiso,"ohTauL3Tiso[NohTau]/I");
 
     //ohpfTaus
+    nohPFTau = 0;
     HltTree->Branch("NohpfTau",&nohPFTau,"NohpfTau/I");
     HltTree->Branch("ohpfTauPt",ohpfTauPt,"ohpfTauPt[NohpfTau]/F");
+    HltTree->Branch("ohpfTauProngs",ohpfTauProngs,"ohpfTauProngs[NohpfTau]/I");
     HltTree->Branch("ohpfTauEta",ohpfTauEta,"ohpfTauEta[NohpfTau]/F");
     HltTree->Branch("ohpfTauPhi",ohpfTauPhi,"ohpfTauPhi[NohpfTau]/F");
     HltTree->Branch("ohpfTauLeadTrackPt",ohpfTauLeadTrackPt,"ohpfTauLeadTrackPt[NohpfTau]/F");
@@ -240,8 +285,10 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     HltTree->Branch("ohpfTauJetPt",ohpfTauJetPt,"ohpfTauJetPt[NohpfTau]/F");    
 
     //ohpfTaus tight cone
+    nohPFTauTightCone = 0;
     HltTree->Branch("NohpfTauTightCone",&nohPFTauTightCone,"NohpfTauTightCone/I");
     HltTree->Branch("ohpfTauTightConePt",ohpfTauTightConePt,"ohpfTauTightConePt[NohpfTauTightCone]/F");
+    HltTree->Branch("ohpfTauTightConeProngs",ohpfTauTightConeProngs,"ohpfTauProngs[NohpfTauTightCone]/I");
     HltTree->Branch("ohpfTauTightConeEta",ohpfTauTightConeEta,"ohpfTauEta[NohpfTauTightCone]/F");
     HltTree->Branch("ohpfTauTightConePhi",ohpfTauTightConePhi,"ohpfTauPhi[NohpfTauTightCone]/F");
     HltTree->Branch("ohpfTauTightConeLeadTrackPt",ohpfTauTightConeLeadTrackPt,"ohpfTauTightConeLeadTrackPt[NohpfTauTightCone]/F");
@@ -260,6 +307,7 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     HltTree->Branch("recopfTauLeadPionPt",recopfTauLeadPionPt,"recopfTauLeadPionPt[NRecoPFTau]/F");
     HltTree->Branch("recopfTauTrkIso",recopfTauTrkIso,"recopfTauTrkIso[NRecoPFTau]/I");
     HltTree->Branch("recopfTauGammaIso",recopfTauGammaIso,"recopfTauGammaIso[NRecoPFTau]/I");
+    HltTree->Branch("recopfTauJetPt",recopfTauJetPt,"recopfTauJetPt[NRecoPFTau]/F");   
     HltTree->Branch("recopfTauDiscrByTancOnePercent",recopfTauDiscrByTancOnePercent,"recopfTauDiscrByTancOnePercent[NRecoPFTau]/F");   
     HltTree->Branch("recopfTauDiscrByTancHalfPercent",recopfTauDiscrByTancHalfPercent,"recopfTauDiscrByTancHalfPercent[NRecoPFTau]/F");   
     HltTree->Branch("recopfTauDiscrByTancQuarterPercent",recopfTauDiscrByTancQuarterPercent,"recopfTauDiscrByTancQuarterPercent[NRecoPFTau]/F");   
@@ -269,6 +317,8 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
     HltTree->Branch("recopfTauDiscrAgainstElec",recopfTauDiscrAgainstElec,"recopfTauDiscrAgainstElec[NRecoPFTau]/F");
   
     //PFJets
+    nohPFJet = 0;
+    HltTree->Branch("pfHT",&pfHT,"pfHT/F");
     HltTree->Branch("pfMHT",&pfMHT,"pfMHT/F");
     HltTree->Branch("NohPFJet",&nohPFJet,"NohPFJet/I");
     HltTree->Branch("pfJetPt",pfJetPt,"pfJetPt[NohPFJet]/F");
@@ -290,8 +340,11 @@ void HLTJets::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
 }
 
 /* **Analyze the event** */
-void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets,
-                      const edm::Handle<reco::CaloJetCollection>      & calocorjets,
+void HLTJets::analyze(edm::Event const& iEvent,
+		      const edm::Handle<reco::CaloJetCollection>      & ohcalojets,
+                      const edm::Handle<reco::CaloJetCollection>      & ohcalocorjets,
+		      const edm::Handle<reco::CaloJetCollection>      & rcalojets,
+		      const edm::Handle<reco::CaloJetCollection>      & rcalocorjets,
                       const edm::Handle<reco::GenJetCollection>       & genjets,
                       const edm::Handle<reco::CaloMETCollection>      & recmets,
                       const edm::Handle<reco::GenMETCollection>       & genmets,
@@ -318,7 +371,7 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
     if (_Debug) std::cout << " Beginning HLTJets " << std::endl;
     
     //initialize branch variables
-    njetcal=0; ncorjetcal=0; njetgen=0;ntowcal=0;
+    nhjetcal=0; nhcorjetcal=0; njetgen=0;ntowcal=0;
     mcalmet=0.; mcalphi=0.;
     mgenmet=0.; mgenphi=0.;
     htcalet=0.,htcalphi=0.,htcalsum=0.;
@@ -328,54 +381,103 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
 
 
 
-
-
+    if (rcalojets.isValid()) {
+      reco::CaloJetCollection mycalojets;
+      mycalojets=*rcalojets;
+      std::sort(mycalojets.begin(),mycalojets.end(),PtGreater());
+      typedef reco::CaloJetCollection::const_iterator cjiter;
+      int jrcal=0;
+      for ( cjiter i=mycalojets.begin(); i!=mycalojets.end(); i++) {
     
-    if (calojets.isValid()) {
+    	if (i->pt()>_CalJetMin){
+    	  jrcalpt[jrcal] = i->pt();
+    	  jrcalphi[jrcal] = i->phi();
+    	  jrcaleta[jrcal] = i->eta();
+    	  jrcale[jrcal] = i->energy();
+    	  jrcalemf[jrcal] = i->emEnergyFraction();
+    	  jrcaln90[jrcal] = i->n90();
+	  jetID->calculate( iEvent, *i );
+	  jrcaln90hits[jrcal] = jetID->n90Hits();
+    	  jrcal++;
+    	}
+      }
+      nrjetcal = jrcal;
+    }
+    else {nrjetcal = 0;}
+    
+    if (rcalocorjets.isValid()) {
+      reco::CaloJetCollection mycalojets;
+      mycalojets=*rcalocorjets;
+      std::sort(mycalojets.begin(),mycalojets.end(),PtGreater());
+      typedef reco::CaloJetCollection::const_iterator cjiter;
+      int jrcal=0;
+      for ( cjiter i=mycalojets.begin(); i!=mycalojets.end(); i++) {
+    
+    	if (i->pt()>_CalJetMin){
+    	  jrcorcalpt[jrcal] = i->pt();
+    	  jrcorcalphi[jrcal] = i->phi();
+    	  jrcorcaleta[jrcal] = i->eta();
+    	  jrcorcale[jrcal] = i->energy();
+    	  jrcorcalemf[jrcal] = i->emEnergyFraction();
+    	  jrcorcaln90[jrcal] = i->n90();
+	  jetID->calculate( iEvent, *i );
+    	  jrcorcaln90hits[jrcal] = jetID->n90Hits();
+    	  jrcal++;
+    	}
+      }
+      nrcorjetcal = jrcal;
+    }
+    else {nrcorjetcal = 0;}
+    
+    if (ohcalojets.isValid()) {
         reco::CaloJetCollection mycalojets;
-        mycalojets=*calojets;
+        mycalojets=*ohcalojets;
         std::sort(mycalojets.begin(),mycalojets.end(),PtGreater());
         typedef reco::CaloJetCollection::const_iterator cjiter;
-        int jcal=0;
+        int jhcal=0;
         for ( cjiter i=mycalojets.begin(); i!=mycalojets.end(); i++) {
             
             if (i->pt()>_CalJetMin){
-                jcalpt[jcal] = i->pt();
-                jcalphi[jcal] = i->phi();
-                jcaleta[jcal] = i->eta();
-                jcale[jcal] = i->energy();
-                jcalemf[jcal] = i->emEnergyFraction();
-                jcaln90[jcal] = i->n90();
-                jcal++;
+                jhcalpt[jhcal] = i->pt();
+                jhcalphi[jhcal] = i->phi();
+                jhcaleta[jhcal] = i->eta();
+                jhcale[jhcal] = i->energy();
+                jhcalemf[jhcal] = i->emEnergyFraction();
+                jhcaln90[jhcal] = i->n90();
+		jetID->calculate( iEvent, *i );
+                jhcaln90hits[jhcal] = jetID->n90Hits();
+                jhcal++;
             }
             
         }
-        njetcal = jcal;
+        nhjetcal = jhcal;
     }
-    else {njetcal = 0;}
+    else {nhjetcal = 0;}
     
-    if (calocorjets.isValid()) {
+    if (ohcalocorjets.isValid()) {
         reco::CaloJetCollection mycalocorjets;
-        mycalocorjets=*calocorjets;
+        mycalocorjets=*ohcalocorjets;
         std::sort(mycalocorjets.begin(),mycalocorjets.end(),PtGreater());
         typedef reco::CaloJetCollection::const_iterator ccorjiter;
-        int jcorcal=0;
+        int jhcorcal=0;
         for ( ccorjiter i=mycalocorjets.begin(); i!=mycalocorjets.end(); i++) {
             
             if (i->pt()>_CalJetMin){
-                jcorcalpt[jcorcal] = i->pt();
-                jcorcalphi[jcorcal] = i->phi();
-                jcorcaleta[jcorcal] = i->eta();
-                jcorcale[jcorcal] = i->energy();
-                jcorcalemf[jcorcal] = i->emEnergyFraction();
-                jcorcaln90[jcorcal] = i->n90();
-                jcorcal++;
+                jhcorcalpt[jhcorcal] = i->pt();
+                jhcorcalphi[jhcorcal] = i->phi();
+                jhcorcaleta[jhcorcal] = i->eta();
+                jhcorcale[jhcorcal] = i->energy();
+                jhcorcalemf[jhcorcal] = i->emEnergyFraction();
+                jhcorcaln90[jhcorcal] = i->n90();
+		jetID->calculate( iEvent, *i );
+                jhcorcaln90hits[jhcorcal] = jetID->n90Hits();
+                jhcorcal++;
             }
             
         }
-        ncorjetcal = jcorcal;
+        nhcorjetcal = jhcorcal;
     }
-    else {ncorjetcal = 0;}
+    else {nhcorjetcal = 0;}
     
     if (caloTowers.isValid()) {
         //    ntowcal = caloTowers->size();
@@ -451,7 +553,6 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
     
     
     /////////////////////////////// Open-HLT Taus ///////////////////////////////
-    
     if (taujets.isValid()) {      
         nohtau = taujets->size();
         reco::HLTTauCollection mytaujets;
@@ -486,17 +587,14 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
         std::sort(taus.begin(),taus.end(),GetPFPtGreater());
         typedef reco::PFTauCollection::const_iterator pftauit;
         int ipftau=0;
-        float pfMHTx = 0;
-        float pfMHTy = 0;
         for(pftauit i=taus.begin(); i!=taus.end(); i++){
             //Ask for Eta,Phi and Et of the tau:
+	    ohpfTauProngs[ipftau] = i->signalPFChargedHadrCands().size();
             ohpfTauEta[ipftau] = i->eta();
             ohpfTauPhi[ipftau] = i->phi();
             ohpfTauPt[ipftau] = i->pt();
             ohpfTauJetPt[ipftau] = i->pfTauTagInfoRef()->pfjetRef()->pt();
 
-            pfMHTx = pfMHTx + i->pfTauTagInfoRef()->pfjetRef()->px();
-            pfMHTy = pfMHTy + i->pfTauTagInfoRef()->pfjetRef()->py();
             
   /*
             if( (i->leadPFCand()).isNonnull())
@@ -563,8 +661,7 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
             ohpfTauGammaIso[ipftau] = maxPtGammaIso;
             ipftau++;
         } 
-        pfMHT = sqrt(pfMHTx*pfMHTx + pfMHTy*pfMHTy);
-        
+      
     }
 
     if(pfTausTightCone.isValid()) {
@@ -575,18 +672,15 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
         std::sort(taus.begin(),taus.end(),GetPFPtGreater());
         typedef reco::PFTauCollection::const_iterator pftauit;
         int ipftau=0;
-        float pfMHTx = 0;
-        float pfMHTy = 0;
         for(pftauit i=taus.begin(); i!=taus.end(); i++){
             //Ask for Eta,Phi and Et of the tau:
+            ohpfTauTightConeProngs[ipftau] = i->signalPFChargedHadrCands().size();
             ohpfTauTightConeEta[ipftau] = i->eta();
             ohpfTauTightConePhi[ipftau] = i->phi();
             ohpfTauTightConePt[ipftau] = i->pt();
             ohpfTauTightConeJetPt[ipftau] = i->pfTauTagInfoRef()->pfjetRef()->pt();
 
-            pfMHTx = pfMHTx + i->pfTauTagInfoRef()->pfjetRef()->px();
-            pfMHTy = pfMHTy + i->pfTauTagInfoRef()->pfjetRef()->py();
-
+    
             if( (i->leadPFNeutralCand()).isNonnull())
                 ohpfTauTightConeLeadPionPt[ipftau] = i->leadPFNeutralCand()->pt();
             else 
@@ -613,7 +707,6 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
             ohpfTauTightConeGammaIso[ipftau] = maxPtGammaIso;
             ipftau++;
         }
-////        pfMHT = sqrt(pfMHTx*pfMHTx + pfMHTy*pfMHTy);
 
     }
     
@@ -622,7 +715,7 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
     if(recoPfTaus.isValid()) {
         float minTrkPt = minPtCH;
         float minGammaPt = minPtGamma;
-        nRecoPFTau  = pfTaus->size();
+        nRecoPFTau  = recoPfTaus->size();
         reco::PFTauCollection taus = *recoPfTaus;
 
         // disable sorting for proper access to discriminators
@@ -717,14 +810,17 @@ void HLTJets::analyze(const edm::Handle<reco::CaloJetCollection>      & calojets
         std::sort(Jets.begin(),Jets.end(),GetPFPtGreater());
         typedef reco::PFJetCollection::const_iterator pfJetit;
         int ipfJet=0;
-        float pfMHTx = 0;
-        float pfMHTy = 0;
+        float pfMHTx = 0.;
+        float pfMHTy = 0.;
+	pfHT         = 0.;
+
         for(pfJetit i=Jets.begin(); i!=Jets.end(); i++){
             //Ask for Eta,Phi and Et of the Jet:
             pfJetEta[ipfJet] = i->eta();
             pfJetPhi[ipfJet] = i->phi();
             pfJetPt[ipfJet] = i->pt();           
             
+	    pfHT  += i -> pt();
             pfMHTx = pfMHTx + i->px();
             pfMHTy = pfMHTy + i->py();
             ipfJet++;   

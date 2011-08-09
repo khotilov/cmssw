@@ -69,7 +69,6 @@ _combinatoricTauConfig = cms.PSet(
     isolationConeSize = cms.double(0.5),
     qualityCuts = PFTauQualityCuts.signalQualityCuts,
     primaryVertexSrc = cms.InputTag("offlinePrimaryVertices"),
-    useClosestPV = cms.bool(True),
     decayModes = cms.VPSet(
         combinatoricDecayModeConfigs.config1prong0pi0,
         combinatoricDecayModeConfigs.config1prong1pi0,
