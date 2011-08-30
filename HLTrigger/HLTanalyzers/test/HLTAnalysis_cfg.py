@@ -38,8 +38,7 @@ if (isData):
     # GLOBAL_TAG='GR_R_311_V0::All' # Temporary tag for running in CMSSW_3_11_X
 ##    GLOBAL_TAG='L1HLTST311_V0::All'
     ## Use the same GLOBAL TAG as in the master table
-#    GLOBAL_TAG='TESTL1_GR_P::All'    
-    GLOBAL_TAG='GR_H_V15::All'
+    GLOBAL_TAG='TESTL1_GR_P::All'    
 else:
     GLOBAL_TAG='START39_V8::All'
     if (MENU == "GRun"): GLOBAL_TAG= 'START39_V8::All'
@@ -58,7 +57,7 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        '/store/data/Run2011A/SingleMu/RAW/v1/000/160/406/CA9EFACF-A14D-E011-ACB9-00304879EDEA.root'
+    '/store/data/Run2010B/Jet/RAW/v1/000/149/181/326E0028-28E2-DF11-8EF5-001D09F2546F.root'
     )
 )
 
@@ -105,9 +104,6 @@ process.hltanalysis.genmet = "genMetTrue"
 process.EcalBarrelGeometryEP.applyAlignment = True
 process.EcalEndcapGeometryEP.applyAlignment = True
 process.EcalPreshowerGeometryEP.applyAlignment = True
-
-# Add tight isolation PF taus
-process.HLTPFTauSequence += process.hltPFTausTightCone
 
 if (MENU == "GRun"):
     # get the objects associated with the menu
