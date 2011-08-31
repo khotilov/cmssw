@@ -101,9 +101,18 @@ process.p = cms.Path(process.inFlightMuons + process.patDefaultSequence + proces
 #----------------------------------------------------------------------
 process.maxEvents.input = -1
 
-process.source.fileNames =[
- '/store/relval/CMSSW_3_8_3/RelValZMM/GEN-SIM-RECO/START38_V9-v1/0022/18DEC833-2FC0-DF11-BB1D-00304867C29C.root'
-#'/store/relval/CMSSW_3_8_3/RelValJpsiMM/GEN-SIM-RECO/START38_V9-v1/0022/0A4D5C6F-F5BF-DF11-861D-0018F3D095F0.root'
- ]
+## Source
+from PhysicsTools.PatAlgos.tools.cmsswVersionTools import pickRelValInputFiles
+process.source = cms.Source("PoolSource",
+    fileNames = cms.untracked.vstring(
+     pickRelValInputFiles( cmsswVersion  = 'CMSSW_4_2_0_pre8'
+                        #, relVal        =  'RelValZMM'
+                        ,relVal        =  'RelValJpsiMM'
+                        , globalTag     = 'START42_V7'
+                        , numberOfFiles = 1
+                        )
+    )
+)
+
 del(process.out)
 del(process.outpath)
