@@ -1,4 +1,4 @@
-// $Id: EventStreamHttpReader.h,v 1.25 2011/03/24 17:19:25 mommsen Exp $
+// $Id: EventStreamHttpReader.h,v 1.28 2011/07/05 12:06:04 mommsen Exp $
 /// @file: EventStreamHttpReader.h
 
 #ifndef StorageManager_EventStreamHttpReader_h
@@ -27,8 +27,8 @@ namespace edm
     framework input source. Currently we inherit from InputSource.
 
     $Author: mommsen $
-    $Revision: 1.25 $
-    $Date: 2011/03/24 17:19:25 $
+    $Revision: 1.28 $
+    $Date: 2011/07/05 12:06:04 $
   */
 
   class EventStreamHttpReader : public edm::StreamerInputSource
@@ -49,8 +49,11 @@ namespace edm
     
     stor::EventServerProxy<stor::EventConsumerRegistrationInfo> eventServerProxy_;
     DQMStore* dqmStore_;
+    bool dqmStoreAvailabiltyChecked_;
 
     const bool dropOldLumisectionEvents_;
+    const std::string consumerName_;
+    unsigned int totalDroppedEvents_;
     unsigned int lastLS_;
 
   };
