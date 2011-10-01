@@ -16,18 +16,18 @@ process.maxEvents = cms.untracked.PSet(
 
 from PhysicsTools.PatExamples.samplesCERN_cff import *
 ##process.source.fileNames = muonSKIM        ## ATTENTION these samples are NOT available on castor
-##process.source.fileNames = simulationQCD   ## ATTENTION these samples are NOT available on castor
-##process.source.fileNames = simulationWjets
+##process.source.fileNames = simulationQCD
+process.source.fileNames = simulationWjets
 ##process.source.fileNames = simulationZjets
 ##process.source.fileNames = simulationTtbar
 
 ## Define the TFileService
 process.TFileService = cms.Service("TFileService",
-fileName = cms.string('analyzePatTopSelection.root')
+##fileName = cms.string('analyzePatTopSelection.root')
 ##fileName = cms.string('analyzePatTopSelection_qcd.root')
 ##fileName = cms.string('analyzePatTopSelection_wjets.root')
 ##fileName = cms.string('analyzePatTopSelection_zjets.root')
-##fileName = cms.string('analyzePatTopSelection_ttbar.root')
+fileName = cms.string('analyzePatTopSelection_ttbar.root')
 )
 
 ## ----------------------------------------------------------------
@@ -111,7 +111,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 
 ## Define loose event selection path
 process.looseEventSelection = cms.Path(
-   #process.step1      *
+    process.step1      *
     process.step2      *
     process.step3b     *
     process.step4      *
@@ -124,8 +124,8 @@ process.looseEventSelection = cms.Path(
 ## Define tight event selection path
 process.tightEventSelection = cms.Path(
     process.monStart   *
-   #process.step1      *
-   #process.monStep1   *
+    process.step1      *
+    process.monStep1   *
     process.step2      *
     process.monStep2   *
     process.step3a     *
