@@ -1,3 +1,0 @@
-RecoTauTag/Configuration                         V01-02-05      
-RecoTauTag/RecoTau                               V01-02-08      
-RecoTauTag/TauTagTools                           V01-02-00  
