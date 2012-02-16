@@ -1,8 +1,0 @@
-*.root
-out.*
-jsons
-psets
-ana_datamc*
-plots
-old
-zprime.C
