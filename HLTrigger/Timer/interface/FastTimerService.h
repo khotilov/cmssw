@@ -14,11 +14,6 @@ typedef int clockid_t;
 #include <map>
 #include <tr1/unordered_map>
 
-// boost headers
-// for forward compatibility with boost 1.47
-#define BOOST_FILESYSTEM_VERSION 3
-#include <boost/filesystem/path.hpp>
-
 // CMSSW headers
 #include "FWCore/ServiceRegistry/interface/ActivityRegistry.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
@@ -171,7 +166,8 @@ private:
 #endif
     TH1F *                      dqm_total;
     TH1F *                      dqm_module_counter;     // for each module in the path, track how many times it ran
-    TH1F *                      dqm_module_runtime;     // for each module in the path, track the total time spent 
+    TH1F *                      dqm_module_active;      // for each module in the path, track the active time spent 
+    TH1F *                      dqm_module_total;       // for each module in the path, track the total time spent 
 
   public:
     PathInfo() :
@@ -204,7 +200,8 @@ private:
 #endif
       dqm_total(0),
       dqm_module_counter(0),
-      dqm_module_runtime(0)
+      dqm_module_active(0),
+      dqm_module_total(0)
     { }
   };
 
@@ -223,7 +220,7 @@ private:
   // dqm configuration
   const double                                  m_dqm_time_range;
   const double                                  m_dqm_time_resolution;
-  boost::filesystem::path                       m_dqm_path;
+  std::string                                   m_dqm_path;
 
   // job configuration and caching
   std::string const *                           m_first_path;           // the framework does not provide a pre-paths or pre-endpaths signal,
