@@ -234,7 +234,6 @@ MuonAssociatorByHits::associateRecoToSimIndices(const TrackHitsCollection & tC,
     // all hits = valid +INVALID
     int n_all         = 0;        
     int n_tracker_all = 0;
-    int n_muon_all    = 0;   
     int n_dt_all      = 0;     
     int n_csc_all     = 0;    
     int n_rpc_all     = 0;    
@@ -246,7 +245,6 @@ MuonAssociatorByHits::associateRecoToSimIndices(const TrackHitsCollection & tC,
     int n_csc_valid     = 0;    
     int n_rpc_valid     = 0;    
 
-    int n_matched_valid         = 0;        
     int n_tracker_matched_valid = 0;
     int n_muon_matched_valid    = 0;   
     int n_dt_matched_valid      = 0;     
@@ -260,7 +258,6 @@ MuonAssociatorByHits::associateRecoToSimIndices(const TrackHitsCollection & tC,
     int n_csc_INVALID     = 0;    
     int n_rpc_INVALID     = 0;    
     
-    int n_matched_INVALID         = 0;        
     int n_tracker_matched_INVALID = 0;
     int n_muon_matched_INVALID    = 0;     
     int n_dt_matched_INVALID      = 0;     
@@ -291,13 +288,10 @@ MuonAssociatorByHits::associateRecoToSimIndices(const TrackHitsCollection & tC,
     n_dt_all      = n_dt_valid  + n_dt_INVALID;
     n_csc_all     = n_csc_valid + n_csc_INVALID;
     n_rpc_all     = n_rpc_valid + n_rpc_INVALID;
-    n_muon_all    = n_muon_valid + n_muon_INVALID;
     n_all         = n_valid + n_INVALID;
 
     n_muon_matched_valid   = n_dt_matched_valid + n_csc_matched_valid + n_rpc_matched_valid;
-    n_matched_valid        = n_tracker_matched_valid + n_muon_matched_valid;
     n_muon_matched_INVALID = n_dt_matched_INVALID + n_csc_matched_INVALID + n_rpc_matched_INVALID;
-    n_matched_INVALID      = n_tracker_matched_INVALID + n_muon_matched_INVALID;
 
     // selected hits are set initially to valid hits
     int n_tracker_selected_hits = n_tracker_valid;
@@ -540,7 +534,6 @@ MuonAssociatorByHits::associateSimToRecoIndices( const TrackHitsCollection & tC,
     // all hits = valid +INVALID
     int n_all         = 0;        
     int n_tracker_all = 0;
-    int n_muon_all    = 0;   
     int n_dt_all      = 0;     
     int n_csc_all     = 0;    
     int n_rpc_all     = 0;    
@@ -552,7 +545,6 @@ MuonAssociatorByHits::associateSimToRecoIndices( const TrackHitsCollection & tC,
     int n_csc_valid     = 0;    
     int n_rpc_valid     = 0;    
 
-    int n_matched_valid         = 0;        
     int n_tracker_matched_valid = 0;
     int n_muon_matched_valid    = 0;   
     int n_dt_matched_valid      = 0;     
@@ -566,7 +558,6 @@ MuonAssociatorByHits::associateSimToRecoIndices( const TrackHitsCollection & tC,
     int n_csc_INVALID     = 0;    
     int n_rpc_INVALID     = 0;    
     
-    int n_matched_INVALID         = 0;        
     int n_tracker_matched_INVALID = 0;
     int n_muon_matched_INVALID    = 0;     
     int n_dt_matched_INVALID      = 0;     
@@ -597,13 +588,10 @@ MuonAssociatorByHits::associateSimToRecoIndices( const TrackHitsCollection & tC,
     n_dt_all      = n_dt_valid  + n_dt_INVALID;
     n_csc_all     = n_csc_valid + n_csc_INVALID;
     n_rpc_all     = n_rpc_valid + n_rpc_INVALID;
-    n_muon_all    = n_muon_valid + n_muon_INVALID;
     n_all         = n_valid + n_INVALID;
 
     n_muon_matched_valid   = n_dt_matched_valid + n_csc_matched_valid + n_rpc_matched_valid;
-    n_matched_valid        = n_tracker_matched_valid + n_muon_matched_valid;
     n_muon_matched_INVALID = n_dt_matched_INVALID + n_csc_matched_INVALID + n_rpc_matched_INVALID;
-    n_matched_INVALID      = n_tracker_matched_INVALID + n_muon_matched_INVALID;
 
      // selected hits are set initially to valid hits
     int n_tracker_selected_hits = n_tracker_valid;
@@ -1033,14 +1021,16 @@ void MuonAssociatorByHits::getMatchedIds
 	
 	if(!SimTrackIds.empty()) {
 	  n_tracker_matched_valid++;
-	  tracker_matchedIds_valid[iH] = SimTrackIds;
+	  //tracker_matchedIds_valid[iH] = SimTrackIds;
+          tracker_matchedIds_valid.push_back( new uint_SimHitIdpr_pair(iH, SimTrackIds));
 	}
       } else {
 	n_tracker_INVALID++;
 
 	if(!SimTrackIds.empty()) {
 	  n_tracker_matched_INVALID++;
-	  tracker_matchedIds_INVALID[iH] = SimTrackIds;
+	  //tracker_matchedIds_INVALID[iH] = SimTrackIds;
+          tracker_matchedIds_INVALID.push_back( new uint_SimHitIdpr_pair(iH, SimTrackIds));
 	}
       }
     }  
@@ -1067,14 +1057,16 @@ void MuonAssociatorByHits::getMatchedIds
 
 	    if (!SimTrackIds.empty()) {
 	      n_dt_matched_valid++;
-	      muon_matchedIds_valid[iH] = SimTrackIds;
+	      //muon_matchedIds_valid[iH] = SimTrackIds;
+              muon_matchedIds_valid.push_back (new uint_SimHitIdpr_pair(iH,SimTrackIds));
 	    }
 	  } else {
 	    n_dt_INVALID++;
 	    
 	    if (!SimTrackIds.empty()) {
 	      n_dt_matched_INVALID++;
-	      muon_matchedIds_INVALID[iH] = SimTrackIds;
+	      //muon_matchedIds_INVALID[iH] = SimTrackIds;
+              muon_matchedIds_INVALID.push_back (new uint_SimHitIdpr_pair(iH,SimTrackIds));
 	    }
 	  }
 
@@ -1137,14 +1129,17 @@ void MuonAssociatorByHits::getMatchedIds
 
 		  if (!i_SimTrackIds.empty()) {
 		    n_dt_matched_valid++;
-		    muon_matchedIds_valid[iH] = i_SimTrackIds;
+		    //muon_matchedIds_valid[iH] = i_SimTrackIds;
+                    muon_matchedIds_valid.push_back (new uint_SimHitIdpr_pair(iH,i_SimTrackIds));
 		  }
 		} else {
 		  n_dt_INVALID++;
 		  
 		  if (!i_SimTrackIds.empty()) {
 		    n_dt_matched_INVALID++;
-		    muon_matchedIds_INVALID[iH] = i_SimTrackIds;
+		    //muon_matchedIds_INVALID[iH] = i_SimTrackIds;
+                    muon_matchedIds_INVALID.push_back (new uint_SimHitIdpr_pair(iH,i_SimTrackIds));
+                    
 		  } 
 		}
 	      } else if (printRtS) edm::LogWarning("MuonAssociatorByHits")
@@ -1192,14 +1187,16 @@ void MuonAssociatorByHits::getMatchedIds
 	    
 	    if (!SimTrackIds.empty()) {
 	      n_csc_matched_valid++;
-	      muon_matchedIds_valid[iH] = SimTrackIds;
+	      //muon_matchedIds_valid[iH] = SimTrackIds;
+              muon_matchedIds_valid.push_back (new uint_SimHitIdpr_pair(iH,SimTrackIds));
 	    }
 	  } else {
 	    n_csc_INVALID++;
 	    
 	    if (!SimTrackIds.empty()) {
 	      n_csc_matched_INVALID++;
-	      muon_matchedIds_INVALID[iH] = SimTrackIds;
+	      //muon_matchedIds_INVALID[iH] = SimTrackIds;
+              muon_matchedIds_INVALID.push_back (new uint_SimHitIdpr_pair(iH,SimTrackIds));
 	    }
 	  }
 	}
@@ -1233,14 +1230,16 @@ void MuonAssociatorByHits::getMatchedIds
 
 		  if (!i_SimTrackIds.empty()) {
 		    n_csc_matched_valid++;
-		    muon_matchedIds_valid[iH] =  i_SimTrackIds;
+		    //muon_matchedIds_valid[iH] =  i_SimTrackIds;
+                    muon_matchedIds_valid.push_back (new uint_SimHitIdpr_pair(iH,i_SimTrackIds));
 		  }
 		} else {
 		  n_csc_INVALID++;
 		  
 		  if (!i_SimTrackIds.empty()) {
 		    n_csc_matched_INVALID++;
-		    muon_matchedIds_INVALID[iH] =  i_SimTrackIds;
+		    //muon_matchedIds_INVALID[iH] =  i_SimTrackIds;
+                    muon_matchedIds_INVALID.push_back (new uint_SimHitIdpr_pair(iH,i_SimTrackIds));
 		  }
 		}
 	      } else if (printRtS) edm::LogWarning("MuonAssociatorByHits")
@@ -1284,14 +1283,17 @@ void MuonAssociatorByHits::getMatchedIds
 
 	  if (!SimTrackIds.empty()) {
 	    n_rpc_matched_valid++;
-	    muon_matchedIds_valid[iH] = SimTrackIds;
+	    //muon_matchedIds_valid[iH] = SimTrackIds;
+            muon_matchedIds_valid.push_back (new uint_SimHitIdpr_pair(iH,SimTrackIds));
+            
 	  }
 	} else {
 	  n_rpc_INVALID++;
 	  
 	  if (!SimTrackIds.empty()) {
 	    n_rpc_matched_INVALID++;
-	    muon_matchedIds_INVALID[iH] = SimTrackIds;
+	    //muon_matchedIds_INVALID[iH] = SimTrackIds;
+            muon_matchedIds_INVALID.push_back (new uint_SimHitIdpr_pair(iH,SimTrackIds));
 	  }
 	}
 	
@@ -1316,11 +1318,12 @@ void MuonAssociatorByHits::getMatchedIds
 int MuonAssociatorByHits::getShared(MapOfMatchedIds & matchedIds, TrackingParticleCollection::const_iterator trpart) const {
   int nshared = 0;
 
+
   // map is indexed over the rechits of the reco::Track (no double-countings allowed)
   for (MapOfMatchedIds::const_iterator iRecH=matchedIds.begin(); iRecH!=matchedIds.end(); ++iRecH) {
 
     // vector of associated simhits associated to the current rechit
-    std::vector<SimHitIdpr> SimTrackIds = (*iRecH).second;
+    std::vector<SimHitIdpr> const & SimTrackIds = (*iRecH).second;
     
     bool found = false;
     
