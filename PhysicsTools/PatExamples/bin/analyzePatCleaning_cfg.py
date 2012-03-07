@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("FWLitePlots")
 
 process.FWLiteParams = cms.PSet(
-    inputFile    = cms.string('file:cocTuple.root'),
+    inputFile    = cms.string('file:patTuple.root'),
     outputFile   = cms.string('analyzePatCleaning.root'),
-    jets     = cms.InputTag('cocPatJets'),
+    jets     = cms.InputTag('cleanPatJets'),
     overlaps = cms.string('electrons')
 )
