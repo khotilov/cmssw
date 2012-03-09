@@ -99,7 +99,7 @@ testSimActivityRegistry::signalForwardingTest()
 namespace {
    
    template<class T> struct Counting : public Observer<const T*> {
-      int& count_;
+      mutable int& count_;
       Counting(int& iCount) : count_(iCount) {}     
       void update(const T*) {
          ++count_;

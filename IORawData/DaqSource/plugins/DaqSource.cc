@@ -1,7 +1,7 @@
 /** \file 
  *
- *  $Date: 2011/06/21 19:31:28 $
- *  $Revision: 1.52 $
+ *  $Date: 2011/06/21 18:34:16 $
+ *  $Revision: 1.51 $
  *  \author N. Amapane - S. Argiro'
  */
 
@@ -152,6 +152,8 @@ namespace edm {
 	setLuminosityBlockAuxiliary(new LuminosityBlockAuxiliary(
 								 runNumber_, luminosityBlockNumber_, timestamp(), Timestamp::invalidTimestamp()));
 	
+	readAndCacheLumi();
+	setLumiPrematurelyRead();
 	//      std::cout << "nextItemType: dealt with new lumi block principal, retval is " << retval << std::endl;
       }
       return IsLumi;
@@ -329,6 +331,8 @@ namespace edm {
       setLuminosityBlockAuxiliary(new LuminosityBlockAuxiliary(
 	runNumber_, luminosityBlockNumber_, timestamp(), Timestamp::invalidTimestamp()));
 
+      readAndCacheLumi();
+      setLumiPrematurelyRead();
       //      std::cout << "nextItemType: dealt with new lumi block principal, retval is " << retval << std::endl;
     }
     //    std::cout << "here retval = " << retval << std::endl;
@@ -347,7 +351,7 @@ namespace edm {
 			    bunchCrossing,
 			    EventAuxiliary::invalidStoreNumber,
 			    orbitNumber);
-    eventPrincipalCache()->fillEventPrincipal(eventAux, boost::shared_ptr<LuminosityBlockPrincipal>());
+    eventPrincipalCache()->fillEventPrincipal(eventAux, luminosityBlockPrincipal());
     eventCached_ = true;
     
     // have fedCollection managed by a std::auto_ptr<>
@@ -407,7 +411,6 @@ namespace edm {
     assert(eventCached_);
     //    std::cout << "asserts done " << std::endl;
     eventCached_ = false;
-    eventPrincipalCache()->setLuminosityBlockPrincipal(luminosityBlockPrincipal());
     return eventPrincipalCache();
   }
 

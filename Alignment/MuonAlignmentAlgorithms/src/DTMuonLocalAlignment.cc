@@ -18,8 +18,7 @@ void DTMuonLocalAlignment::initNTuples(int nMtxSection) {
   for(int n_file = iFile; n_file < iFile+numberOfRootFiles; ++n_file) {
 
     char theNameOfTheFile[150];
-    snprintf(theNameOfTheFile, sizeof(theNameOfTheFile),
-	     "%sMyNtupleResidual_Craft09_%d.root", ntuplePath.c_str(), n_file);
+    sprintf(theNameOfTheFile, "%sMyNtupleResidual_Craft09_%d.root", ntuplePath.c_str(), n_file);
     tali->Add(theNameOfTheFile); 
 
   }

@@ -8,7 +8,6 @@ int Marker[] = {23,22,21,20,29,27,2};
 int Style [] = {1,2,5,7,9,10};
 
 
-
 TObject* GetObjectFromPath(TDirectory* File, std::string Path, bool GetACopy=false)
 {
    size_t pos = Path.find("/");
@@ -27,27 +26,18 @@ TObject* GetObjectFromPath(TDirectory* File, std::string Path, bool GetACopy=fal
          return File->Get(Path.c_str());
       }
    }
+   
 }
-
-TObject* GetObjectFromPath(TDirectory* Container, TDirectory* File, std::string Path, bool GetACopy=false){
-   TObject* toreturn = GetObjectFromPath(File,Path,GetACopy);
-   if(TH1* th1 = dynamic_cast<TH1*>(toreturn))th1->SetDirectory(Container);
-   return toreturn;
-}
-
 
 void MakeDirectories(std::string path){
-/*   size_t pos = 0;
+   size_t pos = 0;
    
    while(pos!=std::string::npos){
       pos = path.find("/",pos+1);
       if(pos!=std::string::npos){
-         system( (std::string("mkdir -p ") + path.substr(0,pos)).c_str());
+         system( (std::string("mkdir ") + path.substr(0,pos)).c_str());
       }
    }
-*/
-
-   system( (std::string("mkdir -p ") + path).c_str());
 }
 
 void SaveCanvas(TCanvas* c, std::string path, std::string name, bool OnlyPPNG=false){

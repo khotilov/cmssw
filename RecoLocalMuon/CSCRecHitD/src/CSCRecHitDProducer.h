@@ -38,7 +38,6 @@ public:
   bool useCalib;
   bool useStaticPedestals;
   bool useTimingCorrections;
-  bool useGasGainCorrections;
 
   edm::InputTag stripDigiTag_;
   edm::InputTag wireDigiTag_;

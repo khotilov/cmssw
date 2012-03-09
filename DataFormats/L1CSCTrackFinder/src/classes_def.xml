@@ -1,19 +1,13 @@
 <lcgdict>
-   <class name="csc::L1Track" ClassVersion="10">
-    <version ClassVersion="10" checksum="3522733234"/>
+   <class name="csc::L1Track">
      <field name="scale" transient="true"/>
    </class>
 
-   <class name="csc::L1TrackId" ClassVersion="10">
-    <version ClassVersion="10" checksum="33053349"/>
-   </class>
+   <class name="csc::L1TrackId"/>
 
-   <class name="L1CSCSPStatusDigi" ClassVersion="10">
-    <version ClassVersion="10" checksum="3445513287"/>
-   </class>
+   <class name="L1CSCSPStatusDigi"/>
 
-   <class name="csctf::TrackStub" ClassVersion="10">
-    <version ClassVersion="10" checksum="2767475416"/>
+   <class name="csctf::TrackStub">
      <field name="thePhiBinning" transient="true"/>
      <field name="theEtaBinning" transient="true"/>
    </class>

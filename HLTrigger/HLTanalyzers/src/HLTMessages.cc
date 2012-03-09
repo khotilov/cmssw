@@ -3,6 +3,7 @@
 const char * kSubEventMap                 = "subevent map";
 const char * kHLTjets                     = "uncorrected HLT jets";
 const char * kHLTCorjets                  = "corrected HLT jets";
+const char * kHLTCorL1L2L3jets            = "corrected, L1L2L3, HLT jets";
 const char * kRecjets                     = "uncorrected reconstructed jets";
 const char * kRecCorjets                  = "corrected reconstructed jets";
 const char * kGenjets                     = "generator jets";
@@ -46,10 +47,12 @@ const char * kMucands3                    = "L3 muon candidates";
 const char * kMunovtxcands2               = "L2 no-vertex muon candidates"; 
 const char * kIsoMap2                     = "L2 muon isolation map";
 const char * kIsoMap3                     = "L3 muon isolation map";
+const char * kIsoTrk10Map3                = "L3 muon Trk10 isolation map"; 
 const char * kMulinks                     = "L3 muon link";
 const char * kOniaPixelCands              = "Pixel track candidates in resonance with a L3 muon";
 const char * kOniaTrackCands              = "Strip track candidates in resonance with a L3 muon";
 const char * kDimuvtxcands3               = "L3 dimuon vertex";
+const char * kTrkMucands                  = "Unseeded trackerMuons";  
 
 const char * kBTagJets                    = "L2 b-jet collection";
 const char * kBTagCorrectedJets           = "L2 calibrated b-jet collection";

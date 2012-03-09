@@ -16,7 +16,6 @@
 #include "CondFormats/CSCObjects/interface/CSCBadChambers.h"
 #include "CondFormats/CSCObjects/interface/CSCDBChipSpeedCorrection.h"
 #include "CondFormats/CSCObjects/interface/CSCChamberTimeCorrections.h"
-#include "CondFormats/CSCObjects/interface/CSCDBGasGainCorrection.h"
 #include "DataFormats/MuonDetId/interface/CSCIndexer.h"
 
 CSCConditions::CSCConditions( const edm::ParameterSet& ps ) 
@@ -29,14 +28,12 @@ CSCConditions::CSCConditions( const edm::ParameterSet& ps )
   theBadChambers(),
   theChipCorrections(),
   theChamberTimingCorrections(),
-  theGasGainCorrections(),
-  readBadChannels_(false), readBadChambers_(false),useTimingCorrections_(false),useGasGainCorrections_(false),
+  readBadChannels_(false), readBadChambers_(false),useTimingCorrections_(false),
   theAverageGain( -1.0 )
 {
   readBadChannels_ = ps.getParameter<bool>("readBadChannels");
   readBadChambers_ = ps.getParameter<bool>("readBadChambers");
   useTimingCorrections_ = ps.getParameter<bool>("CSCUseTimingCorrections");
-  useGasGainCorrections_ = ps.getParameter<bool>("CSCUseGasGainCorrections");
   // set size to hold all layers, using enum defined in .h
   badStripWords.resize( MAX_LAYERS, 0 );
   badWireWords.resize( MAX_LAYERS, 0 );
@@ -88,10 +85,6 @@ void CSCConditions::initializeEvent(const edm::EventSetup & es)
   if ( readBadChambers() ) {
   // Entire bad chambers
     es.get<CSCBadChambersRcd>().get( theBadChambers );
-  }
-
-  if ( useGasGainCorrections()){
-    es.get<CSCDBGasGainCorrectionRcd>().get( theGasGainCorrections );
   }
 
 //  print();
@@ -366,16 +359,4 @@ float CSCConditions::averageGain() const {
   }
 
   return theAverageGain;
-}
-//
-float CSCConditions::gasGainCorrection(const CSCDetId & detId, int strip, int wiregroup) const
-{
-  if ( useGasGainCorrections() ){
-    assert(theGasGainCorrections.isValid());
-    //printf("CSCCondition  e:%d s:%d r:%d c:%d l:%d strip:%d wire:%d\n",detId.endcap(),detId.station(),detId.ring(),detId.chamber(),detId.layer(),strip,wiregroup);
-    return float ( theGasGainCorrections->item(detId,strip,wiregroup).gainCorr );
-
-  } else {
-    return 1.;
-  }
 }

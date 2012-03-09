@@ -1,5 +1,5 @@
 // Original Author: Gero Flucke
-// last change    : $Date: 2011/06/29 20:36:10 $
+// last change    : $Date: 2010/10/26 21:34:25 $
 // by             : $Author: flucke $
 
 #ifndef MILLEPEDETREES_H
@@ -154,7 +154,6 @@ class MillePedeTrees
   // units and names for position strings (r, rphi, phi, x, y, z)
   TString ToMumMuRad(const TString &pos) const;
   TString Name(const TString &pos) const;
-  TString NamePos(UInt_t iPos) const; //0-2 are x, y, z
   TString DelName(const TString &pos) const;// { return "#Delta"+Name(pos);}
   TString DelNameU(const TString &pos) const { return DelName(pos) += Unit(pos);}
   TString Unit(const TString &pos) const;
@@ -166,8 +165,10 @@ class MillePedeTrees
   // tree names
   TString OrgPosT() const { return fOrgPos + Dot();} // nominal global positions
   TString MisPosT() const { return fMisPos + Dot();} // misaligned global positions
+  TString MisRelPosT() const { return fMisRelPos + Dot();} // misaligned
   TString MisParT() const { return fMisPar + Dot();} // misalignment
   TString PosT() const { return fPos + Dot();} // aligned global positions
+  TString RelPosT() const { return fRelPos + Dot();} // aligned
   TString ParT() const { return fPar + Dot();} // remaining misalignment
   TString MpT() const { return fMp + Dot();} // MP tree (parameter, hits,...)
 
@@ -188,8 +189,10 @@ class MillePedeTrees
   // tree names
   TString fOrgPos;    // absolute original positions from xml
   TString fMisPos;    // absolute positions with misalignment applied
+  TString fMisRelPos; // relative positions with misalignment applied (to abs. orig.?)
   TString fMisPar;    // misalignment parameters
   TString fPos;       // positions after alignment
+  TString fRelPos;    // relative positions  after alignment (to abs. orig.?)
   TString fPar;       // remaining misalign paramters after alignment (was: alignment parameters)
   TString fMp;        // specials for/from MillePede
 

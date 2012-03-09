@@ -75,12 +75,15 @@ namespace edm {
 
   void
   Run::commit_() {
+    // fill in guts of provenance here
     RunPrincipal& rp = runPrincipal();
     ProductPtrVec::iterator pit(putProducts().begin());
     ProductPtrVec::iterator pie(putProducts().end());
 
     while(pit != pie) {
-        rp.put(*pit->second, pit->first);
+        // set provenance
+        ProductProvenance prov(pit->second->branchID());
+        rp.put(*pit->second, pit->first, prov);
         // Ownership has passed, so clear the pointer.
         pit->first.reset();
         ++pit;
@@ -88,11 +91,6 @@ namespace edm {
 
     // the cleanup is all or none
     putProducts().clear();
-  }
-
-  ProcessHistoryID const&
-  Run::processHistoryID() const {
-    return runPrincipal().processHistoryID();
   }
 
   ProcessHistory const&

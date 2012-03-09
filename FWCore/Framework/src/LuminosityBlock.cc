@@ -40,12 +40,15 @@ namespace edm {
 
   void
   LuminosityBlock::commit_() {
+    // fill in guts of provenance here
     LuminosityBlockPrincipal& lbp = luminosityBlockPrincipal();
     ProductPtrVec::iterator pit(putProducts().begin());
     ProductPtrVec::iterator pie(putProducts().end());
 
     while(pit != pie) {
-        lbp.put(*pit->second, pit->first);
+        // set provenance
+        ProductProvenance prov(pit->second->branchID());
+        lbp.put(*pit->second, pit->first, prov);
         // Ownership has passed, so clear the pointer.
         pit->first.reset();
         ++pit;
@@ -53,11 +56,6 @@ namespace edm {
 
     // the cleanup is all or none
     putProducts().clear();
-  }
-
-  ProcessHistoryID const&
-  LuminosityBlock::processHistoryID() const {
-    return luminosityBlockPrincipal().processHistoryID();
   }
 
   ProcessHistory const&

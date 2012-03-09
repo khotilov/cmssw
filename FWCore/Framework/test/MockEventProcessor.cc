@@ -172,12 +172,12 @@ namespace edm {
     output_ << "\tendLumi " << run << "/" << lumi << "\n";
   }
 
-  statemachine::Run MockEventProcessor::readAndCacheRun(bool merge) {
+  statemachine::Run MockEventProcessor::readAndCacheRun() {
     output_ << "\treadAndCacheRun " << run_ << "\n";
     return statemachine::Run(ProcessHistoryID(), run_);
   }
 
-  int MockEventProcessor::readAndCacheLumi(bool merge) {
+  int MockEventProcessor::readAndCacheLumi() {
     output_ << "\treadAndCacheLumi " << lumi_ << "\n";
     return lumi_;
   }

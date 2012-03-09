@@ -48,9 +48,8 @@ namespace edm {
     void mergeAuxiliary(RunAuxiliary const& aux);
 
   private:
-    // This is the ID of the full process history (not the reduced process history).
-    // In cases where Run's are merged, the ID of the first process history encountered
-    // is stored here.
+    // most recent process that affected this run
+    // is the last on the list, this defines what "latest" is
     ProcessHistoryID processHistoryID_;
 
     // Run ID

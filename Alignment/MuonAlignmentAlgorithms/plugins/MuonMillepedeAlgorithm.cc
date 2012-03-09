@@ -89,7 +89,7 @@
 	  for(int c_job = 0; c_job < collec_number; ++c_job)
 	  {
 	    char name_f[40];
-	    snprintf(name_f, sizeof(name_f), "%s_%d/%s", collec_path.c_str(), c_job, collec_f.c_str());
+	    sprintf(name_f, "%s_%d/%s", collec_path.c_str(), c_job, collec_f.c_str());
 	    TFile file_it(name_f);
 
 	    if(file_it.IsZombie())
@@ -441,8 +441,7 @@
 		    //this->printM(residuals);
 		    
 		    char name[40];
-		    snprintf(name, sizeof(name),
-			     "Chamber_%d_%d_%d", m_Chamber.wheel(), m_Chamber.station(), m_Chamber.sector());
+		    sprintf(name, "Chamber_%d_%d_%d", m_Chamber.wheel(), m_Chamber.station(), m_Chamber.sector());
 		    std::string chamId(name);
 		    //MB4 need a special treatment
 		    /*AlgebraicMatrix invCovMB4(2,2);
@@ -517,7 +516,7 @@
 	    for(int iCount = 0; iCount < 4; ++iCount)
 	    {
 	      char name[40];
-	      snprintf(name, sizeof(name), "%s_var_%d", id.c_str(), iCount);
+	      sprintf(name, "%s_var_%d", id.c_str(), iCount);
 	      std::string idName(name);
 	      float range = 5.0;
 	      //if( iCount == 0 || iCount == 1 ) {
@@ -535,7 +534,7 @@
 	  for(int iCount = 0; iCount < 4; ++iCount)
 	  {
 	    char name[40];
-	    snprintf(name, sizeof(name), "%s_var_%d", id.c_str(), iCount);
+	    sprintf(name, "%s_var_%d", id.c_str(), iCount);
 	    std::string idName(name); 
 	    histoMap[idName]->Fill(m_res[iCount][0]);
 	  }

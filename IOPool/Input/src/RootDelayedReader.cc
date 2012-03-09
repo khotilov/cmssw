@@ -13,10 +13,12 @@ namespace edm {
 
   RootDelayedReader::RootDelayedReader(
       RootTree const& tree,
+      FileFormatVersion const& fileFormatVersion,
       boost::shared_ptr<InputFile> filePtr) :
    tree_(tree),
    filePtr_(filePtr),
-   nextReader_() {
+   nextReader_(),
+   fileFormatVersion_(fileFormatVersion) {
   }
 
   RootDelayedReader::~RootDelayedReader() {
@@ -41,7 +43,7 @@ namespace edm {
         return WrapperOwningHolder();
       }
     }
-    setRefCoreStreamer(ep);
+    setRefCoreStreamer(ep, !fileFormatVersion_.splitProductIDs(), !fileFormatVersion_.productIDIsInt());
     TClass* cp = branchInfo.classCache_;
     if(0 == cp) {
       branchInfo.classCache_ = gROOT->GetClass(branchInfo.branchDescription_.wrappedName().c_str());
@@ -50,7 +52,7 @@ namespace edm {
     void* p = cp->New();
     br->SetAddress(&p);
     tree_.getEntry(br, entryNumber());
-    setRefCoreStreamer(false);
+    setRefCoreStreamer(!fileFormatVersion_.splitProductIDs());
     WrapperOwningHolder edp(p, interface);
     return edp;
   }

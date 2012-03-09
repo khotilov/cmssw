@@ -18,6 +18,7 @@ class HLTProcess(object):
     "AlCa_RPCMuonNoHits_v*",
     "AlCa_RPCMuonNoTriggers_v*",
     "AlCa_RPCMuonNormalisation_v*",
+    "AlCa_LumiPixels_v*",
     "DQM_FEDIntegrity_v*",
     "HLT_Calibration_v*",
     "HLT_EcalCalibration_v*",
@@ -46,6 +47,9 @@ class HLTProcess(object):
 
     "HLT_HT250_DoubleDisplacedJet60_v*",
     "HLT_HT250_DoubleDisplacedJet60_PromptTrack_v*",
+
+    # new in "5e33"
+    "HLT_Mu17_TkMu8_v*",
   )
 
   def __init__(self, configuration):
@@ -179,137 +183,98 @@ import os
 cmsswVersion = os.environ['CMSSW_VERSION']
 """
 
-    # from CMSSW_4_4_0 / CMSSW_5_0_0_pre1: change input label for V00-04-17-00 RecoVertex/BeamSpotProducer
-    if not self.config.fastsim:
-      self.data += """
-# from CMSSW_4_4_0 / CMSSW_5_0_0_pre1: change input label for V00-04-17-00 RecoVertex/BeamSpotProducer
-if cmsswVersion > "CMSSW_4_4":
-    if 'hltOnlineBeamSpot' in %(dict)s:
-        %(process)shltOnlineBeamSpot.src = %(process)shltOnlineBeamSpot.label
-        del %(process)shltOnlineBeamSpot.label
-"""
-
-    # from CMSSW_4_4_0_pre8: update HF configuration for V00-09-18 RecoLocalCalo/HcalRecProducers
-    if not self.config.fastsim:
-      self.data += """
-# from CMSSW_4_4_0_pre8: update HF configuration for V00-09-18 RecoLocalCalo/HcalRecProducers
-if cmsswVersion > "CMSSW_4_4":
-    if 'hltHfreco' in %(dict)s:
-        %(process)shltHfreco.digiTimeFromDB = cms.bool( False )
-        %(process)shltHfreco.digistat.HFdigiflagCoef = cms.vdouble(
-            %(process)shltHfreco.digistat.HFdigiflagCoef0.value(),
-            %(process)shltHfreco.digistat.HFdigiflagCoef1.value(),
-            %(process)shltHfreco.digistat.HFdigiflagCoef2.value()
+    self.data += """
+# from CMSSW_5_0_0_pre6: ESSource -> ESProducer in JetMETCorrections/Modules
+if cmsswVersion > "CMSSW_5_0":
+    if 'hltESSAK5CaloL2L3' in %(dict)s:
+        %(process)shltESSAK5CaloL2L3 = cms.ESProducer( "JetCorrectionESChain",
+            appendToDataLabel = cms.string( "" ),
+            correctors = cms.vstring( 'hltESSL2RelativeCorrectionService',
+                'hltESSL3AbsoluteCorrectionService' ),
+            label = cms.string( "hltESSAK5CaloL2L3" )
         )
-        del %(process)shltHfreco.digistat.HFdigiflagCoef0
-        del %(process)shltHfreco.digistat.HFdigiflagCoef1
-        del %(process)shltHfreco.digistat.HFdigiflagCoef2
-"""
-
-    # from CMSSW_4_4_0_pre6: updated configuration for the HybridClusterProducer's and EgammaHLTHybridClusterProducer's
-    self.data += """
-# from CMSSW_4_4_0_pre6: updated configuration for the HybridClusterProducer's and EgammaHLTHybridClusterProducer's
-if cmsswVersion > "CMSSW_4_4":
-    if 'hltHybridSuperClustersActivity' in %(dict)s:
-        %(process)shltHybridSuperClustersActivity.xi               = cms.double( 0.0 )
-        %(process)shltHybridSuperClustersActivity.useEtForXi       = cms.bool( False )
-    if 'hltHybridSuperClustersL1Isolated' in %(dict)s:
-        %(process)shltHybridSuperClustersL1Isolated.xi             = cms.double( 0.0 )
-        %(process)shltHybridSuperClustersL1Isolated.useEtForXi     = cms.bool( False )
-    if 'hltHybridSuperClustersL1NonIsolated' in %(dict)s:
-        %(process)shltHybridSuperClustersL1NonIsolated.xi          = cms.double( 0.0 )
-        %(process)shltHybridSuperClustersL1NonIsolated.useEtForXi  = cms.bool( False )
-"""
-
-    # from CMSSW_4_4_0_pre5: updated configuration for the PFRecoTauDiscriminationByIsolation producers
-    self.data += """
-# from CMSSW_4_4_0_pre5: updated configuration for the PFRecoTauDiscriminationByIsolation producers
-if cmsswVersion > "CMSSW_4_4":
-    if 'hltPFTauTightIsoIsolationDiscriminator' in %(dict)s:
-        %(process)shltPFTauTightIsoIsolationDiscriminator.qualityCuts.primaryVertexSrc = %(process)shltPFTauTightIsoIsolationDiscriminator.PVProducer
-        %(process)shltPFTauTightIsoIsolationDiscriminator.qualityCuts.pvFindingAlgo    = cms.string('highestPtInEvent')
-        del %(process)shltPFTauTightIsoIsolationDiscriminator.PVProducer
-    if 'hltPFTauLooseIsolationDiscriminator' in %(dict)s:
-        %(process)shltPFTauLooseIsolationDiscriminator.qualityCuts.primaryVertexSrc = %(process)shltPFTauLooseIsolationDiscriminator.PVProducer
-        %(process)shltPFTauLooseIsolationDiscriminator.qualityCuts.pvFindingAlgo    = cms.string('highestPtInEvent')
-        del %(process)shltPFTauLooseIsolationDiscriminator.PVProducer
-"""
-
-    # from CMSSW_4_4_0_pre5: updated configuration for the EcalSeverityLevelESProducer
-    self.data += """
-# from CMSSW_4_4_0_pre5: updated configuration for the EcalSeverityLevelESProducer
-if cmsswVersion > "CMSSW_4_4":
-    %(process)secalSeverityLevel = cms.ESProducer("EcalSeverityLevelESProducer",
-        appendToDataLabel = cms.string(''),
-        dbstatusMask=cms.PSet(
-            kGood        = cms.vuint32(0),
-            kProblematic = cms.vuint32(1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-            kRecovered   = cms.vuint32(),
-            kTime        = cms.vuint32(),
-            kWeird       = cms.vuint32(),
-            kBad         = cms.vuint32(11, 12, 13, 14, 15, 16)
-        ),
-        flagMask = cms.PSet (
-            kGood        = cms.vstring('kGood'),
-            kProblematic = cms.vstring('kPoorReco', 'kPoorCalib', 'kNoisy', 'kSaturated'),
-            kRecovered   = cms.vstring('kLeadingEdgeRecovered', 'kTowerRecovered'),
-            kTime        = cms.vstring('kOutOfTime'),
-            kWeird       = cms.vstring('kWeird', 'kDiWeird'),
-            kBad         = cms.vstring('kFaultyHardware', 'kDead', 'kKilled')
-        ),
-        timeThresh = cms.double(2.0)
-    )
-"""
-
-    # from CMSSW_4_4_0_pre3: additional ESProducer in cfg files
-    if not self.config.fragment:
-      self.data += """
-# from CMSSW_4_4_0_pre3: additional ESProducer in cfg files
-if cmsswVersion > "CMSSW_4_4":
-    %(process)shltSiPixelQualityESProducer = cms.ESProducer("SiPixelQualityESProducer",
-        ListOfRecordToMerge = cms.VPSet(
-            cms.PSet( record = cms.string("SiPixelQualityFromDbRcd"),
-                      tag    = cms.string("")
-                    ),
-            cms.PSet( record = cms.string("SiPixelDetVOffRcd"),
-                      tag    = cms.string("")
-                    )
+    if 'hltESSAK5CaloL1L2L3' in %(dict)s:
+        %(process)shltESSAK5CaloL1L2L3 = cms.ESProducer( "JetCorrectionESChain",
+            appendToDataLabel = cms.string( "" ),
+            correctors = cms.vstring( 'hltESSL1FastJetCorrectionService',
+                'hltESSL2RelativeCorrectionService',
+                'hltESSL3AbsoluteCorrectionService' ),
+            label = cms.string( "hltESSAK5CaloL1L2L3" )
         )
-    )
-"""
-
-    # from CMSSW_4_3_0_pre6: additional ESProducer in cfg files
-    if not self.config.fragment:
-      self.data += """
-# from CMSSW_4_3_0_pre6: additional ESProducer in cfg files
-if cmsswVersion > "CMSSW_4_3":
-    %(process)shltESPStripLorentzAngleDep = cms.ESProducer("SiStripLorentzAngleDepESProducer",
-        LatencyRecord = cms.PSet(
-            record = cms.string('SiStripLatencyRcd'),
-            label = cms.untracked.string('')
-        ),
-        LorentzAngleDeconvMode = cms.PSet(
-            record = cms.string('SiStripLorentzAngleRcd'),
-            label = cms.untracked.string('deconvolution')
-        ),
-        LorentzAnglePeakMode = cms.PSet(
-            record = cms.string('SiStripLorentzAngleRcd'),
-            label = cms.untracked.string('peak')
+    if 'hltESSL1FastJetCorrectionService' in %(dict)s:
+        %(process)shltESSL1FastJetCorrectionService = cms.ESProducer( "L1FastjetCorrectionESProducer",
+            appendToDataLabel = cms.string( "" ),
+#           era = cms.string( "Jec10V1" ),
+            level = cms.string( "L1FastJet" ),
+            algorithm = cms.string( "AK5Calo" ),
+#           section = cms.string( "" ),
+            srcRho = cms.InputTag( 'hltKT6CaloJets','rho' )#,
+#           useCondDB = cms.untracked.bool( True )
         )
-    )
+    if 'hltESSL2RelativeCorrectionService' in %(dict)s:
+        %(process)shltESSL2RelativeCorrectionService = cms.ESProducer( "LXXXCorrectionESProducer",
+            appendToDataLabel = cms.string( "" ),
+            level = cms.string( "L2Relative" ),
+            algorithm = cms.string( "AK5Calo" )#,
+#           section = cms.string( "" ),
+#           era = cms.string( "" ),
+#           useCondDB = cms.untracked.bool( True )
+        )
+    if 'hltESSL3AbsoluteCorrectionService' in %(dict)s:
+        %(process)shltESSL3AbsoluteCorrectionService = cms.ESProducer( "LXXXCorrectionESProducer",
+            appendToDataLabel = cms.string( "" ),
+            level = cms.string( "L3Absolute" ),
+            algorithm = cms.string( "AK5Calo" )#,
+#           section = cms.string( "" )#,
+#           era = cms.string( "" ),
+#           useCondDB = cms.untracked.bool( True )
+        )
 """
-
-    # from CMSSW_4_3_0_pre6: ECAL severity flags migration
-    self.data += """
-# from CMSSW_4_3_0_pre6: ECAL severity flags migration
-if cmsswVersion > "CMSSW_4_3":
-  import HLTrigger.Configuration.Tools.updateEcalSeverityFlags
-  HLTrigger.Configuration.Tools.updateEcalSeverityFlags.update( %(dict)s )
-"""
-
+    if self.config.data:
+      self.data += """
+# from CMSSW_5_0_0_pre6: RawDataLikeMC=False (to keep "source")
+if cmsswVersion > "CMSSW_5_0":
+    if 'source' in %(dict)s:
+        %(process)ssource.labelRawDataLikeMC = cms.untracked.bool( False )
+"""        
 
   # customize the configuration according to the options
   def customize(self):
+
+    # manual override some parameters
+    if self.config.type in ('GRun', ):
+      self.data += """
+# En-able HF Noise filters in GRun menu
+if 'hltHfreco' in %(dict)s:
+    %(process)shltHfreco.setNoiseFlags = cms.bool( True )
+"""
+    if self.config.type in ('HIon', ):
+      self.data += """
+# Disable HF Noise filters in HIon menu
+if 'hltHfreco' in %(dict)s:
+    %(process)shltHfreco.setNoiseFlags = cms.bool( False )
+"""
+
+## Use L1 menu from xml file
+#  ...removed in favor of sqlite file    
+#%(process)sl1GtTriggerMenuXml = cms.ESProducer("L1GtTriggerMenuXmlProducer",
+#    TriggerMenuLuminosity = cms.string('startup'),
+#    DefXmlFile = cms.string('L1Menu_CollisionsHeavyIons2011_v0_L1T_Scales_20101224_Imp0_0x1026.xml'),
+#    VmeXmlFile = cms.string('')
+#)
+#%(process)sL1GtTriggerMenuRcdSource = cms.ESSource("EmptyESSource",
+#    recordName = cms.string('L1GtTriggerMenuRcd'),
+#    iovIsRunNotTime = cms.bool(True),
+#    firstValid = cms.vuint32(1)
+#)
+
+#    # untracked parameter with no default in the code
+#    if not self.config.data:
+#      self.data += """
+## untracked parameter with no default in the code
+#if 'hltHcalDataIntegrityMonitor' in %(dict)s:
+#    %(process)shltHcalDataIntegrityMonitor.RawDataLabel = cms.untracked.InputTag("rawDataCollector")
+#"""
 
     if self.config.fragment:
       # if running on MC, adapt the configuration accordingly
@@ -342,20 +307,6 @@ if cmsswVersion > "CMSSW_4_3":
 
       # if requested, override all ED/HLTfilters to always pass ("open" mode)
       self.instrumentOpenMode()
-
-      # manual override some Heavy Ion parameters
-      if self.config.type in ('HIon', ):
-        self.data += """
-# HIon paths in smart prescalers
-if 'hltPreDQMOutputSmart' in %(dict)s:
-    %(process)shltPreDQMOutputSmart.throw     = cms.bool( False )
-if 'hltPreExpressOutputSmart' in %(dict)s:
-    %(process)shltPreExpressOutputSmart.throw = cms.bool( False )
-if 'hltPreHLTDQMOutputSmart' in %(dict)s:
-    %(process)shltPreHLTDQMOutputSmart.throw  = cms.bool( False )
-if 'hltPreHLTMONOutputSmart' in %(dict)s:
-    %(process)shltPreHLTMONOutputSmart.throw  = cms.bool( False )
-"""
 
       # override the output modules to output root files
       self.overrideOutput()
@@ -618,7 +569,7 @@ process = HLTrigger.Configuration.customizeHLTforL1Emulator.%(CustomHLT)s( proce
     # override the "online" ShmStreamConsumer output modules with "offline" PoolOutputModule's
     self.data = re.sub(
       r'\b(process\.)?hltOutput(\w+) *= *cms\.OutputModule\( *"ShmStreamConsumer" *,',
-      r'%(process)shltOutput\2 = cms.OutputModule( "PoolOutputModule",\n    fileName = cms.untracked.string( "output\2.root" ),\n    fastCloning = cms.untracked.bool( False ),',
+      r'%(process)shltOutput\2 = cms.OutputModule( "PoolOutputModule",\n    fileName = cms.untracked.string( "output\2.root" ),\n    fastCloning = cms.untracked.bool( False ),\n    dataset = cms.untracked.PSet(\n        filterName = cms.untracked.string( "" ),\n        dataTier = cms.untracked.string( "RAW" )\n    ),',
       self.data
     )
 
@@ -647,23 +598,35 @@ process = HLTrigger.Configuration.customizeHLTforL1Emulator.%(CustomHLT)s( proce
 
 # adapt HLT modules to the correct process name
 if 'hltTrigReport' in %%(dict)s:
-    %%(process)shltTrigReport.HLTriggerResults       = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+    %%(process)shltTrigReport.HLTriggerResults                    = cms.InputTag( 'TriggerResults', '', '%(name)s' )
 
-if 'hltPreExpressSmart' in %%(dict)s:
-    %%(process)shltPreExpressSmart.TriggerResultsTag = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+if 'hltPreExpressCosmicsOutputSmart' in %%(dict)s:
+    %%(process)shltPreExpressCosmicsOutputSmart.TriggerResultsTag = cms.InputTag( 'TriggerResults', '', '%(name)s' )
 
-if 'hltPreHLTMONSmart' in %%(dict)s:
-    %%(process)shltPreHLTMONSmart.TriggerResultsTag  = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+if 'hltPreExpressOutputSmart' in %%(dict)s:
+    %%(process)shltPreExpressOutputSmart.TriggerResultsTag        = cms.InputTag( 'TriggerResults', '', '%(name)s' )
 
-if 'hltPreDQMSmart' in %%(dict)s:
-    %%(process)shltPreDQMSmart.TriggerResultsTag     = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+if 'hltPreDQMForHIOutputSmart' in %%(dict)s:
+    %%(process)shltPreDQMForHIOutputSmart.TriggerResultsTag       = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+
+if 'hltPreDQMForPPOutputSmart' in %%(dict)s:
+    %%(process)shltPreDQMForPPOutputSmart.TriggerResultsTag       = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+
+if 'hltPreHLTDQMResultsOutputSmart' in %%(dict)s:
+    %%(process)shltPreHLTDQMResultsOutputSmart.TriggerResultsTag  = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+
+if 'hltPreHLTDQMOutputSmart' in %%(dict)s:
+    %%(process)shltPreHLTDQMOutputSmart.TriggerResultsTag         = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+
+if 'hltPreHLTMONOutputSmart' in %%(dict)s:
+    %%(process)shltPreHLTMONOutputSmart.TriggerResultsTag         = cms.InputTag( 'TriggerResults', '', '%(name)s' )
 
 if 'hltDQMHLTScalers' in %%(dict)s:
-    %%(process)shltDQMHLTScalers.triggerResults      = cms.InputTag( 'TriggerResults', '', '%(name)s' )
-    %%(process)shltDQMHLTScalers.processname         = '%(name)s'
+    %%(process)shltDQMHLTScalers.triggerResults                   = cms.InputTag( 'TriggerResults', '', '%(name)s' )
+    %%(process)shltDQMHLTScalers.processname                      = '%(name)s'
 
 if 'hltDQML1SeedLogicScalers' in %%(dict)s:
-    %%(process)shltDQML1SeedLogicScalers.processname = '%(name)s'
+    %%(process)shltDQML1SeedLogicScalers.processname              = '%(name)s'
 """ % self.config.__dict__
 
 

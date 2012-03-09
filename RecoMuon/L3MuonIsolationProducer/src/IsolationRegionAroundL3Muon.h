@@ -30,7 +30,6 @@ public:
 
     theDeltaEta = regionPSet.getParameter<double>("deltaEtaRegion");
     theDeltaPhi =  regionPSet.getParameter<double>("deltaPhiRegion");
-    theMeasurementTrackerName = regionPSet.getParameter<std::string>("measurementTrackerName"); 
   }   
 
   virtual ~IsolationRegionAroundL3Muon(){}
@@ -65,8 +64,7 @@ public:
       GlobalVector dirVector((iTrk)->px(),(iTrk)->py(),(iTrk)->pz());
       result.push_back( 
           new RectangularEtaPhiTrackingRegion( dirVector, GlobalPoint(0,0,float(vz)), 
-					       thePtMin, theOriginRadius, deltaZVertex, theDeltaEta, theDeltaPhi,
-					       0,true,theMeasurementTrackerName) );
+          thePtMin, theOriginRadius, deltaZVertex, theDeltaEta, theDeltaPhi) );
     }
 
     return result;
@@ -85,7 +83,6 @@ private:
 
   double theDeltaEta; 
   double theDeltaPhi;
-  std::string theMeasurementTrackerName;
 };
 
 #endif 

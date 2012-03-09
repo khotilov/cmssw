@@ -32,6 +32,7 @@ HLTAnalyzer::HLTAnalyzer(edm::ParameterSet const& conf) {
 
     hltjets_          = conf.getParameter<edm::InputTag> ("hltjets");
     hltcorjets_       = conf.getParameter<edm::InputTag> ("hltcorjets");    
+    hltcorL1L2L3jets_ = conf.getParameter<edm::InputTag> ("hltcorL1L2L3jets");    
     recjets_          = conf.getParameter<edm::InputTag> ("recjets");
     reccorjets_       = conf.getParameter<edm::InputTag> ("reccorjets");
     genjets_          = conf.getParameter<edm::InputTag> ("genjets");
@@ -80,6 +81,8 @@ HLTAnalyzer::HLTAnalyzer(edm::ParameterSet const& conf) {
     MuNoVtxCandTag2_     = conf.getParameter<edm::InputTag> ("MuNoVtxCandTag2");
     MuCandTag3_          = conf.getParameter<edm::InputTag> ("MuCandTag3");
     MuIsolTag3_          = conf.getParameter<edm::InputTag> ("MuIsolTag3");
+    MuTrkIsolTag3_       = conf.getParameter<edm::InputTag> ("MuTrkIsolTag3");
+    TrackerMuonTag_      = conf.getParameter<edm::InputTag> ("TrackerMuonTag");
     oniaPixelTag_        = conf.getParameter<edm::InputTag> ("OniaPixelTag");
     oniaTrackTag_        = conf.getParameter<edm::InputTag> ("OniaTrackTag");
     DiMuVtx_             = conf.getParameter<edm::InputTag> ("DiMuVtx");
@@ -203,7 +206,7 @@ HLTAnalyzer::HLTAnalyzer(edm::ParameterSet const& conf) {
     track_analysis_.setup(conf, HltTree);
     mct_analysis_.setup(conf, HltTree);
     hlt_analysis_.setup(conf, HltTree);
-    //    vrt_analysisHLT_.setup(conf, HltTree, "HLT");
+    vrt_analysisHLT_.setup(conf, HltTree, "HLT");
     vrt_analysisOffline0_.setup(conf, HltTree, "Offline0");
     evt_header_.setup(HltTree);
 }
@@ -229,6 +232,7 @@ void HLTAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
     // to retrieve from event "iEvent".
     edm::Handle<reco::CaloJetCollection>              hltjets;
     edm::Handle<reco::CaloJetCollection>              hltcorjets;
+    edm::Handle<reco::CaloJetCollection>              hltcorL1L2L3jets;
     edm::Handle<reco::CaloJetCollection>              recjets;
     edm::Handle<reco::CaloJetCollection>              reccorjets;
     edm::Handle<reco::GenJetCollection>               genjets;
@@ -254,12 +258,13 @@ void HLTAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
     
     edm::Handle<reco::RecoChargedCandidateCollection> mucands2, mucands3, munovtxcands2;
     edm::Handle<reco::RecoChargedCandidateCollection> oniaPixelCands, oniaTrackCands;
-    edm::Handle<reco::VertexCollection> dimuvtxcands3;
-    edm::Handle<edm::ValueMap<bool> >                 isoMap2,  isoMap3;
+    edm::Handle<reco::VertexCollection>               dimuvtxcands3;
+    edm::Handle<reco::MuonCollection>                 trkmucands;
+    edm::Handle<edm::ValueMap<bool> >                 isoMap2,  isoMap3, isoTrk10Map3;
     edm::Handle<reco::HLTTauCollection>               taus;
-    edm::Handle<reco::PFTauCollection>               pftaus;
-    edm::Handle<reco::PFTauCollection>               pftausTightCone;
-    edm::Handle<reco::PFJetCollection>               pfjets;
+    edm::Handle<reco::PFTauCollection>                pftaus;
+    edm::Handle<reco::PFTauCollection>                pftausTightCone;
+    edm::Handle<reco::PFJetCollection>                pfjets;
     
     // offline reco tau collection and discriminators
     edm::Handle<reco::PFTauCollection>  recoPftaus;
@@ -384,6 +389,7 @@ void HLTAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
     
     getCollection( iEvent, missing, hltjets,         hltjets_,           kHLTjets );
     getCollection( iEvent, missing, hltcorjets,      hltcorjets_,        kHLTCorjets );
+    getCollection( iEvent, missing, hltcorL1L2L3jets,hltcorL1L2L3jets_,  kHLTCorL1L2L3jets );
     getCollection( iEvent, missing, recjets,         recjets_,           kRecjets );
     getCollection( iEvent, missing, reccorjets,      reccorjets_,        kRecCorjets );
     getCollection( iEvent, missing, genjets,         genjets_,           kGenjets );
@@ -425,11 +431,13 @@ void HLTAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
     getCollection( iEvent, missing, mucands2,        MuCandTag2_,        kMucands2 );
     getCollection( iEvent, missing, munovtxcands2,   MuNoVtxCandTag2_,   kMunovtxcands2 ); 
     getCollection( iEvent, missing, mucands3,        MuCandTag3_,        kMucands3 );
-    getCollection( iEvent, missing, oniaPixelCands,        oniaPixelTag_,        kOniaPixelCands );
-    getCollection( iEvent, missing, oniaTrackCands,        oniaTrackTag_,        kOniaTrackCands );
+    getCollection( iEvent, missing, oniaPixelCands,  oniaPixelTag_,      kOniaPixelCands );
+    getCollection( iEvent, missing, oniaTrackCands,  oniaTrackTag_,      kOniaTrackCands );
+    getCollection( iEvent, missing, trkmucands,      TrackerMuonTag_,    kTrkMucands );
     getCollection( iEvent, missing, dimuvtxcands3,   DiMuVtx_,           kDimuvtxcands3 );
     getCollection( iEvent, missing, isoMap2,         MuIsolTag2_,        kIsoMap2 );
     getCollection( iEvent, missing, isoMap3,         MuIsolTag3_,        kIsoMap3 );
+    getCollection( iEvent, missing, isoTrk10Map3,    MuTrkIsolTag3_,     kIsoTrk10Map3 ); 
     getCollection( iEvent, missing, hRawBJets,                m_rawBJets,                 kBTagJets );
     getCollection( iEvent, missing, hCorrectedBJets,          m_correctedBJets,           kBTagCorrectedJets );
     getCollection( iEvent, missing, hLifetimeBJetsL25,        m_lifetimeBJetsL25,         kBTagLifetimeBJetsL25 );
@@ -526,6 +534,7 @@ void HLTAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
     jet_analysis_.analyze(iEvent,
 			  hltjets,
 			  hltcorjets,
+                    	  hltcorL1L2L3jets,
                           recjets,
                           reccorjets,
                           genjets,
@@ -559,10 +568,12 @@ void HLTAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
                            isoMap2,
                            mucands3,
                            isoMap3,
+			   isoTrk10Map3,
                            oniaPixelCands,
                            oniaTrackCands,
 			   dimuvtxcands3,
 			   munovtxcands2,
+			   trkmucands,
 			   theMagField,
                            recoBeamSpotHandle,
 			   // BSPosition,
@@ -656,9 +667,9 @@ void HLTAnalyzer::analyze(edm::Event const& iEvent, edm::EventSetup const& iSetu
                            hPerformanceBJetsL3,
                            HltTree);
 
-    //    vrt_analysisHLT_.analyze(
-    //                          recoVertexsHLT,
-    //			  HltTree);
+    vrt_analysisHLT_.analyze(
+			     recoVertexsHLT,
+			     HltTree);
 
     vrt_analysisOffline0_.analyze(
 			     recoVertexsOffline0,

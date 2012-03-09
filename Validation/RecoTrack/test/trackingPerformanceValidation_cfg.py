@@ -52,10 +52,10 @@ process.multiTrackValidator.nintpT = cms.int32(40)
 process.multiTrackValidator.skipHistoFit=cms.untracked.bool(False)
 
 process.multiTrackValidator.label = ['TRACKS']
-#if (process.multiTrackValidator.label[0] == 'generalTracks'):
-#    process.multiTrackValidator.UseAssociators = cms.bool(False)
-#else:
-#    process.multiTrackValidator.UseAssociators = cms.bool(True)
+if (process.multiTrackValidator.label[0] == 'generalTracks'):
+    process.multiTrackValidator.UseAssociators = cms.bool(False)
+else:
+    process.multiTrackValidator.UseAssociators = cms.bool(True)
 ######
 
 
@@ -71,14 +71,14 @@ process.options = cms.untracked.PSet(
 )
 
 
-process.digi2track = cms.Sequence(process.siPixelDigis*process.siStripDigis*
+process.digi2track = cms.Sequence(process.siPixelDigis*process.SiStripRawToDigis*
                                   process.trackerlocalreco*
                                   process.ckftracks*
                                   process.cutsRecoTracks*
                                   process.multiTrackValidator)
 #redo also tracking particles
 process.digi2track_and_TP = cms.Sequence(process.mix*process.trackingParticles*
-                                  process.siPixelDigis*process.siStripDigis*
+                                  process.siPixelDigis*process.SiStripRawToDigis*
                                   process.trackerlocalreco*
                                   process.ckftracks*
                                   process.cutsRecoTracks*
@@ -163,4 +163,5 @@ process.harvesting= cms.Sequence(process.EDMtoMEConverter*process.postValidation
 ### final path and endPath
 process.p = cms.Path(process.SEQUENCE)
 #process.outpath = cms.EndPath(process.OUTPUT)
+
 

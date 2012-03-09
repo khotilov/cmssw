@@ -4,8 +4,8 @@
 /**
  * Author     : Gero Flucke (based on code for ORCA by Edmund Widl)
  * date       : 2006/09/17
- * last update: $Date: 2010/09/10 12:11:39 $
- * by         : $Author: mussgill $
+ * last update: $Date: 2009/12/17 12:28:06 $
+ * by         : $Author: flucke $
  *
  * Base class for reference 'trajectories' of single- or multiparticles
  * stated.
@@ -161,16 +161,15 @@ public:
 
   inline unsigned int numberOfHits() const { return theNumberOfHits; }
   inline unsigned int numberOfPar() const { return theNumberOfPars; }
-  inline unsigned int numberOfVirtualMeas() const { return theNumberOfVirtualMeas; }  
-  inline unsigned int numberOfVirtualPar() const { return theNumberOfVirtualPars; }  
+  inline unsigned int numberOfMsMeas() const { return theNumberOfMsMeas; }  
+  inline unsigned int numberOfMsPar() const { return theNumberOfMsPars; }  
   inline unsigned int numberOfHitMeas() const { return theNumberOfHits * nMeasPerHit; } 
      
   virtual ReferenceTrajectoryBase* clone() const = 0;
 
 protected:
 
-  explicit ReferenceTrajectoryBase(unsigned int nPar, unsigned int nHits,
-				   unsigned int nVirtualPar, unsigned int nVirtualMeas);
+  explicit ReferenceTrajectoryBase(unsigned int nPar, unsigned int nHits, unsigned int nMsPar, unsigned int nMsMeas);
 
   unsigned int numberOfUsedRecHits(const TransientTrackingRecHit::ConstRecHitContainer &recHits) const;
   bool useRecHit(const TransientTrackingRecHit::ConstRecHitPointer& hitPtr) const;
@@ -180,8 +179,8 @@ protected:
 
   unsigned int theNumberOfHits;   // number of (measurements from) hits
   unsigned int theNumberOfPars;   // number of (track) parameters
-  unsigned int theNumberOfVirtualMeas; // number of virtual measurements
-  unsigned int theNumberOfVirtualPars; // number of parameters for virtual measurements
+  unsigned int theNumberOfMsMeas; // number of measurements for multiple scattering
+  unsigned int theNumberOfMsPars; // number of parameters   for multiple scattering 
       
   std::vector<TrajectoryStateOnSurface> theTsosVec;
   TransientTrackingRecHit::ConstRecHitContainer theRecHits;

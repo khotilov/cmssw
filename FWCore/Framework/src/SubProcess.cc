@@ -2,16 +2,9 @@
 
 #include "DataFormats/Common/interface/ProductData.h"
 #include "DataFormats/Provenance/interface/BranchID.h"
-#include "DataFormats/Provenance/interface/EventSelectionID.h"
-#include "DataFormats/Provenance/interface/FullHistoryToReducedHistoryMap.h"
-#include "DataFormats/Provenance/interface/ProcessHistoryID.h"
-#include "DataFormats/Provenance/interface/ProcessHistoryRegistry.h"
-#include "DataFormats/Provenance/interface/ProductRegistry.h"
 #include "DataFormats/Provenance/interface/LuminosityBlockAuxiliary.h"
 #include "DataFormats/Provenance/interface/RunAuxiliary.h"
-#include "FWCore/Framework/interface/EventPrincipal.h"
 #include "FWCore/Framework/interface/Group.h"
-#include "FWCore/Framework/interface/HistoryAppender.h"
 #include "FWCore/Framework/interface/LuminosityBlockPrincipal.h"
 #include "FWCore/Framework/interface/OccurrenceTraits.h"
 #include "FWCore/Framework/interface/RunPrincipal.h"
@@ -45,7 +38,6 @@ namespace edm {
       esp_(),
       schedule_(),
       parentToChildPhID_(),
-      historyAppender_(new HistoryAppender),
       esInfo_(0),
       subProcess_() {
 
@@ -107,10 +99,7 @@ namespace edm {
     preg_ = items.preg_;
     processConfiguration_ = items.processConfiguration_;
 
-    std::map<std::string, std::vector<std::pair<std::string, int> > > outputModulePathPositions;
-    setEventSelectionInfo(outputModulePathPositions, parentProductRegistry->anyProductProduced());
-
-    boost::shared_ptr<EventPrincipal> ep(new EventPrincipal(preg_, *processConfiguration_, historyAppender_.get()));
+    boost::shared_ptr<EventPrincipal> ep(new EventPrincipal(preg_, *processConfiguration_));
     principalCache_.insert(ep);
 
     if(subProcessParameterSet) {
@@ -177,18 +166,11 @@ namespace edm {
   SubProcess::write(EventPrincipal const& principal) {
     EventAuxiliary aux(principal.aux());
     aux.setProcessHistoryID(principal.processHistoryID());
-
-    boost::shared_ptr<EventSelectionIDVector> esids(new EventSelectionIDVector);
-    *esids = principal.eventSelectionIDs();
-    if (principal.productRegistry().anyProductProduced() || !wantAllEvents()) {
-      esids->push_back(selectorConfig());
-    }
-
     EventPrincipal& ep = principalCache_.eventPrincipal();
     ep.fillEventPrincipal(aux,
                           principalCache_.lumiPrincipalPtr(),
-                          esids,
-                          boost::shared_ptr<BranchListIndexes>(new BranchListIndexes(principal.branchListIndexes())),
+                          boost::shared_ptr<EventSelectionIDVector>(new EventSelectionIDVector), // UGH use subprocess specific parameter
+                          boost::shared_ptr<BranchListIndexes>(new BranchListIndexes), // UGH figure this out
                           principal.branchMapperPtr(),
                           principal.reader());
     propagateProducts(InEvent, principal, ep);
@@ -211,16 +193,11 @@ namespace edm {
   SubProcess::beginRun(RunPrincipal const& principal) {
     boost::shared_ptr<RunAuxiliary> aux(new RunAuxiliary(principal.aux()));
     aux->setProcessHistoryID(principal.processHistoryID());
-    boost::shared_ptr<RunPrincipal> rpp(new RunPrincipal(aux, preg_, *processConfiguration_, historyAppender_.get()));
-    rpp->fillRunPrincipal(principal.reader());
+    boost::shared_ptr<RunPrincipal> rpp(new RunPrincipal(aux, preg_, *processConfiguration_));
+    rpp->fillRunPrincipal(principal.branchMapperPtr(), principal.reader());
     principalCache_.insert(rpp);
-
-    FullHistoryToReducedHistoryMap & phidConverter(ProcessHistoryRegistry::instance()->extra());
-    ProcessHistoryID const& parentInputReducedPHID = phidConverter.reduceProcessHistoryID(principal.aux().processHistoryID());
-    ProcessHistoryID const& inputReducedPHID       = phidConverter.reduceProcessHistoryID(principal.processHistoryID());
-
-    parentToChildPhID_.insert(std::make_pair(parentInputReducedPHID,inputReducedPHID));
-
+    parentToChildPhID_.insert(std::make_pair(principal.aux().processHistoryID(), principal.processHistoryID()));
+    parentToChildPhID_.insert(std::make_pair(principal.processHistoryID(), rpp->processHistoryID()));
     RunPrincipal& rp = *principalCache_.runPrincipalPtr();
     propagateProducts(InRun, principal, rp);
     typedef OccurrenceTraits<RunPrincipal, BranchActionBegin> Traits;
@@ -256,14 +233,6 @@ namespace edm {
   }
 
   void
-  SubProcess::deleteRunFromCache(ProcessHistoryID const& parentPhID, int runNumber) {
-    std::map<ProcessHistoryID, ProcessHistoryID>::const_iterator it = parentToChildPhID_.find(parentPhID);
-    assert(it != parentToChildPhID_.end());
-    principalCache_.deleteRun(it->second, runNumber);
-    if(subProcess_.get()) subProcess_->deleteRunFromCache(it->second, runNumber);
-  }
-
-  void
   SubProcess::doBeginLuminosityBlock(LuminosityBlockPrincipal const& principal, IOVSyncValue const& ts) {
     ServiceRegistry::Operate operate(serviceToken_);
     esInfo_.reset(new ESInfo(ts, *esp_));
@@ -276,9 +245,11 @@ namespace edm {
   SubProcess::beginLuminosityBlock(LuminosityBlockPrincipal const& principal) {
     boost::shared_ptr<LuminosityBlockAuxiliary> aux(new LuminosityBlockAuxiliary(principal.aux()));
     aux->setProcessHistoryID(principal.processHistoryID());
-    boost::shared_ptr<LuminosityBlockPrincipal> lbpp(new LuminosityBlockPrincipal(aux, preg_, *processConfiguration_, principalCache_.runPrincipalPtr(), historyAppender_.get()));
-    lbpp->fillLuminosityBlockPrincipal(principal.reader());
+    boost::shared_ptr<LuminosityBlockPrincipal> lbpp(new LuminosityBlockPrincipal(aux, preg_, *processConfiguration_, principalCache_.runPrincipalPtr()));
+    lbpp->fillLuminosityBlockPrincipal(principal.branchMapperPtr(), principal.reader());
     principalCache_.insert(lbpp);
+    parentToChildPhID_.insert(std::make_pair(principal.aux().processHistoryID(), principal.processHistoryID()));
+    parentToChildPhID_.insert(std::make_pair(principal.processHistoryID(), lbpp->processHistoryID()));
     LuminosityBlockPrincipal& lbp = *principalCache_.lumiPrincipalPtr();
     propagateProducts(InLumi, principal, lbp);
     typedef OccurrenceTraits<LuminosityBlockPrincipal, BranchActionBegin> Traits;
@@ -311,14 +282,6 @@ namespace edm {
     assert(it != parentToChildPhID_.end());
     schedule_->writeLumi(principalCache_.lumiPrincipal(it->second, runNumber, lumiNumber));
     if(subProcess_.get()) subProcess_->writeLumi(it->second, runNumber, lumiNumber);
-  }
-
-  void
-  SubProcess::deleteLumiFromCache(ProcessHistoryID const& parentPhID, int runNumber, int lumiNumber) {
-    std::map<ProcessHistoryID, ProcessHistoryID>::const_iterator it = parentToChildPhID_.find(parentPhID);
-    assert(it != parentToChildPhID_.end());
-    principalCache_.deleteLumi(it->second, runNumber, lumiNumber);
-      if(subProcess_.get()) subProcess_->deleteLumiFromCache(it->second, runNumber, lumiNumber);
   }
 
   void

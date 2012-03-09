@@ -281,7 +281,7 @@ void KalmanAlignmentDataCollector::clearData( void )
 string KalmanAlignmentDataCollector::toString( int i )
 {
   char temp[10];
-  snprintf( temp, sizeof(temp), "%u", i );
+  sprintf( temp, "%u", i );
 
   return string( temp );
 }

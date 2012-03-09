@@ -10,44 +10,26 @@
 
 HcalShapes::HcalShapes()
 : theMCParams(0),
-  theShapes(),
+  theShapes(5),
   theHcalShape(),
   theHFShape(),
   theZDCShape(),
   theSiPMShape()
 {
-/*
-         00 - not used (reserved)
-        101 - regular HPD  HB/HE/HO shape
-        102 - "special" HB HPD#14 long shape
-        201 - SiPMs Zecotec shape   (HO)
-        202 - SiPMs Hamamatsu shape (HO)
-        301 - regular HF PMT shape
-        401 - regular ZDC shape
-  */
-  theShapes[101] = new CaloCachedShapeIntegrator(&theHcalShape);
-  theShapes[102] = theShapes[101];
-  theShapes[201] = new CaloCachedShapeIntegrator(&theSiPMShape);
-  theShapes[202] = theShapes[201];
-  theShapes[301] = new CaloCachedShapeIntegrator(&theHFShape);
-  theShapes[401] = new CaloCachedShapeIntegrator(&theZDCShape);
-
-  // backward-compatibility with old scheme
-  theShapes[0] = theShapes[101];
-  //FIXME "special" HB
-  theShapes[1] = theShapes[101];
-  theShapes[2] = theShapes[201];
-  theShapes[3] = theShapes[301];
-  theShapes[4] = theShapes[401];
+  theShapes[0] = new CaloCachedShapeIntegrator(&theHcalShape);
+  theShapes[1] = new CaloCachedShapeIntegrator(&theHcalShape);
+  theShapes[2] = new CaloCachedShapeIntegrator(&theSiPMShape);
+  theShapes[3] = new CaloCachedShapeIntegrator(&theHFShape);
+  theShapes[4] = new CaloCachedShapeIntegrator(&theZDCShape);
 }
 
 
 HcalShapes::~HcalShapes()
 {
-  for(ShapeMap::const_iterator shapeItr = theShapes.begin();
+  for(std::vector<const CaloVShape *>::const_iterator shapeItr = theShapes.begin();
       shapeItr != theShapes.end();  ++shapeItr)
   {
-    delete shapeItr->second;
+    delete *shapeItr;
   }
   theShapes.clear();
   delete theMCParams;
@@ -72,29 +54,16 @@ void HcalShapes::endRun()
 const CaloVShape * HcalShapes::shape(const DetId & detId) const
 {
   if(!theMCParams) {
-    return defaultShape(detId);
+    edm::LogWarning("HcalShapes") << "Cannot find HCAL MC Params ";
+    // try to figure the appropriate shape
+    HcalGenericDetId::HcalGenericSubdetector subdet = HcalGenericDetId(detId).genericSubdet();
+    if(subdet == HcalGenericDetId::HcalGenBarrel || subdet == HcalGenericDetId::HcalGenEndcap) return theShapes[0];
+    else if(subdet == HcalGenericDetId::HcalGenOuter) return theShapes[2];
+    else if(subdet == HcalGenericDetId::HcalGenForward) return theShapes[3];
+    else if(subdet == HcalGenericDetId::HcalGenZDC) return theShapes[4];
+    else return 0;
   }
   int shapeType = theMCParams->getValues(detId)->signalShape();
-  ShapeMap::const_iterator shapeMapItr = theShapes.find(shapeType);
-  if(shapeMapItr == theShapes.end()) {
-    return defaultShape(detId);
-  } else {
-    return shapeMapItr->second;
-  }
+  return theShapes.at(shapeType);
 }
 
-const CaloVShape * HcalShapes::defaultShape(const DetId & detId) const
-{
-  edm::LogWarning("HcalShapes") << "Cannot find HCAL MC Params ";
-  // try to figure the appropriate shape
-  const CaloVShape * result;
-  HcalGenericDetId::HcalGenericSubdetector subdet 
-    = HcalGenericDetId(detId).genericSubdet();
-  if(subdet == HcalGenericDetId::HcalGenBarrel 
-  || subdet == HcalGenericDetId::HcalGenEndcap) result = theShapes.find(0)->second;
-  else if(subdet == HcalGenericDetId::HcalGenOuter) result = theShapes.find(2)->second;
-  else if(subdet == HcalGenericDetId::HcalGenForward) result = theShapes.find(3)->second;
-  else if(subdet == HcalGenericDetId::HcalGenZDC) result = theShapes.find(3)->second;
-  else result = 0;
-  return result;
-}

@@ -31,6 +31,7 @@ class TTreeCache;
 namespace edm {
   struct BranchKey;
   class DelayedReader;
+  class FileFormatVersion;
   class InputFile;
   class RootTree;
 
@@ -62,6 +63,7 @@ namespace edm {
     typedef roottree::BranchMap BranchMap;
     typedef roottree::EntryNumber EntryNumber;
     RootTree(boost::shared_ptr<InputFile> filePtr,
+             FileFormatVersion const& fileFormatVersion,
              BranchType const& branchType,
              unsigned int maxVirtualSize,
              unsigned int cacheSize,

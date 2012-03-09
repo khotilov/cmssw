@@ -19,6 +19,7 @@
 #include "DataFormats/JetReco/interface/GenJetCollection.h"
 
 #include "DataFormats/Common/interface/Handle.h"
+#include "DataFormats/Common/interface/EDProduct.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
