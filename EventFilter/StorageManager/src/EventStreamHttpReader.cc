@@ -1,11 +1,13 @@
-// $Id: EventStreamHttpReader.cc,v 1.46 2011/04/04 14:47:04 mommsen Exp $
+// $Id: EventStreamHttpReader.cc,v 1.50 2011/07/04 10:21:53 mommsen Exp $
 /// @file: EventStreamHttpReader.cc
 
 #include "DQMServices/Core/interface/MonitorElement.h"
 #include "EventFilter/StorageManager/interface/CurlInterface.h"
 #include "EventFilter/StorageManager/src/EventServerProxy.icc"
 #include "EventFilter/StorageManager/src/EventStreamHttpReader.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/Utilities/interface/Exception.h"
 
 #include <string>
 
@@ -20,7 +22,9 @@ namespace edm
   StreamerInputSource(pset, desc),
   eventServerProxy_(pset),
   dqmStore_(0),
+  dqmStoreAvailabiltyChecked_(false),
   dropOldLumisectionEvents_(pset.getUntrackedParameter<bool>("dropOldLumisectionEvents", false)),
+  consumerName_(pset.getUntrackedParameter<std::string>("consumerName")),
   lastLS_(0)
   {
     // Default in StreamerInputSource is 'false'
@@ -61,10 +65,16 @@ namespace edm
     );
     
     lastLS_ = currentLS;
-    
-    dqmStore_->cd();
-    MonitorElement* me = dqmStore_->bookInt("droppedEventsCount");
-    me->Fill(droppedEvents);
+
+    if (dqmStore_)
+    {
+      MonitorElement* me = dqmStore_->get("SM_SMPS_Stats/droppedEventsCount_" + consumerName_ );
+      if (!me){
+        dqmStore_->setCurrentFolder("SM_SMPS_Stats");
+        me = dqmStore_->bookInt("droppedEventsCount_" + consumerName_ );
+      }
+      me->Fill(droppedEvents);
+    }
 
     return deserializeEvent(EventMsgView(&data[0]));
   }
@@ -82,12 +92,19 @@ namespace edm
   
   void EventStreamHttpReader::initializeDQMStore()
   {
-    if ( ! dqmStore_ )
-      dqmStore_ = edm::Service<DQMStore>().operator->();
-    
-    if ( ! dqmStore_ )
-      throw cms::Exception("read", "EventStreamHttpReader")
-        << "Unable to lookup the DQMStore service!\n";
+    if ( ! dqmStoreAvailabiltyChecked_ )
+    {   
+      try
+      {
+        dqmStore_ = edm::Service<DQMStore>().operator->();
+      }
+      catch (cms::Exception& e)
+      {
+        edm::LogInfo("EventStreamHttpReader")
+          << "Service DQMStore not defined. Will not record the number of dropped events.";
+      }
+      dqmStoreAvailabiltyChecked_ = true;
+    }
   }
 
 

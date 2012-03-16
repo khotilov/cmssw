@@ -19,9 +19,7 @@ process.source = cms.Source("EmptyIOVSource",
 
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 
-#process.CondDBCommon.connect = 'sqlite_file:DB.db'
-#process.CondDBCommon.connect = 'oracle://cms_orcoff_prep/CMS_COND_ECAL'
-process.CondDBCommon.connect = 'oracle://cms_orcon_prod/CMS_COND_31X_ECAL'
+process.CondDBCommon.connect = 'sqlite_file:DB.db'
 process.CondDBCommon.DBParameters.authenticationPath = '/nfshome0/popcondev/conddb'
 
 process.PoolDBOutputService = cms.Service("PoolDBOutputService",
@@ -29,7 +27,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     logconnect = cms.untracked.string('sqlite_file:log.db'),   
     toPut = cms.VPSet(cms.PSet(
         record = cms.string('EcalIntercalibConstantsRcd'),
-        tag = cms.string('EcalIntercalibConstants_v9_offline')
+        tag = cms.string('EcalIntercalibConstants_test')
     ))
 )
 
@@ -39,14 +37,13 @@ process.Test1 = cms.EDAnalyzer("ExTestEcalIntercalibAnalyzer",
     IsDestDbCheckedInQueryLog=cms.untracked.bool(True),
     SinceAppendMode=cms.bool(True),
     Source=cms.PSet(
-     FileLowField = cms.string('/nfshome0/popcondev/EcalTPGPopCon/CMSSW_3_11_0_ONLINE/src/CondTools/Ecal/python/interCalib_Boff.xml'),
-     FileHighField = cms.string('/nfshome0/popcondev/EcalTPGPopCon/CMSSW_3_11_0_ONLINE/src/CondTools/Ecal/python/interCalib_Bon.xml'),
-     Value_Bon = cms.untracked.double(0.75585),
+     FileLowField = cms.string('/nfshome0/fra/interCalib_Boff.xml'),
+     FileHighField = cms.string('/nfshome0/fra/interCalib_Bon.xml'),
      firstRun = cms.string('98273'),
      lastRun = cms.string('10000000'),
      OnlineDBSID = cms.string('cms_omds_lb'),
      OnlineDBUser = cms.string('cms_ecal_r'),
-     OnlineDBPassword = cms.string('*******'),
+     OnlineDBPassword = cms.string('*****'),
      LocationSource = cms.string('P5'),
      Location = cms.string('P5_Co'),
      GenTag = cms.string('GLOBAL'),

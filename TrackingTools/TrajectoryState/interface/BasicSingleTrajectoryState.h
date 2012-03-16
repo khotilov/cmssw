@@ -12,8 +12,6 @@
 #include "DataFormats/GeometrySurface/interface/Surface.h"
 #include "TrackingTools/TrajectoryParametrization/interface/TrajectoryStateExceptions.h"
 
-#include "FWCore/Utilities/interface/Visibility.h"
-
 /// vvv DEBUG
 #include <iostream>
 
@@ -99,11 +97,7 @@ public:
   }
   static void notValid();
 
-  // bool hasError() const;
-  bool hasError() const {
-    return (theFreeState && theFreeState->hasError()) || theLocalErrorValid;
-  }
-
+  bool hasError() const;
   
   void missingError(char const * where) const;
 
@@ -199,16 +193,16 @@ public:
 private:
 
 // create global parameters and errors from local
-  void checkGlobalParameters() const dso_internal;
-  void checkCurvilinError() const  dso_internal;
-  void checkCartesianError() const  dso_internal;
+  void checkGlobalParameters() const;
+  void checkCurvilinError() const;
+  void checkCartesianError() const;
 
 // create local parameters and errors from global
-  void createLocalParameters() const  dso_internal;
+  void createLocalParameters() const;
   // create local errors from global
-  void createLocalError() const  dso_internal;
-  void createLocalErrorFromCartesianError() const  dso_internal;
-  void createLocalErrorFromCurvilinearError() const  dso_internal;
+  void createLocalError() const;
+  void createLocalErrorFromCartesianError() const;
+  void createLocalErrorFromCurvilinearError() const;
 
 private:
 

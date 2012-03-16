@@ -33,12 +33,6 @@ void PatTriggerAnalyzer::beginJob()
 {
   edm::Service< TFileService > fileService;
 
-  /*   YOUR HISTOGRAM DEFINITIONS GO HERE!
-  histos1D_[ "histoName" ] = fileService->make< TH1D >( "[normal TH1D constructor]" ); // EXAMPLE CODE
-  histos1D_[ "histoName" ]->SetXTitle( "x-axis label" );                               // EXAMPLE CODE
-  histos1D_[ "histoName" ]->SetYTitle( "y-axis label" );                               // EXAMPLE CODE
-  */
-
   // pt correlation plot
   histos2D_[ "ptTrigCand" ] = fileService->make< TH2D >( "ptTrigCand", "Object vs. candidate p_{T} (GeV)", 60, 0., 300., 60, 0., 300. );
   histos2D_[ "ptTrigCand" ]->SetXTitle( "candidate p_{T} (GeV)" );
@@ -56,8 +50,8 @@ void PatTriggerAnalyzer::beginJob()
   histos1D_[ "turnOn" ]->SetXTitle( "candidate p_{T} (GeV)" );
   histos1D_[ "turnOn" ]->SetYTitle( "# of objects" );
   // mean pt for all trigger objects
-  histos1D_[ "ptMean" ] = fileService->make< TH1D >( "ptMean", "Mean p_{T} (GeV) per filter ID", maxID_ - minID_ + 1, minID_ - 0.5, maxID_ + 0.5);
-  histos1D_[ "ptMean" ]->SetXTitle( "filter ID" );
+  histos1D_[ "ptMean" ] = fileService->make< TH1D >( "ptMean", "Mean p_{T} (GeV) per trigger object type", maxID_ - minID_ + 1, minID_ - 0.5, maxID_ + 0.5);
+  histos1D_[ "ptMean" ]->SetXTitle( "trigger object type" );
   histos1D_[ "ptMean" ]->SetYTitle( "mean p_{T} (GeV)" );
 
   // initialize counters for mean pt calculation
@@ -72,9 +66,6 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
   // PAT trigger event
   edm::Handle< TriggerEvent > triggerEvent;
   iEvent.getByLabel( triggerEvent_, triggerEvent );
-  // PAT trigger objects
-  edm::Handle< TriggerObjectCollection > triggerObjects;
-  iEvent.getByLabel( trigger_, triggerObjects );
 
   // PAT object collection
   edm::Handle< MuonCollection > muons;
@@ -84,16 +75,12 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
   const helper::TriggerMatchHelper matchHelper;
 
   /*
-    YOUR ANALYSIS CODE GOES HERE!
-  */
-
-  /*
     kinematics comparison
   */
 
   // loop over muon references (PAT muons have been used in the matcher in task 3)
   for( size_t iMuon = 0; iMuon < muons->size(); ++iMuon ) {
-    // we need all these ingedients to recieve matched trigger object from the matchHelper
+    // we need all these ingedients to recieve matched trigger objects from the matchHelper
     const TriggerObjectRef trigRef( matchHelper.triggerMatchObject( muons, iMuon, muonMatch_, iEvent, *triggerEvent ) );
     // finally we can fill the histograms
     if ( trigRef.isAvailable() && trigRef.isNonnull() ) { // check references (necessary!)
@@ -107,17 +94,19 @@ void PatTriggerAnalyzer::analyze( const edm::Event & iEvent, const edm::EventSet
     turn-on curve
   */
 
-  // loop over HLT muon references
-  for ( size_t iTrig = 0; iTrig < triggerObjects->size(); ++iTrig ) {
+  // get the trigger objects corresponding to the used matching (HLT muons)
+  const TriggerObjectRefVector trigRefs( triggerEvent->objects( trigger::TriggerMuon ) );
+  // loop over selected trigger objects
+  for ( TriggerObjectRefVector::const_iterator iTrig = trigRefs.begin(); iTrig != trigRefs.end(); ++iTrig ) {
     // get all matched candidates for the trigger object
-    const reco::CandidateBaseRefVector candRefs( matchHelper.triggerMatchCandidates( triggerObjects, iTrig, muonMatch_, iEvent, *triggerEvent ) );
+    const reco::CandidateBaseRefVector candRefs( matchHelper.triggerMatchCandidates( ( *iTrig ), muonMatch_, iEvent, *triggerEvent ) );
     if ( candRefs.empty() ) continue;
     // fill the histogram...
     // (only for the first match, since we resolved ambiguities in the matching configuration,
     // so that we have one at maximum per trigger object)
-    reco::CandidateBaseRef muon( candRefs.at( 0 ) );
-    if ( candRefs.at( 0 ).isAvailable() && candRefs.at( 0 ).isNonnull() ) {
-      histos1D_[ "turnOn" ]->Fill( candRefs.at( 0 )->pt() );
+    reco::CandidateBaseRef muonRef( candRefs.at( 0 ) );
+    if ( muonRef.isAvailable() && muonRef.isNonnull() ) {
+      histos1D_[ "turnOn" ]->Fill( muonRef->pt() );
     }
   }
 
