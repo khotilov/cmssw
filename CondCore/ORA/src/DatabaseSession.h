@@ -49,7 +49,6 @@ namespace ora {
     virtual ~DatabaseSession();
 
     bool connect( const std::string& connectionString, bool readOnly );
-    bool connect( const std::string& connectionString, const std::string& asRole, bool readOnly );
 
     void disconnect();
 

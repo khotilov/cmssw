@@ -87,9 +87,6 @@ namespace ora {
         case MappingElement::Blob :
           iT->second.m_dataColumns.insert( std::make_pair( dataCols[0],
                                                            coral::AttributeSpecification::typeNameForId( typeid(coral::Blob) ) ));
-          iT->second.m_dataColumns.insert( std::make_pair( dataCols[1],
-                                                           coral::AttributeSpecification::typeNameForId( typeid(std::string) ) ));
-	  iT->second.m_nullableColumns.insert( dataCols[1] );
           break;
         case MappingElement::OraReference :
           iT->second.m_dataColumns.insert( std::make_pair( dataCols[0],

@@ -56,9 +56,6 @@ namespace ora {
     bool connect( const std::string& connectionString, bool readOnly=false );
     
     /// 
-    bool connect( const std::string& connectionString, const std::string& asRole, bool readOnly=false );
-
-    /// 
     void disconnect();
 
     /// 

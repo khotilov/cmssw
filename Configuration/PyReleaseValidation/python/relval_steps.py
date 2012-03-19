@@ -199,6 +199,7 @@ steps['SingleMuPt10INPUT']={'INPUT':InputInfo(dataSet='/RelValSingleMuPt10/%s/GE
 steps['SingleMuPt100INPUT']={'INPUT':InputInfo(dataSet='/RelValSingleMuPt100/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
 steps['SingleMuPt1000INPUT']={'INPUT':InputInfo(dataSet='/RelValSingleMuPt1000/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
 steps['TTbarINPUT']={'INPUT':InputInfo(dataSet='/RelValTTbar/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
+steps['TTbarLeptonINPUT']={'INPUT':InputInfo(dataSet='/RelValTTbarLepton/CMSSW_5_2_0_pre5-START52_V1-v1/GEN-SIM',location='STD')}
 steps['OldTTbarINPUT']={'INPUT':InputInfo(dataSet='/RelValProdTTbar/CMSSW_5_0_0_pre6-START50_V5-v1/GEN-SIM-RECO',location='STD')}
 steps['OldGenSimINPUT']={'INPUT':InputInfo(dataSet='/RelValTTbar/CMSSW_4_4_2-START44_V7-v1/GEN-SIM-DIGI-RAW-HLTDEBUG',location='STD')}
 steps['Wjet_Pt_80_120INPUT']={'INPUT':InputInfo(dataSet='/RelValWjet_Pt_80_120/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
@@ -415,8 +416,9 @@ steps['Z2Jets_Pt-0To100_TuneZ2star_8TeV_alpgen_tauola']=genvalid('Hadronizer_Et2
 steps['Z3Jets-Pt_0To100_TuneZ2star_8TeV_alpgen_tauola']=genvalid('Hadronizer_Et20ExclTuneZ2star_8TeV_alpgen_tauola_cff',step1GenDefaults,'dy',443)
 steps['ZJetsLNu_Tune4C_8TeV_madgraph-pythia8']=genvalid('Hadronizer_MgmMatchTune4C_8TeV_madgraph_pythia8_cff',step1GenDefaults,'dy',2925)
 
-PU={'--pileup':'default','--pileup_input':'dbs:/RelValProdMinBias/%s/GEN-SIM-RAW'%(baseDataSetRelease[0],)}
-PUFS={'--pileup':'default'}
+PU={'--pileup':'2012_Startup_50ns_PoissonOOTPU','--pileup_input':'dbs:/RelValProdMinBias/%s/GEN-SIM-RAW'%(baseDataSetRelease[0],)}
+PUFS={'--pileup':'2012_Startup_inTimeOnly'}
+
 steps['TTbarFSPU']=merge([PUFS,steps['TTbarFS']])
 ##########################
 
@@ -456,7 +458,15 @@ dataReco={'--conditions':'auto:com10',
           '--scenario':'pp',
           }
 
-steps['HLTD']=merge([{'--process':'reHLT','-s':'HLT','--condition':'auto:hltonline','--data':'','--datatier':'RAW','--eventcontent':'RAW'},])
+steps['HLTD']=merge([{'--process':'reHLT',
+                      '-s':'L1REPACK,HLT',
+                      '--condition':'auto:hltonline',
+                      '--custom_conditions':'L1GtTriggerMenu_L1Menu_Collisions2012_v0_mc,L1GtTriggerMenuRcd,frontier://FrontierProd/CMS_COND_31X_L1T', 
+                      '--data':'',
+                      '--datatier':'RAW',
+                      '--eventcontent':'RAW',
+                      '--customise_commands':'\'process.RAWoutput.outputCommands.append("drop FEDRawDataCollection_rawDataCollector__LHC")\''
+                      },])
 steps['RECOD']=merge([{'--scenario':'pp',},dataReco])
 steps['RECOSKIMALCA']=merge([{'--inputCommands':'"keep *","drop *_*_*_RECO"'
                               },steps['RECOD']])
@@ -559,6 +569,14 @@ steps['ALCAEXP']={'-s':'ALCA:PromptCalibProd',
 steps['HARVESTD']={'-s':'HARVESTING:dqmHarvesting',
                    '--conditions':'auto:com10',
                    '--filein':'file:step2_inDQM.root',
+                   '--filetype':'DQM',
+                   '--data':'',
+                   '--scenario':'pp'}
+
+# run RECO+DQM in step 3 and harvesting in step4, for HLT + RECO workflow
+steps['HARVESTDst4']={'-s':'HARVESTING:dqmHarvesting',
+                   '--conditions':'auto:com10',
+                   '--filein':'file:step3_inDQM.root',
                    '--filetype':'DQM',
                    '--data':'',
                    '--scenario':'pp'}
