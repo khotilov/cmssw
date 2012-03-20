@@ -70,7 +70,6 @@ namespace ora {
       static std::string columnNameForRefId( const std::string& variableName, const std::string& scope );
       static std::string columnNameForPosition();
       static std::string columnNameForNamedReference( const std::string& variableName, const std::string& scope );
-      static std::string columnNameForBlobMetadata( const std::string& dataColumnName );
       static std::string fkNameForIdentity( const std::string& tableName, int index=0 );
 
       /// formatting for variable names to schema object names

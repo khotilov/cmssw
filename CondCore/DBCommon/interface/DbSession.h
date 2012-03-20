@@ -53,7 +53,6 @@ namespace cond{
     const std::string& blobStreamingService() const;
 
     void open( const std::string& connectionString, bool readOnly=false );
-    void open( const std::string& connectionString, const std::string&  role, bool readOnly=false );
 
     void close();
 

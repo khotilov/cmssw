@@ -14,8 +14,7 @@ namespace ora {
         m_idColumns(),
         m_dataColumns(),
         m_parentTableName(""),
-        m_refColumns(),
-	m_nullableColumns(){
+        m_refColumns(){
       }
       TableInfo( const TableInfo& rhs ):
         m_dependency( rhs.m_dependency ),
@@ -23,8 +22,7 @@ namespace ora {
         m_idColumns( rhs.m_idColumns ),
         m_dataColumns( rhs.m_dataColumns ),
         m_parentTableName(rhs.m_parentTableName),
-        m_refColumns(rhs.m_refColumns),
-	m_nullableColumns(rhs.m_nullableColumns){
+        m_refColumns(rhs.m_refColumns){
       }
       TableInfo& operator=( const TableInfo& rhs ){
         m_dependency = rhs.m_dependency;
@@ -33,7 +31,6 @@ namespace ora {
         m_dataColumns = rhs.m_dataColumns;
         m_parentTableName = rhs.m_parentTableName;
         m_refColumns = rhs.m_refColumns;
-	m_nullableColumns = rhs.m_nullableColumns;
         return *this;
       }
       bool m_dependency;
@@ -42,7 +39,6 @@ namespace ora {
       std::map<std::string,std::string> m_dataColumns;
       std::string m_parentTableName;
       std::vector<std::string> m_refColumns;
-      std::set<std::string> m_nullableColumns;
   };
   
 

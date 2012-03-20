@@ -69,7 +69,7 @@ jetMETAnalyzer = cms.EDAnalyzer("JetMETAnalyzer",
     DoTcMETAnalysis              = cms.untracked.bool(True),
     DoMuCorrMETAnalysis          = cms.untracked.bool(True),
     DoPfMETAnalysis              = cms.untracked.bool(True),
-    DoHTMHTAnalysis              = cms.untracked.bool(False),
+    DoHTMHTAnalysis              = cms.untracked.bool(True),
 
     #
     #

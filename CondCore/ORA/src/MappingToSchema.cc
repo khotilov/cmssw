@@ -43,11 +43,7 @@ void ora::MappingToSchema::createTable( const TableInfo& tableInfo ){
   for( std::map<std::string,std::string>::const_iterator iDataCol = tableInfo.m_dataColumns.begin();
        iDataCol != tableInfo.m_dataColumns.end(); ++iDataCol ){
     description.insertColumn( iDataCol->first, iDataCol->second );
-    // workaround (temporary?) for Blob. The metadata column has to be relaxed in the NOT NULL constraint (previous versions are not filling this column)
-    std::set<std::string>::const_iterator iNullable = tableInfo.m_nullableColumns.find( iDataCol->first );
-    if( iNullable == tableInfo.m_nullableColumns.end()){
-      description.setNotNullConstraint( iDataCol->first );
-    }
+    description.setNotNullConstraint( iDataCol->first );
   }
   description.setPrimaryKey( columnsForIndex );
   if( !tableInfo.m_parentTableName.empty() ){

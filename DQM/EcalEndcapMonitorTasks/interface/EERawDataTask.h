@@ -4,8 +4,8 @@
 /*
  * \file EERawDataTask.h
  *
- * $Date: 2011/11/01 20:44:55 $
- * $Revision: 1.10 $
+ * $Date: 2009/10/26 17:33:50 $
+ * $Revision: 1.7 $
  * \author E. Di Marco
  *
 */
@@ -75,7 +75,6 @@ edm::InputTag FEDRawDataCollection_;
 edm::InputTag EcalRawDataCollection_;
 
 MonitorElement* meEECRCErrors_;
-MonitorElement* meEEEventType_;
 MonitorElement* meEEEventTypePreCalibrationBX_;
 MonitorElement* meEEEventTypeCalibrationBX_;
 MonitorElement* meEEEventTypePostCalibrationBX_;
@@ -85,9 +84,7 @@ MonitorElement* meEETriggerTypeErrors_;
 MonitorElement* meEECalibrationEventErrors_;
 MonitorElement* meEEL1ADCCErrors_;
 MonitorElement* meEEBunchCrossingDCCErrors_;
-// temporary measure to avoid dead links in the layout; remove 1d histo once transition is done
 MonitorElement* meEEL1AFEErrors_;
-MonitorElement* meEEL1AFEErrorsMap_[2];
 MonitorElement* meEEBunchCrossingFEErrors_;
 MonitorElement* meEEL1ATCCErrors_;
 MonitorElement* meEEBunchCrossingTCCErrors_;
@@ -95,8 +92,6 @@ MonitorElement* meEEL1ASRPErrors_;
 MonitorElement* meEEBunchCrossingSRPErrors_;
 
 MonitorElement* meEESynchronizationErrorsByLumi_;
-
-MonitorElement* meEvtType_[18];
 
 bool init_;
 
