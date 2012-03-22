@@ -13,7 +13,7 @@
 #include "G4hMultipleScattering.hh"
 #include "G4eMultipleScattering.hh"
 #include "G4MscStepLimitType.hh"
-#include "G4UrbanMscModel93.hh"
+#include "CMSUrbanMscModel95.hh"
 
 #include "G4eIonisation.hh"
 #include "G4eBremsstrahlung.hh"
@@ -119,13 +119,16 @@ void CMSEmStandardPhysics95::ConstructParticle() {
   G4GenericIon::GenericIonDefinition();
 }
 
-void CMSEmStandardPhysics95::ConstructProcess() {
+void CMSEmStandardPhysics95::ConstructProcess() 
+{
   // Add standard EM Processes
+  /*
   G4Region* reg = 0;
   if (region != " ") {
     G4RegionStore* regStore = G4RegionStore::GetInstance();
     reg = regStore->GetRegion(region, true);
   }
+  */
 
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
@@ -148,11 +151,7 @@ void CMSEmStandardPhysics95::ConstructProcess() {
       eioni->SetStepFunction(0.8, 1.0*mm);
       G4eMultipleScattering* msc = new G4eMultipleScattering;
       msc->SetStepLimitType(fMinimal);
-      if (reg != 0) {
-	G4UrbanMscModel93* msc_el  = new G4UrbanMscModel93();
-	msc_el->SetRangeFactor(0.04);
-	msc->AddEmModel(0,msc_el,reg);
-      }
+      msc->AddEmModel(0,new CMSUrbanMscModel95());
 
       G4eBremsstrahlung* ebrem = new G4eBremsstrahlung();
       ebrem->SetEmModel(new G4SeltzerBergerModel95(), 1);
@@ -169,11 +168,7 @@ void CMSEmStandardPhysics95::ConstructProcess() {
       eioni->SetStepFunction(0.8, 1.0*mm);
       G4eMultipleScattering* msc = new G4eMultipleScattering;
       msc->SetStepLimitType(fMinimal);
-      if (reg != 0) {
-	G4UrbanMscModel93* msc_pos  = new G4UrbanMscModel93();
-	msc_pos->SetRangeFactor(0.04);
-	msc->AddEmModel(0,msc_pos,reg);
-      }
+      msc->AddEmModel(0,new CMSUrbanMscModel95());
 
       G4eBremsstrahlung* ebrem = new G4eBremsstrahlung();
       ebrem->SetEmModel(new G4SeltzerBergerModel95(), 1);
