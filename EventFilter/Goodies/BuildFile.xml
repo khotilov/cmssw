@@ -1,6 +1,0 @@
-<use   name="EventFilter/Utilities"/>
-<use   name="root"/>
-<use   name="rootgraphics"/>
-<export>
-  <lib   name="1"/>
-</export>
