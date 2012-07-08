@@ -31,36 +31,6 @@ matplotlib.rcParams['legend.fontsize']=10
 matplotlib.rcParams['axes.labelsize']=11
 matplotlib.rcParams['font.weight']=567
 
-def guessInstLumiUnit(t):
-    '''
-    input : largest total lumivalue
-    output: (unitstring,denomitor)
-    '''
-    unitstring='$\mu$b$^{-1}$s$^{-1}$'
-    denomitor=1.0
-    if t>=1.0e3 and t<1.0e06:
-        denomitor=1.0e3
-        unitstring='nb$^{-1}$s$^{-1}$'
-    elif t>=1.0e6 and t<1.0e9:
-        denomitor=1.0e6
-        unitstring='pb$^{-1}$s$^{-1}$'
-    elif t>=1.0e9 and t<1.0e12:
-        denomitor=1.0e9
-        unitstring='fb$^{-1}$s$^{-1}$'
-    elif  t>=1.0e12 and t<1.0e15:
-        denomitor=1.0e12
-        unitstring='ab$^{-1}$s$^{-1}$'
-    elif t<=1.0e-3 and t>1.0e-6: #left direction
-        denomitor=1.0e-3
-        unitstring='mb$^{-1}$s$^{-1}$'
-    elif t<=1.0e-6 and t>1.0e-9:
-        denomitor=1.0e-6
-        unitstring='b$^{-1}$s$^{-1}$'
-    elif t<=1.0e-9 and t>1.0e-12:
-        denomitor=1.0e-9
-        unitstring='kb$^{-1}$s$^{-1}$'
-    return (unitstring,denomitor)
-
 def guessLumiUnit(t):
     '''
     input : largest total lumivalue
@@ -395,8 +365,8 @@ class matplotRender():
             csvreport=csvReporter.csvReporter(textoutput)
             csvreport.writeRow(head)
             allruns=[int(t[0]) for t in rawdata[referenceLabel]]
-            allstarts=[ lut.DatetimeToStr(t[1],customfm='%Y-%m-%d %H:%M:%S') for t in rawdata[referenceLabel] ]
-            allstops=[ lut.DatetimeToStr(t[2],customfm='%Y-%m-%d %H:%M:%S') for t in rawdata[referenceLabel] ]
+            allstarts=[ t[1] for t in rawdata[referenceLabel]]
+            allstops=[ t[2] for t in rawdata[referenceLabel]]
             flat.insert(0,allruns)
             flat.insert(1,allstarts)
             flat.insert(2,allstops)
@@ -471,20 +441,21 @@ class matplotRender():
         csvreport=None
         rows=[]
         flat=[]
-        MinDay=minTime.date().toordinal()
-        MaxDay=maxTime.date().toordinal()
-        fulldays=range(MinDay,MaxDay+1)
-        allstarts=[]
-        allstops=[]
         for label,yvalues in rawdata.items():
             yvalues.sort()
             flat.append([t[3] for t in yvalues])
-            alldays=[t[0] for t in yvalues]
-            alldates=[str(datetime.date.fromordinal(t)) for t in alldays]
+            minday=yvalues[0][0]
+            #print 'minday ',minday
+            maxday=yvalues[-1][0]
+            #print 'maxday ',maxday
+            alldays=range(minday,maxday+1)
+            #print 'alldays ',alldays
             ypoints[label]=[]
+            dayvals=[t[0] for t in yvalues]
             lumivals=[t[3] for t in yvalues]
-            for d in fulldays:
-                if not d in alldays:
+            #print 'lumivals ',lumivals
+            for d in alldays:
+                if not d in dayvals:
                     ypoints[label].append(0.0)
                 else:
                     thisdaylumi=[t[3] for t in yvalues if t[0]==d][0]
@@ -497,20 +468,19 @@ class matplotRender():
                          thisdaylumi=thisdaylumi/denomitor
                     ypoints[label].append(thisdaylumi)
                 ymax[label]=max(lumivals)/denomitor
-        xpoints=fulldays
+        xpoints=alldays
         if textoutput:
             csvreport=csvReporter.csvReporter(textoutput)
-            head=['#day','begrunls','endrunls','delivered','recorded','date']
+            head=['#day','begrunls','endrunls','delivered','recorded']
             csvreport.writeRow(head)
             flat.insert(0,alldays)
             allstarts=[ t[1] for t in rawdata[referenceLabel]]
             allstops=[ t[2] for t in rawdata[referenceLabel]]
-            #print 'allstarts ',allstarts
             flat.insert(1,allstarts)
             flat.insert(2,allstops)
-            flat.append(alldates)
             rows=zip(*flat)
             csvreport.writeRows([list(t) for t in rows])
+        
         yearStrMin=minTime.strftime('%Y')
         yearStrMax=maxTime.strftime('%Y')
         if yearStrMin==yearStrMax:
@@ -536,8 +506,8 @@ class matplotRender():
         ax.grid(True)
         legendlist=[]
         ax.set_ylabel(r'L '+unitstring,position=(0,0.9))
-        textsummaryhead=['#TotalRunningDays']
-        textsummaryline=['#'+str(len(alldays))]
+        textsummaryhead=['#TotalDays']
+        textsummaryline=['#'+str(len(xpoints))]
         for ylabel in labels:
             cl='k'
             if self.colormap.has_key(ylabel):
@@ -612,23 +582,22 @@ class matplotRender():
             return
         maxlum=max([t[3] for t in rawdata[referenceLabel]])
         minlum=min([t[3] for t in rawdata[referenceLabel] if t[3]>0]) #used only for log scale, fin the non-zero bottom
-        (unitstring,denomitor)=guessInstLumiUnit(maxlum)
-        
+        (unitstring,denomitor)=guessLumiUnit(maxlum)
         csvreport=None
         rows=[]
         flat=[]
-        MinDay=minTime.date().toordinal()
-        MaxDay=maxTime.date().toordinal()
-        fulldays=range(MinDay,MaxDay+1)
+        alldays=[]
         for label,yvalues in rawdata.items():
             yvalues.sort()#sort by day
-            alldays=[t[0] for t in yvalues]
-            alldates=[str(datetime.date.fromordinal(t)) for t in alldays]
+            minday=yvalues[0][0]
+            maxday=yvalues[-1][0]
+            alldays=range(minday,maxday+1)
             ypoints[label]=[]
+            dayvals=[t[0] for t in yvalues]
             lumivals=[t[3] for t in yvalues]
             flat.append(lumivals)
-            for d in fulldays:
-                if not d in alldays:
+            for d in alldays:
+                if not d in dayvals:
                     ypoints[label].append(0.0)
                 else:
                     thisdaylumi=[t[3] for t in yvalues if t[0]==d][0]
@@ -641,17 +610,16 @@ class matplotRender():
                         thisdaylumi=thisdaylumi/denomitor
                     ypoints[label].append(thisdaylumi)
             ymax[label]=max(lumivals)/denomitor
-        xpoints=fulldays
+        xpoints=alldays
         if textoutput:
             csvreport=csvReporter.csvReporter(textoutput)
-            head=['#day','run','lsnum','maxinstlumi','date']
+            head=['#day','run','lsnum','maxinstlumi']
             csvreport.writeRow(head)
-            flat.insert(0,alldays)
+            flat.insert(0,[t[0] for t in yvalues])
             allruns=[ t[1] for t in rawdata[referenceLabel]]
             allls=[ t[2] for t in rawdata[referenceLabel]]
             flat.insert(1,allruns)
             flat.insert(2,allls)
-            flat.append(alldates)
             rows=zip(*flat)
             csvreport.writeRows([list(t) for t in rows])
             
@@ -680,8 +648,8 @@ class matplotRender():
             tx.set_horizontalalignment('right')
         ax.grid(True)
         cl=self.colormap['Max Inst']
-        textsummaryhead=['#TotalRunningDays']
-        textsummaryline=['#'+str(len(alldays))]
+        textsummaryhead=['#TotalDays']
+        textsummaryline=['#'+str(len(xpoints))]
         for ylabel in labels:
             cl='k'
             if self.colormap.has_key(ylabel):

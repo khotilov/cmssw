@@ -51,7 +51,7 @@ class MatrixInjector(object):
             
         self.defaultChain={
             "RequestType" :   "TaskChain",                    #this is how we handle relvals
-            "AcquisitionEra": "ReleaseValidation",            #Acq Era
+            "AcquisitionEra": None,            #Acq Era
             "Requestor": self.user,                           #Person responsible
             "Group": self.group,                              #group for the request
             "CMSSWVersion": os.getenv('CMSSW_VERSION'),       #CMSSW Version (used for all tasks in chain)
@@ -152,6 +152,7 @@ class MatrixInjector(object):
                                 return -15
                             chainDict['nowmTasklist'][-1]['ConfigCacheID']='%s/%s.py'%(dir,step)
                             chainDict['GlobalTag']=chainDict['nowmTasklist'][-1]['nowmIO']['GT']
+                            chainDict['AcquisitionEra']=(chainDict['CMSSWVersion']+'-'+chainDict['GlobalTag']).replace('::All','')
                         index+=1
                         
             #wrap up for this one
@@ -193,17 +194,18 @@ class MatrixInjector(object):
             return self.count
         else:
             try:
-                from wmcontrol2_newauth import upload_to_couch,loadConfig
+                from modules.wma import upload_to_couch
             except:
                 print '\n\tUnable to find wmcontrol modules. Please include it in your python path\n'
                 print '\n\t QUIT\n'
                 sys.exit(-16)
             print "Loading",filePath,"to",where,"for",label
             return upload_to_couch(filePath,
-                                   self.group,
-                                   self.user,
                                    labelInCouch,
-                                   where
+                                   self.user,
+                                   self.group,
+                                   test_mode=False,
+                                   url=where
                                    )
     
     def upload(self):
@@ -220,7 +222,8 @@ class MatrixInjector(object):
             
     def submit(self):
         try:
-            from wmcontrol2_newauth import makeRequest,approveRequest,random_sleep
+            from modules.wma import makeRequest,approveRequest
+            from wmcontrol import random_sleep
             print '\n\tFound wmcontrol\n'
         except:
             print '\n\tUnable to find wmcontrol modules. Please include it in your python path\n'
@@ -238,7 +241,7 @@ class MatrixInjector(object):
                 print "For eyes before submitting",n
                 print pprint.pprint(d)
                 print "Submitting",n,"..........."
-                workFlow=makeRequest(self.wmagent,d)
+                workFlow=makeRequest(self.wmagent,d,encodeDict=True)
                 approveRequest(self.wmagent,workFlow)
                 print "...........",n,"submitted"
                 random_sleep()

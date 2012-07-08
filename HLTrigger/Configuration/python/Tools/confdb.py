@@ -36,6 +36,7 @@ class HLTProcess(object):
     "AlCa_LumiPixels_Random_v*",
     "AlCa_LumiPixels_ZeroBias_v*",
     "DQM_FEDIntegrity_v*",
+    "DQM_HcalEmptyEvents_v*",
     "HLT_Calibration_v*",
     "HLT_EcalCalibration_v*",
     "HLT_HcalCalibration_v*",
@@ -63,6 +64,8 @@ class HLTProcess(object):
     "HLT_L2Mu10_NoVertex_NoBPTX3BX_v*",
     "HLT_L2Mu20_NoVertex_NoBPTX3BX_v*",
     "HLT_L2Mu30_NoVertex_NoBPTX3BX_v*",
+    "HLT_L2Mu20_NoVertex_2Cha_NoBPTX3BX_NoHalo_v*",
+    "HLT_L2Mu30_NoVertex_2Cha_NoBPTX3BX_NoHalo_v*",
     "HLT_PixelTracks_Multiplicity70_v*",
     "HLT_PixelTracks_Multiplicity80_v*",
     "HLT_PixelTracks_Multiplicity90_v*",
@@ -74,7 +77,7 @@ class HLTProcess(object):
     "HLT_GlobalRunHPDNoise_v*",
     "HLT_L1Tech_HBHEHO_totalOR_v*",
     "HLT_L1Tech_HCAL_HF_single_channel_v*",
-    "HLT_L1TrackerCosmics_v",   
+    "HLT_L1TrackerCosmics_v*",
     
 # TODO: paths not supported by FastSim, but for which a recovery should be attempted
   
@@ -342,10 +345,13 @@ if 'hltHfreco' in %(dict)s:
 
   def fixForMC(self):
     if not self.config.data:
-      pass # No longer needed!
-#      # override the raw data collection label
-#      self._fix_parameter(type = 'InputTag', value = 'source', replace = 'rawDataCollector')
-#      self._fix_parameter(type = 'string',   value = 'source', replace = 'rawDataCollector')
+      # customise the HLT menu for running on MC
+      if not self.config.fragment:
+        self.data += """
+# customise the HLT menu for running on MC
+from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC
+process = customizeHLTforMC(process)
+"""
 
 
   def fixForFastSim(self):
