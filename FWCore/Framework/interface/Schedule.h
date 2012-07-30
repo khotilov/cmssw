@@ -251,23 +251,14 @@ namespace edm {
     void reportSkipped(LuminosityBlockPrincipal const&) const {}
     void reportSkipped(RunPrincipal const&) const {}
 
-    void reduceParameterSet(ParameterSet& proc_pset,
-                            vstring& modulesInConfig,
-                            std::set<std::string> const& modulesInConfigSet,
-                            vstring& labelsOnTriggerPaths,
-                            vstring& shouldBeUsedLabels,
-                            std::map<std::string, std::vector<std::pair<std::string, int> > >& outputModulePathPositions);
-
     void fillWorkers(ParameterSet& proc_pset,
                      ProductRegistry& preg,
                      boost::shared_ptr<ProcessConfiguration const> processConfiguration,
-                     std::string const& name, bool ignoreFilters, PathWorkers& out,
-                     vstring* labelsOnPaths);
+                     std::string const& name, bool ignoreFilters, PathWorkers& out);
     void fillTrigPath(ParameterSet& proc_pset,
                       ProductRegistry& preg,
                       boost::shared_ptr<ProcessConfiguration const> processConfiguration,
-                      int bitpos, std::string const& name, TrigResPtr,
-                      vstring* labelsOnTriggerPaths);
+                      int bitpos, std::string const& name, TrigResPtr);
     void fillEndPath(ParameterSet& proc_pset,
                      ProductRegistry& preg,
                      boost::shared_ptr<ProcessConfiguration const> processConfiguration,

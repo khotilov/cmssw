@@ -1,7 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 DefaultAlgorithms = cms.PSet(
-
+    doAPVRestore = cms.bool(True),
+    useCMMeanMap= cms.bool(False),
     ## Pedestal subtraction ----------------
     PedestalSubtractionFedMode = cms.bool(False),
 
@@ -37,10 +38,20 @@ DefaultAlgorithms = cms.PSet(
     nSmooth = cms.uint32(9),                 # for smoothing and local minimum determination (odd number)
     minStripsToFit = cms.uint32(4),          # minimum strips to try spline algo (otherwise default to median)
     ApplyBaselineCleaner = cms.bool(True),
+    CleaningSequence = cms.uint32(1),
+    slopeX=cms.int32(3),
+    slopeY=cms.int32(4),
+    ApplyBaselineRejection = cms.bool(True),
+    MeanCM = cms.int32(0),
+
+    #Parameters for bad APV selector
+    filteredBaselineMax=cms.double(6),
+    filteredBaselineDerivativeSumSquare=cms.double(30),
     
     ## Zero suppression --------------------
     SiStripFedZeroSuppressionMode = cms.uint32(4),
     TruncateInSuppressor = cms.bool(True)
+    
     
     )
 

@@ -1,7 +1,7 @@
 #ifndef PLOTMILLEPEDE_H
 #define PLOTMILLEPEDE_H
 // Original Author: Gero Flucke
-// last change    : $Date: 2011/08/08 16:47:33 $
+// last change    : $Date: 2011/02/11 10:49:02 $
 // by             : $Author: flucke $
 //
 // PlotMillePede is a class to interprete the content of the ROOT
@@ -26,7 +26,7 @@
 //
 // By calling new p.Draw..(..) commands, usually previously drawn canvases are
 // deleted. But most methods provide either a boolean flag 'addPlots' or
-// understand the option 'add'. If the flag is true or the option string
+// understand the option 'add'. If the flag is true or the optione string
 // contains 'add', canvases from previous Draw-commands are kept (in fact they
 // are re-drawn).
 //
@@ -74,7 +74,6 @@
 //     * StripStereo:     only Id's of stereo modules in 2D layers/rings 
 //     * StripRphi:       only Id's of rphi modules in 2D layers/rings 
 //     * StripDoubleOr1D: only Id's from 1D layers or composed Dets in 2D layers/rings
-//     * Not<one of above>: the opposite of the above three selections
 //
 // 4b) Geometrical and N(hit) selection:
 // void AddAdditionalSel(const TString &xyzrPhiNhit, Float_t min, Float_t max);
@@ -82,27 +81,6 @@
 //  Selects quantity 'xyzrPhiNhit' between 'min' and 'max' where
 //  'xyzrPhiNhit' can be any of x, y, z, r, phi, Nhit.
 //  Also cleared by 'ClearAdditionalSel()'.
-//
-// 5) Selecting predefined detector layers
-// bool SetDetLayerCuts(unsigned int detLayer, bool silent = false);
-//   This makes use of SetSubDetId(..) and AddAdditionalSel(..)
-//   to select detector layers (or rings), e.g. TIB L1 stereo or TID R3.
-//   Note this changes the internal state of cuts defined by previous calls
-//   to these two methods! Therefore a warning is printed if such cuts are
-//   set before. If this silent == true, this warning is suppressed.
-//   Returns false if 'detLayer' not supported.
-//
-// 
-// IOV handling
-// ============
-// In case of IOV dependent alignment, results are stored for each IOV.
-// The second argument of the constructor decides which IOV is used.
-// The default is 1 that is also valid in case there is no IOV dependence. 
-//
-// Note that the hit statistics is (unfortunately) counted without
-// taking care of IOV boundaries, i.e. whatever IOV is chosen, the number of
-// hits per alignable is always the same, i.e. the sum of all IOVs.
- 
 
 #include "MillePedeTrees.h"
 #include <TArrayI.h>
@@ -112,9 +90,9 @@ class GFHistManager;
 class PlotMillePede : public MillePedeTrees
 {
  public:
-  explicit PlotMillePede(const char *fileName, Int_t iov = 1, Int_t hieraLevel = 0,
+  explicit PlotMillePede(const char *fileName, Int_t iter = 2, Int_t hieraLevel = 0,
 			 bool useDiff = false);// iter=1/2: singlerun/merged; heiraLev: -1 ignore, 0 lowest level, etc.; useDiff = true only for before2007_02_26
-  PlotMillePede(const char *fileName, Int_t iov, Int_t hieraLevel, const char *treeNameAdd);
+  PlotMillePede(const char *fileName, Int_t iter, Int_t hieraLevel, const char *treeNameAdd);
   virtual ~PlotMillePede();
 
   void SetTitle(const char *title) {fTitle = title;}
@@ -126,13 +104,9 @@ class PlotMillePede : public MillePedeTrees
   void DrawParam(bool addPlots = false, const TString &sel = ""); // default: not fixed params
   void DrawPedeParam(Option_t *option = "", unsigned int nNonRigidParam = 12);//"add": add plots, "vs": p_i vs p_j; params beyond rigid body 
   void DrawPedeParamVsLocation(Option_t *option = "", unsigned int nNonRigidParam = 12);//"add" to add plots; params beyond rigid body 
+  //void DrawTwoSurfaceDeltas(Option_t *option = "");
   void DrawSurfaceDeformations(const TString &whichOne = "result start",
-			       Option_t *option = "", unsigned int maxNumPars = 12);//"start result diff"; "add" to add plots, "all" to erase selection to be valid
-  void DrawSurfaceDeformationsLayer(Option_t *option = "", const unsigned int firstDetLayer = 22,
-				    const unsigned int lastDetLayer = 33,
-				    const TString &whichOne = "result",
-				    unsigned int maxNumPars = 12);//"add", "verbose", "nolimit", "spread"; which det layers; "start", "result", "diff" 
-
+			       Option_t *option = "", unsigned int maxNumPars = 13);//start,result,diff or several of these
 
 
   void DrawOrigParam(bool addPlots = false, const TString &sel = ""); //this->AnyFreePar()
@@ -167,16 +141,11 @@ class PlotMillePede : public MillePedeTrees
   void AddSubDetId(Int_t subDetId); // 1-6 are TPB, TPE, TIB, TID, TOB, TEC
   Int_t SetAlignableTypeId(Int_t alignableTypeId);//detunit=1,det=2,...,TIBString=15,etc. from StructureType.h (-1: all)
   Int_t SetHieraLevel(Int_t hieraLevel); // select hierarchical level (-1: all)
-  void AddAdditionalSel(const char *selection);// special select; StripDoubleOr1D,StripRphi,StripStereo (may be prepended by 'Not')
+  void AddAdditionalSel(const char *selection);// special select; StripDoubleOr1D,StripRphi,StripStereo
   void AddAdditionalSel(const TString &xyzrPhiNhit, Float_t min, Float_t max); // x,y,z,r,phi,Nhit
 
   const TString GetAdditionalSel () const { return fAdditionalSel;}
   void ClearAdditionalSel () { fAdditionalSel = ""; fAdditionalSelTitle = "";}
- 
-  bool SetDetLayerCuts(unsigned int detLayer, bool silent = false); // e.g. TIB L1 stereo (false if 'detLayer' not supported); if silent, no warnings
-  TString DetLayerLabel(unsigned int detLayer) const; // e.g. 'TIB L1S'
-
-
   void AddBasicSelection(TString &sel) const;
 
   TString FinalMisAlignment(UInt_t iPar) const;

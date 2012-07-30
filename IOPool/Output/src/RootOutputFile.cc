@@ -85,7 +85,11 @@ namespace edm {
       pLumiAux_(&lumiAux_),
       pRunAux_(&runAux_),
       eventEntryInfoVector_(),
+      lumiEntryInfoVector_(),
+      runEntryInfoVector_(),
       pEventEntryInfoVector_(&eventEntryInfoVector_),
+      pLumiEntryInfoVector_(&lumiEntryInfoVector_),
+      pRunEntryInfoVector_(&runEntryInfoVector_),
       pBranchListIndexes_(0),
       pEventSelectionIDs_(0),
       eventTree_(filePtr_, InEvent, om_->splitLevel(), om_->treeMaxVirtualSize()),
@@ -119,9 +123,13 @@ namespace edm {
 
     lumiTree_.addAuxiliary<LuminosityBlockAuxiliary>(BranchTypeToAuxiliaryBranchName(InLumi),
                                                      pLumiAux_, om_->auxItems()[InLumi].basketSize_);
+    lumiTree_.addAuxiliary<StoredProductProvenanceVector>(BranchTypeToProductProvenanceBranchName(InLumi),
+                                                    pLumiEntryInfoVector_, om_->auxItems()[InLumi].basketSize_);
 
     runTree_.addAuxiliary<RunAuxiliary>(BranchTypeToAuxiliaryBranchName(InRun),
                                         pRunAux_, om_->auxItems()[InRun].basketSize_);
+    runTree_.addAuxiliary<StoredProductProvenanceVector>(BranchTypeToProductProvenanceBranchName(InRun),
+                                                   pRunEntryInfoVector_, om_->auxItems()[InRun].basketSize_);
 
     treePointers_[InEvent] = &eventTree_;
     treePointers_[InLumi]  = &lumiTree_;
@@ -401,10 +409,8 @@ namespace edm {
       dataTypeReported_ = true;
     }
 
-    // Store the reduced ID in the IndexIntoFile
-    ProcessHistoryID reducedPHID = ProcessHistoryRegistry::instance()->extra().reduceProcessHistoryID(e.processHistoryID());
     // Add event to index
-    indexIntoFile_.addEntry(reducedPHID, pEventAux_->run(), pEventAux_->luminosityBlock(), pEventAux_->event(), eventEntryNumber_);
+    indexIntoFile_.addEntry(e.processHistoryID(), pEventAux_->run(), pEventAux_->luminosityBlock(), pEventAux_->event(), eventEntryNumber_);
     ++eventEntryNumber_;
 
     // Report event written
@@ -418,12 +424,10 @@ namespace edm {
     lumiAux_ = lb.aux();
     // Use the updated process historyID
     lumiAux_.setProcessHistoryID(lb.processHistoryID());
-    // Store the reduced ID in the IndexIntoFile
-    ProcessHistoryID reducedPHID = ProcessHistoryRegistry::instance()->extra().reduceProcessHistoryID(lb.processHistoryID());
     // Add lumi to index.
-    indexIntoFile_.addEntry(reducedPHID, lumiAux_.run(), lumiAux_.luminosityBlock(), 0U, lumiEntryNumber_);
+    indexIntoFile_.addEntry(lb.processHistoryID(), lumiAux_.run(), lumiAux_.luminosityBlock(), 0U, lumiEntryNumber_);
     ++lumiEntryNumber_;
-    fillBranches(InLumi, lb, 0);
+    fillBranches(InLumi, lb, pLumiEntryInfoVector_);
     lumiTree_.optimizeBaskets(10ULL*1024*1024);
   }
 
@@ -433,12 +437,10 @@ namespace edm {
     runAux_ = r.aux();
     // Use the updated process historyID
     runAux_.setProcessHistoryID(r.processHistoryID());
-    // Store the reduced ID in the IndexIntoFile
-    ProcessHistoryID reducedPHID = ProcessHistoryRegistry::instance()->extra().reduceProcessHistoryID(r.processHistoryID());
     // Add run to index.
-    indexIntoFile_.addEntry(reducedPHID, runAux_.run(), 0U, 0U, runEntryNumber_);
+    indexIntoFile_.addEntry(r.processHistoryID(), runAux_.run(), 0U, 0U, runEntryNumber_);
     ++runEntryNumber_;
-    fillBranches(InRun, r, 0);
+    fillBranches(InRun, r, pRunEntryInfoVector_);
     runTree_.optimizeBaskets(10ULL*1024*1024);
   }
 
@@ -645,7 +647,7 @@ namespace edm {
 
   void
   RootOutputFile::insertAncestors(ProductProvenance const& iGetParents,
-                                  EventPrincipal const& principal,
+                                  Principal const& principal,
                                   bool produced,
                                   std::set<StoredProductProvenance>& oToFill) {
     assert(om_->dropMetaData() != PoolOutputModule::DropAll);
@@ -690,10 +692,9 @@ namespace edm {
       branchesWithStoredHistory_.insert(id);
 
       bool produced = i->branchDescription_->produced();
-      bool keepProvenance = productProvenanceVecPtr != 0 &&
-                            (om_->dropMetaData() == PoolOutputModule::DropNone ||
-                             om_->dropMetaData() == PoolOutputModule::DropDroppedPrior ||
-                            (om_->dropMetaData() == PoolOutputModule::DropPrior && produced));
+      bool keepProvenance = om_->dropMetaData() == PoolOutputModule::DropNone ||
+                            om_->dropMetaData() == PoolOutputModule::DropDroppedPrior ||
+                           (om_->dropMetaData() == PoolOutputModule::DropPrior && produced);
       bool getProd = (produced || !fastCloning ||
          treePointers_[branchType]->uncloned(i->branchDescription_->branchName()));
 
@@ -702,9 +703,8 @@ namespace edm {
       if(keepProvenance && oh.productProvenance()) {
         insertProductProvenance(*oh.productProvenance(),provenanceToKeep);
         //provenanceToKeep.insert(*oh.productProvenance());
-        EventPrincipal const& eventPrincipal = dynamic_cast<EventPrincipal const&>(principal);
-        assert(eventPrincipal.branchMapperPtr());
-        insertAncestors(*oh.productProvenance(), eventPrincipal, produced, provenanceToKeep);
+        assert(principal.branchMapperPtr());
+        insertAncestors(*oh.productProvenance(), principal, produced, provenanceToKeep);
       }
       product = oh.wrapper();
       if(getProd) {
@@ -719,9 +719,9 @@ namespace edm {
       }
     }
 
-    if(productProvenanceVecPtr != 0) productProvenanceVecPtr->assign(provenanceToKeep.begin(), provenanceToKeep.end());
+    productProvenanceVecPtr->assign(provenanceToKeep.begin(), provenanceToKeep.end());
     treePointers_[branchType]->fillTree();
-    if(productProvenanceVecPtr != 0) productProvenanceVecPtr->clear();
+    productProvenanceVecPtr->clear();
     for(Dummies::iterator it = dummies.begin(), itEnd = dummies.end(); it != itEnd; ++it) {
       it->first->Destructor(const_cast<void *>(it->second));
     }

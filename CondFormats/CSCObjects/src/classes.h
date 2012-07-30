@@ -19,7 +19,6 @@
 #include "CondFormats/CSCObjects/interface/CSCDQM_DCSData.h"
 #include "CondFormats/CSCObjects/interface/CSCDBChipSpeedCorrection.h"
 #include "CondFormats/CSCObjects/interface/CSCChamberTimeCorrections.h"
-#include "CondFormats/CSCObjects/interface/CSCDBGasGainCorrection.h"
 
 
 namespace {
@@ -50,10 +49,6 @@ namespace {
     std::vector<CSCDBChipSpeedCorrection::Item> chipCorrcontainer1;
     std::map< int, std::vector<CSCDBChipSpeedCorrection::Item> > chipCorrmap;
     std::vector<CSCDBChipSpeedCorrection::Item> chipCorrcontainer2;
-
-    std::vector<CSCDBGasGainCorrection::Item> gasGainCorrcontainer1;
-    std::map< int, std::vector<CSCDBGasGainCorrection::Item> > gasGainCorrmap;
-    std::vector<CSCDBGasGainCorrection::Item> gasGainCorrcontainer2;
 
     std::map< int, CSCMapItem::MapItem > chmap;
     std::pair< const int, CSCMapItem::MapItem > chmapvalue;

@@ -21,6 +21,8 @@
 // system include files
 #include <memory>
 
+#include <boost/cstdint.hpp>
+
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
@@ -30,7 +32,6 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "FWCore/Utilities/interface/typedefs.h"
 
 // forward declarations
 class FEDRawDataCollection;
@@ -70,7 +71,7 @@ private:
     /// gives the number of bunch crosses in the event, as well as the active boards
     /// records for inactive boards are not written in the GT DAQ record
     void packGTFE(const edm::EventSetup&, unsigned char*, L1GtfeWord&,
-                  cms_uint16_t activeBoardsGtValue);
+                  boost::uint16_t activeBoardsGtValue);
 
     /// pack FDL blocks for various bunch crosses
     void packFDL(const edm::EventSetup&, unsigned char*, L1GtFdlWord&);
@@ -107,7 +108,7 @@ private:
     edm::InputTag m_muGmtInputTag;
 
     /// mask for active boards
-    cms_uint16_t m_activeBoardsMaskGt;
+    boost::uint16_t m_activeBoardsMaskGt;
 
     /// total Bx's in the event, obtained from GTFE block
     int m_totalBxInEvent;

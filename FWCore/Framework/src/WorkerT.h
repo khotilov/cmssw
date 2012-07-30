@@ -41,11 +41,6 @@ namespace edm {
      
   }
 
-    void setEventSelectionInfo(std::map<std::string, std::vector<std::pair<std::string, int> > > const& outputModulePathPositions,
-                               bool anyProductProduced) {
-      module_->setEventSelectionInfo(outputModulePathPositions, anyProductProduced);
-    }
-
   protected:
     T& module() {return *module_;}
     T const& module() const {return *module_;}

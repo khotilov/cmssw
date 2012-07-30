@@ -13,7 +13,7 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronCoreFwd.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronCore.h"
-#include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
+
 #include <iostream>
 
 //#define DEBUG 1
@@ -88,17 +88,14 @@ void ElectronRecalibSuperClusterAssociator::produce(edm::Event& e, const edm::Ev
 #endif
 
   // Get Electrons
-  Handle<edm::View<reco::GsfElectron> > pElectrons;
+  Handle<reco::GsfElectronCollection> pElectrons;
   e.getByLabel(electronProducer_, electronCollection_, pElectrons);
   if (!pElectrons.isValid()) {
     std::cerr << "Error! can't get the product ElectronCollection "<< std::endl;
   }
-  const edm::View<reco::GsfElectron>* electronCollection = pElectrons.product();
-
-  GsfElectronCoreRefProd rEleCore=e.getRefBeforePut<GsfElectronCoreCollection>();
-  edm::Ref<GsfElectronCoreCollection>::key_type idxEleCore = 0;
+  const reco::GsfElectronCollection* electronCollection = pElectrons.product();
   
-  for(edm::View<reco::GsfElectron>::const_iterator eleIt = electronCollection->begin(); eleIt != electronCollection->end(); eleIt++)
+  for(reco::GsfElectronCollection::const_iterator eleIt = electronCollection->begin(); eleIt != electronCollection->end(); eleIt++)
     {
       float DeltaRMineleSCbarrel(0.15); 
       float DeltaRMineleSCendcap(0.15); 
@@ -147,37 +144,28 @@ void ElectronRecalibSuperClusterAssociator::produce(edm::Event& e, const edm::Ev
       }
       ////////////////////////      
 
+      GsfElectronCoreRefProd rEleCore=e.getRefBeforePut<GsfElectronCoreCollection>();
+      edm::Ref<GsfElectronCoreCollection>::key_type idxEleCore = 0;
 
-
-#ifdef DEBUG
-      std::cout << "+++++++++++" << std::endl;
-      std::cout << &(*eleIt->gsfTrack()) << std::endl;
-      std::cout << eleIt->core()->ecalDrivenSeed() << std::endl;
-      std::cout << "+++++++++++" << std::endl;
-#endif
-      if(eleIt->isEB() && nearestSCbarrel){
-#ifdef DEBUG
-	std::cout << "Starting Association is with EB superCluster "<< std::endl;
-#endif  
+      if(nearestSCbarrel && !nearestSCendcap){
  	reco::GsfElectronCore newEleCore(*(eleIt->core()));
 	newEleCore.setGsfTrack(eleIt->gsfTrack());
 	reco::SuperClusterRef scRef(reco::SuperClusterRef(pSuperClusters, iscRef));
 	newEleCore.setSuperCluster(scRef);
 	reco::GsfElectronCoreRef newEleCoreRef(reco::GsfElectronCoreRef(rEleCore, idxEleCore ++));
 	pOutEleCore->push_back(newEleCore);
-	reco::GsfElectron newEle(*eleIt,newEleCoreRef);
-	//,CaloClusterPtr(),
-	//				  TrackRef(),GsfTrackRefVector());
-	//TrackRef(),TrackBaseRef(), GsfTrackRefVector());
-	newEle.setCorrectedEcalEnergy(eleIt->p4().energy()*(nearestSCbarrel->energy()/eleIt->ecalEnergy()),eleIt->ecalEnergyError()*(nearestSCbarrel->energy()/eleIt->ecalEnergy()));
-	//	std::cout << "FROM REF " << newEle.superCluster().key() << std::endl;
+        reco::GsfElectron newEle(*eleIt,newEleCoreRef,CaloClusterPtr(),
+//				  TrackRef(),GsfTrackRefVector());
+				  TrackRef(),TrackBaseRef(), GsfTrackRefVector());
+	newEle.setP4(eleIt->p4()*(nearestSCbarrel->energy()/eleIt->ecalEnergy()));
+
 	pOutEle->push_back(newEle);
 #ifdef DEBUG
 	std::cout << "Association is with EB superCluster "<< std::endl;
 #endif  
       }  
 
-      if(!(eleIt->isEB()) && nearestSCendcap)
+      if(!nearestSCbarrel && nearestSCendcap)
 	{
 #ifdef DEBUG
 	std::cout << "Starting Association is with EE superCluster "<< std::endl;
@@ -198,7 +186,7 @@ void ElectronRecalibSuperClusterAssociator::produce(edm::Event& e, const edm::Ev
 	  reco::SuperCluster newSC(nearestSCendcap->energy() + preshowerEnergy, nearestSCendcap->position() , nearestSCendcap->seed(),newBCRef , preshowerEnergy );
 	  pOutNewEndcapSC->push_back(newSC);
 	  reco::SuperClusterRef scRef(reco::SuperClusterRef(rSC, idxSC ++));
-	  
+
 	  reco::GsfElectronCore newEleCore(*(eleIt->core()));
 	  newEleCore.setGsfTrack(eleIt->gsfTrack());
 	  newEleCore.setSuperCluster(scRef);
@@ -207,7 +195,8 @@ void ElectronRecalibSuperClusterAssociator::produce(edm::Event& e, const edm::Ev
 	  reco::GsfElectron newEle(*eleIt,newEleCoreRef,CaloClusterPtr(),
 //				  TrackRef(),GsfTrackRefVector());
 				  TrackRef(),TrackBaseRef(), GsfTrackRefVector());
-	  newEle.setCorrectedEcalEnergy(eleIt->p4().energy()*(newSC.energy()/eleIt->ecalEnergy()),eleIt->ecalEnergyError()*(newSC.energy()/eleIt->ecalEnergy())); 
+           
+          newEle.setP4(eleIt->p4()*(newSC.energy()/eleIt->ecalEnergy())) ;
 	  pOutEle->push_back(newEle);
 
 #ifdef DEBUG
@@ -215,6 +204,54 @@ void ElectronRecalibSuperClusterAssociator::produce(edm::Event& e, const edm::Ev
 #endif  
       }  
     
+      if(nearestSCbarrel && nearestSCendcap){
+	reco::GsfElectronCore newEleCore(*(eleIt->core()));
+	newEleCore.setGsfTrack(eleIt->gsfTrack());
+
+	
+	if(DeltaRMineleSCendcap>=DeltaRMineleSCbarrel)
+	  {
+	    reco::SuperClusterRef scRef(reco::SuperClusterRef(pSuperClusters, iscRef));
+	    newEleCore.setSuperCluster(scRef);
+	    reco::GsfElectronCoreRef newEleCoreRef(reco::GsfElectronCoreRef(rEleCore, idxEleCore ++));
+	    pOutEleCore->push_back(newEleCore);
+	    reco::GsfElectron newEle(*eleIt,newEleCoreRef,CaloClusterPtr(),
+//				  TrackRef(),GsfTrackRefVector());
+				  TrackRef(),TrackBaseRef(), GsfTrackRefVector());
+	    newEle.setP4(eleIt->p4()*(nearestSCbarrel->energy()/eleIt->ecalEnergy()));
+	    pOutEle->push_back(newEle);
+
+
+#ifdef DEBUG
+	    std::cout << "Association is with EB superCluster, after quarrel "<< std::endl;
+#endif  
+	  }
+	else if(DeltaRMineleSCendcap<DeltaRMineleSCbarrel)
+	  {
+	    float preshowerEnergy=eleIt->superCluster()->preshowerEnergy(); 
+	    CaloClusterPtrVector newBCRef;
+	    for (CaloCluster_iterator bcRefIt=nearestSCendcap->clustersBegin();bcRefIt!=nearestSCendcap->clustersEnd();++bcRefIt){
+	      CaloClusterPtr cPtr(*bcRefIt);
+	      newBCRef.push_back(*bcRefIt);}
+	    reco::SuperCluster newSC(nearestSCendcap->energy() + preshowerEnergy,  nearestSCendcap->position() , nearestSCendcap->seed(), newBCRef , preshowerEnergy );
+	    pOutNewEndcapSC->push_back(newSC);
+	    reco::SuperClusterRef scRef(reco::SuperClusterRef(rSC, idxSC ++));
+	    newEleCore.setSuperCluster(scRef);
+	    reco::GsfElectronCoreRef newEleCoreRef(reco::GsfElectronCoreRef(rEleCore, idxEleCore ++));
+	    pOutEleCore->push_back(newEleCore);
+	    reco::GsfElectron newEle(*eleIt,newEleCoreRef,CaloClusterPtr(),
+//				  TrackRef(),GsfTrackRefVector());
+				  TrackRef(),TrackBaseRef(), GsfTrackRefVector());
+	    newEle.setP4(eleIt->p4()*(newSC.energy()/eleIt->ecalEnergy())) ;
+	    pOutEle->push_back(newEle);
+#ifdef DEBUG
+	    std::cout << "Association is with EE superCluster, after quarrel "<< std::endl;
+#endif  
+	  }	
+
+      }
+      
+
     }
   
   

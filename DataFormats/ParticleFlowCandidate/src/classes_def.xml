@@ -34,9 +34,7 @@
   <class name="edm::ValueMap<edm::Ptr<reco::PFCandidate> >"/>
 
 
-  <class name="reco::IsolatedPFCandidate"  ClassVersion="10">
-   <version ClassVersion="10" checksum="1426765407"/>
-  </class>
+  <class name="reco::IsolatedPFCandidate" />
   <class name="std::vector<reco::IsolatedPFCandidate>"/>
   <class name="edm::Wrapper<std::vector<reco::IsolatedPFCandidate> >"/>
   <class name="reco::IsolatedPFCandidateRef"/>
@@ -44,9 +42,7 @@
   <class name="reco::IsolatedPFCandidateRefVector"/>
   <class name="reco::IsolatedPFCandidatePtr"/>
 
-  <class name="reco::PileUpPFCandidate"  ClassVersion="10">
-   <version ClassVersion="10" checksum="1986419188"/>
-  </class>
+  <class name="reco::PileUpPFCandidate" />
   <class name="std::vector<reco::PileUpPFCandidate>"/>
   <class name="edm::Wrapper<std::vector<reco::PileUpPFCandidate> >"/>
   <class name="reco::PileUpPFCandidateRef"/>
@@ -61,8 +57,7 @@
   <class name="std::vector<reco::PFCandidateFwdRef>"/>
   <class name="std::vector<reco::PFCandidateFwdPtr>"/>
 
-  <class name="reco::PFCandidateElectronExtra" ClassVersion="10">
-   <version ClassVersion="10" checksum="1297637479"/>
+  <class name="reco::PFCandidateElectronExtra">
 <!-- 
   <field name="mvaVariables_" transient="true"/>
 -->
@@ -73,8 +68,7 @@
   <class name="reco::PFCandidateElectronExtraRefProd"/>
   <class name="reco::PFCandidateElectronExtraRefVector"/>
 
-  <class name="reco::PFCandidatePhotonExtra" ClassVersion="10">
-   <version ClassVersion="10" checksum="536762407"/>
+  <class name="reco::PFCandidatePhotonExtra">
 <!-- 
   <field name="assoSingleLegRefTrack_" transient="true"/>
   <field name="assoSingleLegMva_" transient="true"/>

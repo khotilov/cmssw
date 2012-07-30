@@ -1,18 +1,17 @@
-#ifndef DataFormats_TestObjects_StreamTestThing_h
-#define DataFormats_TestObjects_StreamTestThing_h
-
-#include "FWCore/Utilities/interface/typedefs.h"
+#ifndef TestObjects_StreamTestThing_h
+#define TestObjects_StreamTestThing_h
 
 #include <vector>
 
 namespace edmtestprod {
 
-  struct StreamTestThing {
+  struct StreamTestThing
+  {
     ~StreamTestThing();
     explicit StreamTestThing(int sz);
     StreamTestThing();
 
-    std::vector<cms_int32_t> data_;
+    std::vector<int> data_;
   };
 
 }

@@ -12,28 +12,32 @@ namespace edm {
       boost::shared_ptr<LuminosityBlockAuxiliary> aux,
       boost::shared_ptr<ProductRegistry const> reg,
       ProcessConfiguration const& pc,
-      boost::shared_ptr<RunPrincipal> rp,
-      HistoryAppender* historyAppender) :
-    Base(reg, pc, InLumi, historyAppender),
+      boost::shared_ptr<RunPrincipal> rp) :
+        Base(reg, pc, InLumi),
         runPrincipal_(rp),
         aux_(aux) {
   }
 
   void
   LuminosityBlockPrincipal::fillLuminosityBlockPrincipal(
+      boost::shared_ptr<BranchMapper> mapper,
       DelayedReader* reader) {
 
-    fillPrincipal(aux_->processHistoryID(), reader);
-
+    fillPrincipal(aux_->processHistoryID(), mapper, reader);
+    if(runPrincipal_) {
+      setProcessHistory(*runPrincipal_);
+    }
+    branchMapperPtr()->processHistoryID() = processHistoryID();
     for(const_iterator i = this->begin(), iEnd = this->end(); i != iEnd; ++i) {
-      (*i)->setProcessHistoryID(processHistoryID());
+      (*i)->setProvenance(branchMapperPtr());
     }
   }
 
   void
   LuminosityBlockPrincipal::put(
         ConstBranchDescription const& bd,
-        WrapperOwningHolder const& edp) {
+        WrapperOwningHolder const& edp,
+        ProductProvenance& productProvenance) {
 
     assert(bd.produced());
     if(!edp.isValid()) {
@@ -41,10 +45,11 @@ namespace edm {
         << "put: Cannot put because auto_ptr to product is null."
         << "\n";
     }
+    branchMapperPtr()->insert(productProvenance);
     Group *g = getExistingGroup(bd.branchID());
     assert(g);
     // Group assumes ownership
-    putOrMerge(edp, g);
+    putOrMerge(edp, productProvenance, g);
   }
 
   void
@@ -57,6 +62,7 @@ namespace edm {
         }
       }
     }
+    branchMapperPtr()->setDelayedRead(false);
   }
 
   void

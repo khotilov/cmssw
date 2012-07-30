@@ -1,68 +1,13 @@
 #include "CalibCalorimetry/HcalAlgos/interface/HcalPulseShapes.h"
-#include "CondFormats/HcalObjects/interface/HcalMCParam.h"
-#include "CondFormats/HcalObjects/interface/HcalMCParams.h"
-#include "CondFormats/DataRecord/interface/HcalMCParamsRcd.h"
-#include "FWCore/Utilities/interface/Exception.h"
-#include "FWCore/Framework/interface/ESHandle.h"
-#include "FWCore/Framework/interface/EventSetup.h"
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include <cmath>
 
-HcalPulseShapes::HcalPulseShapes() 
-: theMCParams(0),
-  theShapes()
-{
-  computeHPDShape();
-  computeHFShape();
-  computeSiPMShape();
-/*
-         00 - not used (reserved)
-        101 - regular HPD  HB/HE/HO shape
-        102 - "special" HB HPD#14 long shape
-        201 - SiPMs Zecotec shape   (HO)
-        202 - SiPMs Hamamatsu shape (HO)
-        301 - regular HF PMT shape
-        401 - regular ZDC shape
-  */
-  theShapes[101] = &hpdShape_;
-  theShapes[102] = theShapes[101];
-  theShapes[201] = &siPMShape_;
-  theShapes[202] = theShapes[201];
-  theShapes[301] = &hfShape_;
-  //theShapes[401] = new CaloCachedShapeIntegrator(&theZDCShape);
-
-  // backward-compatibility with old scheme
-  theShapes[0] = theShapes[101];
-  //FIXME "special" HB
-  theShapes[1] = theShapes[101];
-  theShapes[2] = theShapes[201];
-  theShapes[3] = theShapes[301];
-  //theShapes[4] = theShapes[401];
-
+HcalPulseShapes::HcalPulseShapes() {
+  computeHPDShape(hpdShape_);
+  computeHFShape(hfShape_);
 }
 
 
-HcalPulseShapes::~HcalPulseShapes() {
-  delete theMCParams;
-}
-
-
-void HcalPulseShapes::beginRun(edm::EventSetup const & es)
-{
-  edm::ESHandle<HcalMCParams> p;
-  es.get<HcalMCParamsRcd>().get(p);
-  theMCParams = new HcalMCParams(*p.product());
-}
-
-
-void HcalPulseShapes::endRun()
-{
-  delete theMCParams;
-  theMCParams = 0;
-}
-
-
-void HcalPulseShapes::computeHPDShape()
+void HcalPulseShapes::computeHPDShape(HcalPulseShapes::Shape& sh)
 {
 
   // pulse shape time constants in ns
@@ -78,7 +23,7 @@ void HcalPulseShapes::computeHPDShape()
   
   // pulse shape componnts over a range of time 0 ns to 255 ns in 1 ns steps
   int nbin = 256;
-  hpdShape_.setNBin(nbin);
+  sh.setNBin(nbin);
   std::vector<float> ntmp(nbin,0.0);  // zeroing output pulse shape
   std::vector<float> nth(nbin,0.0);   // zeroing HPD drift shape
   std::vector<float> ntp(nbin,0.0);   // zeroing Binkley preamp shape
@@ -158,14 +103,14 @@ void HcalPulseShapes::computeHPDShape()
   }
 
   for(i=0; i<nbin; i++){
-    hpdShape_.setShapeBin(i,ntmp[i]);
+    sh.setShapeBin(i,ntmp[i]);
   }
 }
 
-void HcalPulseShapes::computeHFShape() {
+void HcalPulseShapes::computeHFShape(HcalPulseShapes::Shape& sh) {
   // first create pulse shape over a range of time 0 ns to 255 ns in 1 ns steps
   int nbin = 256;
-  hfShape_.setNBin(nbin);
+  sh.setNBin(nbin);
   std::vector<float> ntmp(nbin,0.0);  // 
 
   const float k0=0.7956; // shape parameters
@@ -187,69 +132,45 @@ void HcalPulseShapes::computeHFShape() {
   // normalize pulse area to 1.0
   for(int j = 0; j < 25 && j < nbin; ++j){
     ntmp[j] /= norm;
-    hfShape_.setShapeBin(j,ntmp[j]);
+    sh.setShapeBin(j,ntmp[j]);
   }
 }
 
-
-void HcalPulseShapes::computeSiPMShape()
-{
-  int nbin = 512;
-  siPMShape_.setNBin(nbin);
-  std::vector<float> nt(nbin,0.0);  //
-
-  double norm = 0.;
-  for (int j = 0; j < nbin; ++j) {
-    if (j <= 31.)
-      nt[j] = 2.15*j;
-    else if ((j > 31) && (j <= 96))
-      nt[j] = 102.1 - 1.12*j;
-    else
-      nt[j] = 0.0076*j - 6.4;
-    norm += (nt[j]>0) ? nt[j] : 0.;
-  }
-
-  for (int j = 0; j < nbin; ++j) {
-    nt[j] /= norm;
-    siPMShape_.setShapeBin(j,nt[j]);
-  }
+HcalPulseShapes::Shape::Shape() {
+  nbin_=0;
+  tpeak_=0;
 }
 
-
-const HcalPulseShapes::Shape &
-HcalPulseShapes::shape(const HcalDetId & detId) const
-{
-  if(!theMCParams) {
-    return defaultShape(detId);
-  }
-  int shapeType = theMCParams->getValues(detId)->signalShape();
-  ShapeMap::const_iterator shapeMapItr = theShapes.find(shapeType);
-  if(shapeMapItr == theShapes.end()) {
-    return defaultShape(detId);
-  } else {
-    return *(shapeMapItr->second);
-  }
+void HcalPulseShapes::Shape::setNBin(int n) {
+  nbin_=n;
+  shape_=std::vector<float>(n,0.0f);
 }
 
-
-const HcalPulseShapes::Shape &
-HcalPulseShapes::defaultShape(const HcalDetId & detId) const
-{
-  edm::LogWarning("HcalPulseShapes") << "Cannot find HCAL MC Params ";
-  HcalSubdetector subdet = detId.subdet();
-  switch(subdet) {
-  case HcalBarrel:
-    return hbShape();
-  case HcalEndcap:
-    return heShape();
-  case HcalForward:
-    return hfShape();
-  case HcalOuter:
-    //FIXME doesn't look for SiPMs
-    return hoShape(false);
-  default:
-    throw cms::Exception("HcalPulseShapes") << "unknown detId";
-    break;
-  }
+void HcalPulseShapes::Shape::setShapeBin(int i, float f) {
+  if (i>=0 && i<nbin_) shape_[i]=f;
 }
 
+float HcalPulseShapes::Shape::operator()(double t) const {
+  // shape is in 1 ns steps
+  return at(t);
+}
+
+float HcalPulseShapes::Shape::at(double t) const {
+  // shape is in 1 ns steps
+  int i=(int)(t+0.5);
+  float rv=0;
+  if (i>=0 && i<nbin_) rv=shape_[i];
+  return rv;
+}
+
+float HcalPulseShapes::Shape::integrate(double t1, double t2) const {
+  static const float int_delta_ns = 0.05f; 
+  double intval = 0.0;
+
+  for (double t = t1; t < t2; t+= int_delta_ns) {
+    float loedge = at(t);
+    float hiedge = at(t+int_delta_ns);
+    intval += (loedge+hiedge)*int_delta_ns/2.0;
+  }
+  return (float)intval;
+}

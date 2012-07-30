@@ -7,16 +7,15 @@ Toy EDProducts for testing purposes only.
 
 ----------------------------------------------------------------------*/
 
-#include "DataFormats/Common/interface/AssociationVector.h"
-#include "DataFormats/Common/interface/DetSetVector.h"
-#include "DataFormats/Common/interface/DetSetVectorNew.h"
-#include "DataFormats/Common/interface/OwnVector.h"
-#include "DataFormats/Common/interface/SortedCollection.h"
-#include "FWCore/Utilities/interface/typedefs.h"
-
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#include "DataFormats/Common/interface/SortedCollection.h"
+#include "DataFormats/Common/interface/OwnVector.h"
+#include "DataFormats/Common/interface/AssociationVector.h"
+#include "DataFormats/Common/interface/DetSetVector.h"
+#include "DataFormats/Common/interface/DetSetVectorNew.h"
 
 namespace edmtest {
 
@@ -31,15 +30,15 @@ namespace edmtest {
   struct IntProduct {
     explicit IntProduct(int i = 0) : value(i) {}
     ~IntProduct() {}
-
-    cms_int32_t value;
+    
+    int value;
   };
 
   struct TransientIntProduct {
     explicit TransientIntProduct(int i = 0) : value(i) {}
     ~TransientIntProduct() {}
-
-    cms_int32_t value;
+    
+    int value;
     ProductWithNoDictionary dummy;
   };
 
@@ -53,13 +52,13 @@ namespace edmtest {
   struct DoubleProduct {
     explicit DoubleProduct(double d = 2.2) : value(d) {}
     ~DoubleProduct() {}
-
+    
     double value;
   };
 
   struct StringProduct {
     StringProduct() : name_() {}
-    explicit StringProduct(std::string const& s) : name_(s) {}
+    explicit StringProduct(std::string const& s) : name_(s){}
     std::string name_;
   };
 
@@ -67,7 +66,7 @@ namespace edmtest {
     Simple() : key(0), value(0.0) {}
     Simple(Simple const& in) : key(in.key), value(in.value) {}
     virtual ~Simple();
-    typedef cms_int32_t key_type;
+    typedef int key_type;
     key_type    key;
     double      value;
     key_type id() const { return key; }
@@ -79,7 +78,7 @@ namespace edmtest {
   operator==(Simple const& a, Simple const& b) {
     return(a.key == b.key && a.value == b.value);
   }
-
+  
   inline
   bool operator<(Simple const& a, Simple const& b) {
     return a.key < b.key;
@@ -94,7 +93,7 @@ namespace edmtest {
   };
 
   struct Sortable {
-    cms_int32_t data;
+    int data;
     Sortable() : data(0) {}
     explicit Sortable(int i) : data(i) {}
   };
@@ -111,7 +110,7 @@ namespace edmtest {
   }
 
   struct Unsortable : public edm::DoNotSortUponInsertion {
-    cms_int32_t data;
+    int data;
     Unsortable() : data(0) {}
     explicit Unsortable(int i) : data(i) {}
   };
@@ -122,7 +121,7 @@ namespace edmtest {
   }
 
   struct Prodigal : public edm::DoNotRecordParents {
-    cms_int32_t data;
+    int data;
     Prodigal() : data(0) {}
     explicit Prodigal(int i) : data(i) {}
   };

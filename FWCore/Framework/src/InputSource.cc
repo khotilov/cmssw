@@ -4,7 +4,6 @@
 
 #include "DataFormats/Provenance/interface/ProcessHistory.h"
 #include "DataFormats/Provenance/interface/ProcessHistoryRegistry.h"
-#include "DataFormats/Provenance/interface/FullHistoryToReducedHistoryMap.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventPrincipal.h"
 #include "FWCore/Framework/interface/FileBlock.h"
@@ -48,6 +47,28 @@ namespace edm {
         boost::shared_ptr<T> createSharedPtrToStatic(T* ptr) {
           return boost::shared_ptr<T>(ptr, do_nothing_deleter());
         }
+
+        ProcessHistoryID
+        deleteFromProcessHistory(ProcessHistoryID const& phid, std::string const& processName) {
+        // Delete the current process from the process history.  This must be done to maintain consistency
+        // for runs or lumis when the principal cache is flushed, because the process history modified flag,
+        // stored in the principal, is lost when the cache is flushed.
+          if(!phid.isValid()) {
+            return phid;
+          }
+          ProcessHistory ph;
+          bool found = ProcessHistoryRegistry::instance()->getMapped(phid, ph);
+          assert(found);
+          ProcessHistory newPH;
+          newPH.reserve(ph.size());
+          for(ProcessHistory::const_iterator it = ph.begin(), itEnd = ph.end(); it != itEnd; ++it) {
+            if(processName != it->processName()) {
+              newPH.push_back(*it);
+            }
+          }
+          ProcessHistoryRegistry::instance()->insertMapped(newPH);
+          return newPH.id();
+        }
   }
 
   InputSource::InputSource(ParameterSet const& pset, InputSourceDescription const& desc) :
@@ -69,6 +90,8 @@ namespace edm {
       state_(IsInvalid),
       runAuxiliary_(),
       lumiAuxiliary_(),
+      runPrematurelyRead_(false),
+      lumiPrematurelyRead_(false),
       statusFileName_() {
 
     if(pset.getUntrackedParameter<bool>("writeStatusFile", false)) {
@@ -259,12 +282,15 @@ namespace edm {
   }
 
   void
-  InputSource::readAndCacheRun(bool merge, HistoryAppender& historyAppender) {
+  InputSource::readAndCacheRun() {
+    if(runPrematurelyRead_) {
+      runPrematurelyRead_ = false;
+      return;
+    }
     RunSourceSentry(*this);
-    if (merge) {
-      principalCache_->merge(runAuxiliary(), productRegistry_);
-    } else {
-      boost::shared_ptr<RunPrincipal> rp(new RunPrincipal(runAuxiliary(), productRegistry_, processConfiguration(), &historyAppender));
+    bool merged = principalCache_->merge(runAuxiliary(), productRegistry_);
+    if(!merged) {
+      boost::shared_ptr<RunPrincipal> rp(new RunPrincipal(runAuxiliary(), productRegistry_, processConfiguration()));
       principalCache_->insert(rp);
     }
     readRun_(principalCache_->runPrincipalPtr());
@@ -280,17 +306,19 @@ namespace edm {
   }
 
   void
-  InputSource::readAndCacheLumi(bool merge, HistoryAppender& historyAppender) {
+  InputSource::readAndCacheLumi() {
+    if(lumiPrematurelyRead_) {
+      lumiPrematurelyRead_ = false;
+      return;
+    }
     LumiSourceSentry(*this);
-    if (merge) {
-      principalCache_->merge(luminosityBlockAuxiliary(), productRegistry_);
-    } else {
+    bool merged = principalCache_->merge(luminosityBlockAuxiliary(), productRegistry_);
+    if(!merged) {
       boost::shared_ptr<LuminosityBlockPrincipal> lb(
         new LuminosityBlockPrincipal(luminosityBlockAuxiliary(),
                                      productRegistry_,
                                      processConfiguration(),
-                                     principalCache_->runPrincipalPtr(),
-                                     &historyAppender));
+                                     principalCache_->runPrincipalPtr()));
       principalCache_->insert(lb);
     }
     readLuminosityBlock_(principalCache_->lumiPrincipalPtr());
@@ -331,7 +359,6 @@ namespace edm {
 
     EventPrincipal* result = readEvent_();
     if(result != 0) {
-      assert(result->luminosityBlockPrincipalPtrValid());
       assert(lbCache->run() == result->run());
       assert(lbCache->luminosityBlock() == result->luminosityBlock());
       Event event(*result, moduleDescription());
@@ -473,6 +500,7 @@ namespace edm {
     Run run(rp, moduleDescription());
     endRun(run);
     run.commit_();
+    runPrematurelyRead_ = false;
   }
 
   void
@@ -488,6 +516,7 @@ namespace edm {
     LuminosityBlock lb(lbp, moduleDescription());
     endLuminosityBlock(lb);
     lb.commit_();
+    lumiPrematurelyRead_ = false;
   }
 
   void
@@ -543,9 +572,9 @@ namespace edm {
   }
 
   ProcessHistoryID const&
-  InputSource::reducedProcessHistoryID() const {
+  InputSource::processHistoryID() const {
     assert(runAuxiliary());
-    return ProcessHistoryRegistry::instance()->extra().reduceProcessHistoryID(runAuxiliary()->processHistoryID());
+    return runAuxiliary()->processHistoryID();
   }
 
   RunNumber_t

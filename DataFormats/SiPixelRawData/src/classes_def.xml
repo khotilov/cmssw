@@ -1,6 +1,5 @@
 <lcgdict>
- <class name="SiPixelRawDataError" ClassVersion="10">
-  <version ClassVersion="10" checksum="3703023458"/>
+ <class name="SiPixelRawDataError">
    <field name="errorMessage_" transient="true"/>
  </class>
  <class name="std::vector<SiPixelRawDataError>"/>

@@ -46,9 +46,9 @@ class NUEvent {
   const std::vector<NUEvent::NUInteraction>& theNUInteractions() 
     {return NUInteractions_;}
 
-  unsigned nParticles() const { return NUParticles_.size(); }
+  const unsigned nParticles() const { return NUParticles_.size(); }
 
-  unsigned nInteractions() const { return NUInteractions_.size(); }
+  const unsigned nInteractions() const { return NUInteractions_.size(); }
 
  private:
 

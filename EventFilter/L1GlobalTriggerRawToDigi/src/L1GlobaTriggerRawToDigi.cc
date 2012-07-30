@@ -19,6 +19,7 @@
 #include "EventFilter/L1GlobalTriggerRawToDigi/interface/L1GlobalTriggerRawToDigi.h"
 
 // system include files
+#include <boost/cstdint.hpp>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -327,11 +328,11 @@ void L1GlobalTriggerRawToDigi::produce(edm::Event& iEvent, const edm::EventSetup
 
     // get list of active blocks
     // blocks not active are not written to the record
-    cms_uint16_t activeBoardsGtInitial = m_gtfeWord->activeBoards();
-    cms_uint16_t altNrBxBoardInitial = m_gtfeWord->altNrBxBoard();
+    boost::uint16_t activeBoardsGtInitial = m_gtfeWord->activeBoards();
+    boost::uint16_t altNrBxBoardInitial = m_gtfeWord->altNrBxBoard();
 
     // mask some boards, if needed
-    cms_uint16_t activeBoardsGt = activeBoardsGtInitial & m_activeBoardsMaskGt;
+    boost::uint16_t activeBoardsGt = activeBoardsGtInitial & m_activeBoardsMaskGt;
     m_gtfeWord->setActiveBoards(activeBoardsGt);
 
     if (m_verbosity) {
@@ -521,9 +522,9 @@ void L1GlobalTriggerRawToDigi::produce(edm::Event& iEvent, const edm::EventSetup
                 }
 
                 // change RecordLength
-                // cast int to cms_uint16_t (there are normally 3 or 5 BxInEvent)
-                m_gtfeWord->setRecordLength(static_cast<cms_uint16_t> (m_unpackBxInEvent));
-                m_gtfeWord->setRecordLength1(static_cast<cms_uint16_t> (m_unpackBxInEvent));
+                // cast int to boost::uint16_t (there are normally 3 or 5 BxInEvent)
+                m_gtfeWord->setRecordLength(static_cast<boost::uint16_t> (m_unpackBxInEvent));
+                m_gtfeWord->setRecordLength1(static_cast<boost::uint16_t> (m_unpackBxInEvent));
 
             } else {
 
@@ -537,9 +538,9 @@ void L1GlobalTriggerRawToDigi::produce(edm::Event& iEvent, const edm::EventSetup
                 }
 
                 // change RecordLength
-                // cast int to cms_uint16_t (there are normally 3 or 5 BxInEvent)
-                m_gtfeWord->setRecordLength(static_cast<cms_uint16_t> (m_unpackBxInEvent));
-                m_gtfeWord->setRecordLength1(static_cast<cms_uint16_t> (m_unpackBxInEvent));
+                // cast int to boost::uint16_t (there are normally 3 or 5 BxInEvent)
+                m_gtfeWord->setRecordLength(static_cast<boost::uint16_t> (m_unpackBxInEvent));
+                m_gtfeWord->setRecordLength1(static_cast<boost::uint16_t> (m_unpackBxInEvent));
 
             }
 
@@ -588,7 +589,7 @@ void L1GlobalTriggerRawToDigi::produce(edm::Event& iEvent, const edm::EventSetup
                             // add 1 to the GT luminosity number to use the same convention as
                             // offline, where LS number starts with 1;
                             // in GT hardware, LS starts with 0
-                            cms_uint16_t lsNr = m_gtFdlWord->lumiSegmentNr() + 1;
+                            boost::uint16_t lsNr = m_gtFdlWord->lumiSegmentNr() + 1;
                             m_gtFdlWord->setLumiSegmentNr(lsNr);
 
                             // add FDL block to GT readout record
@@ -757,8 +758,8 @@ void L1GlobalTriggerRawToDigi::unpackHeader(const unsigned char* gtPtr, FEDHeade
     // print the header info
     if (m_verbosity && m_isDebugEnabled) {
 
-        const cms_uint64_t* payload =
-                reinterpret_cast<cms_uint64_t*> (const_cast<unsigned char*> (gtPtr));
+        const boost::uint64_t* payload =
+                reinterpret_cast<boost::uint64_t*> (const_cast<unsigned char*> (gtPtr));
 
         std::ostringstream myCoutStream;
 
@@ -814,8 +815,8 @@ void L1GlobalTriggerRawToDigi::unpackPSB(
     int psbSize = psbWord.getSize();
     int psbWords = psbSize / uLength;
 
-    const cms_uint64_t* payload =
-            reinterpret_cast<cms_uint64_t*> (const_cast<unsigned char*> (psbPtr));
+    const boost::uint64_t* payload =
+            reinterpret_cast<boost::uint64_t*> (const_cast<unsigned char*> (psbPtr));
 
     for (int iWord = 0; iWord < psbWords; ++iWord) {
 
@@ -869,8 +870,8 @@ void L1GlobalTriggerRawToDigi::unpackGMT(const unsigned char* chp, std::auto_ptr
         if ( ( iGmtRec >= m_lowSkipBxInEvent ) && ( iGmtRec < m_uppSkipBxInEvent )) {
 
             // Dump the block
-            const cms_uint64_t* bp =
-                    reinterpret_cast<cms_uint64_t*> (const_cast<unsigned*> (p));
+            const boost::uint64_t* bp =
+                    reinterpret_cast<boost::uint64_t*> (const_cast<unsigned*> (p));
             for (int iWord = 0; iWord < 17; iWord++) {
                 LogTrace("L1GlobalTriggerRawToDigi") << std::setw(4) << iWord << "  " << std::hex
                         << std::setfill('0') << std::setw(16) << *bp++ << std::dec << std::setfill(
@@ -964,8 +965,8 @@ void L1GlobalTriggerRawToDigi::unpackTrailer(const unsigned char* trlPtr, FEDTra
     // print the trailer info
     if (m_verbosity && m_isDebugEnabled) {
 
-        const cms_uint64_t* payload =
-                reinterpret_cast<cms_uint64_t*> (const_cast<unsigned char*> (trlPtr));
+        const boost::uint64_t* payload =
+                reinterpret_cast<boost::uint64_t*> (const_cast<unsigned char*> (trlPtr));
 
         std::ostringstream myCoutStream;
 
@@ -1045,10 +1046,10 @@ void L1GlobalTriggerRawToDigi::dumpFedRawData(
     LogTrace("L1GlobalTriggerRawToDigi") << "\nFED GT words (" << wLength << " bits):" << gtWords
             << "\n" << std::endl;
 
-    const cms_uint64_t* payload =
-            reinterpret_cast<cms_uint64_t*> (const_cast<unsigned char*> (gtPtr));
+    const boost::uint64_t* payload =
+            reinterpret_cast<boost::uint64_t*> (const_cast<unsigned char*> (gtPtr));
 
-    for (unsigned int i = 0; i < gtSize / sizeof(cms_uint64_t); i++) {
+    for (unsigned int i = 0; i < gtSize / sizeof(boost::uint64_t); i++) {
         myCout << std::setw(4) << i << "  " << std::hex << std::setfill('0') << std::setw(16)
                 << payload[i] << std::dec << std::setfill(' ') << std::endl;
     }

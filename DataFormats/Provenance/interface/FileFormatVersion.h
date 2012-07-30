@@ -29,7 +29,6 @@ namespace edm
     bool mergeOnlySequentialRunsOrLumis() const;
     bool noMetaDataTrees() const;
     bool storedProductProvenanceUsed() const;
-    bool useReducedProcessHistoryID() const;
     int value() const {return value_;}
     
    private:

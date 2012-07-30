@@ -46,7 +46,7 @@ namespace {
     reco::TrackCaloClusterPtrAssociation v10;
     edm::Wrapper<edm::ValueMap<reco::CaloClusterPtr> > m10;
 
-    reco::ConversionTrackCollection v11;
+    reco::ConversionTrack v11;
     edm::Wrapper<reco::ConversionTrackCollection> m11;    
     
   };

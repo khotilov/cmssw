@@ -35,21 +35,17 @@ namespace edm {
     basketSize_() {
    }
 
-  void
-  BranchDescription::Transients::reset() {
-    *this = BranchDescription::Transients();
-  }
-
   BranchDescription::BranchDescription() :
     branchType_(InEvent),
     moduleLabel_(),
     processName_(),
     branchID_(),
+    productID_(),
     fullClassName_(),
     friendlyClassName_(),
     productInstanceName_(),
     branchAliases_(),
-    transient_() {
+    transients_() {
     // do not call init here! It will result in an exception throw.
   }
 
@@ -67,17 +63,18 @@ namespace edm {
       moduleLabel_(mdLabel),
       processName_(procName),
       branchID_(),
+      productID_(),
       fullClassName_(name),
       friendlyClassName_(fName),
       productInstanceName_(pin),
       branchAliases_(aliases),
-      transient_() {
+      transients_() {
     dropped() = false;
     produced() = true;
     onDemand() = false;
     typeID() = theTypeID;
-    transient_.parameterSetID_ = modDesc.parameterSetID();
-    transient_.moduleName_ = modDesc.moduleName();
+    transients_.get().parameterSetID_ = modDesc.parameterSetID();
+    transients_.get().moduleName_ = modDesc.moduleName();
     init();
   }
 

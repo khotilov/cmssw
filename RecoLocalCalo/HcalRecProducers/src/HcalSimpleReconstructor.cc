@@ -43,25 +43,26 @@ HcalSimpleReconstructor::HcalSimpleReconstructor(edm::ParameterSet const& conf):
 HcalSimpleReconstructor::~HcalSimpleReconstructor() { }
 
 void HcalSimpleReconstructor::beginRun(edm::Run&r, edm::EventSetup const & es){
-  if(tsFromDB_) {
-    edm::ESHandle<HcalRecoParams> p;
-    es.get<HcalRecoParamsRcd>().get(p);
-    paramTS = new HcalRecoParams(*p.product());
-  }
-  reco_.beginRun(es);
+
+  if (tsFromDB_==true)
+    {
+      edm::ESHandle<HcalRecoParams> p;
+      es.get<HcalRecoParamsRcd>().get(p);
+      paramTS = new HcalRecoParams(*p.product());
+    }
 }
 
 void HcalSimpleReconstructor::endRun(edm::Run&r, edm::EventSetup const & es){
-  if(tsFromDB_ && paramTS) {
-    delete paramTS;
-    paramTS = 0;
-    reco_.endRun();
-  }
+  if (tsFromDB_==true)
+    {
+      if (paramTS) delete paramTS;
+    }
 }
 
 
-template<class DIGICOLL, class RECHITCOLL> 
-void HcalSimpleReconstructor::process(edm::Event& e, const edm::EventSetup& eventSetup)
+
+
+void HcalSimpleReconstructor::produce(edm::Event& e, const edm::EventSetup& eventSetup)
 {
   // get conditions
   edm::ESHandle<HcalDbService> conditions;
@@ -70,58 +71,164 @@ void HcalSimpleReconstructor::process(edm::Event& e, const edm::EventSetup& even
 
   // HACK related to HB- corrections
   if(e.isRealData()) reco_.setForData();
-
-  edm::Handle<DIGICOLL> digi;
-
-  e.getByLabel(inputLabel_,digi);
-
-  // create empty output
-  std::auto_ptr<RECHITCOLL> rec(new RECHITCOLL);
-  rec->reserve(digi->size());
-  // run the algorithm
-  int first = firstSample_;
-  int toadd = samplesToAdd_;
-  typename DIGICOLL::const_iterator i;
-  for (i=digi->begin(); i!=digi->end(); i++) {
-    HcalDetId cell = i->id();
-    DetId detcell=(DetId)cell;
-    // rof 27.03.09: drop ZS marked and passed digis:
-    if (dropZSmarkedPassed_)
-      if (i->zsMarkAndPass()) continue;
-
-    const HcalCalibrations& calibrations=conditions->getHcalCalibrations(cell);
-    const HcalQIECoder* channelCoder = conditions->getHcalCoder (cell);
-    HcalCoderDb coder (*channelCoder, *shape);
-
-    //>>> firstSample & samplesToAdd
-    if(tsFromDB_) {
-      const HcalRecoParam* param_ts = paramTS->getValues(detcell.rawId());
-      first = param_ts->firstSample();
-      toadd = param_ts->samplesToAdd();
-    }
-    rec->push_back(reco_.reconstruct(*i,first,toadd,coder,calibrations));
-
-  }
-  // return result
-  e.put(rec);
-}
-
-
-void HcalSimpleReconstructor::produce(edm::Event& e, const edm::EventSetup& eventSetup)
-{
-  // HACK related to HB- corrections
-  if(e.isRealData()) reco_.setForData();
  
   
   if (det_==DetId::Hcal) {
     if (subdet_==HcalBarrel || subdet_==HcalEndcap) {
-      process<HBHEDigiCollection, HBHERecHitCollection>(e, eventSetup);
-    } else if (subdet_==HcalForward) {
-      process<HFDigiCollection, HFRecHitCollection>(e, eventSetup);
+      edm::Handle<HBHEDigiCollection> digi;
+      
+      e.getByLabel(inputLabel_,digi);
+      
+      // create empty output
+      std::auto_ptr<HBHERecHitCollection> rec(new HBHERecHitCollection);
+      rec->reserve(digi->size());
+      // run the algorithm
+      int toaddMem = 0;
+      int first = firstSample_;
+      int toadd = samplesToAdd_;
+      HBHEDigiCollection::const_iterator i;
+      for (i=digi->begin(); i!=digi->end(); i++) {
+	HcalDetId cell = i->id();
+	DetId detcell=(DetId)cell;
+	// rof 27.03.09: drop ZS marked and passed digis:
+	if (dropZSmarkedPassed_)
+	  if (i->zsMarkAndPass()) continue;
+
+	const HcalCalibrations& calibrations=conditions->getHcalCalibrations(cell);
+	const HcalQIECoder* channelCoder = conditions->getHcalCoder (cell);
+	HcalCoderDb coder (*channelCoder, *shape);
+
+	//>>> firstSample & samplesToAdd
+        if(tsFromDB_) {
+	  const HcalRecoParam* param_ts = paramTS->getValues(detcell.rawId());
+	  first = param_ts->firstSample();    
+	  toadd = param_ts->samplesToAdd();
+	}    
+        if(toaddMem != toadd) {
+	  reco_.initPulseCorr(toadd);
+          toaddMem = toadd;
+	}
+
+	rec->push_back(reco_.reconstruct(*i,first,toadd,coder,calibrations));
+
+      }
+      // return result
+      e.put(rec);
     } else if (subdet_==HcalOuter) {
-      process<HODigiCollection, HORecHitCollection>(e, eventSetup);
+      edm::Handle<HODigiCollection> digi;
+      e.getByLabel(inputLabel_,digi);
+      
+      // create empty output
+      std::auto_ptr<HORecHitCollection> rec(new HORecHitCollection);
+      rec->reserve(digi->size());
+      // run the algorithm
+      int toaddMem = 0;
+      int first = firstSample_;
+      int toadd = samplesToAdd_;
+      HODigiCollection::const_iterator i;
+      for (i=digi->begin(); i!=digi->end(); i++) {
+	HcalDetId cell = i->id();
+	DetId detcell=(DetId)cell;
+	// rof 27.03.09: drop ZS marked and passed digis:
+	if (dropZSmarkedPassed_)
+	  if (i->zsMarkAndPass()) continue;
+
+	const HcalCalibrations& calibrations=conditions->getHcalCalibrations(cell);
+	const HcalQIECoder* channelCoder = conditions->getHcalCoder (cell);
+	HcalCoderDb coder (*channelCoder, *shape);
+       
+
+	//>>> firstSample & samplesToAdd
+        if(tsFromDB_) {
+	  const HcalRecoParam* param_ts = paramTS->getValues(detcell.rawId());
+	  first = param_ts->firstSample();    
+	  toadd = param_ts->samplesToAdd();    
+	}
+        if(toaddMem != toadd) {
+	  reco_.initPulseCorr(toadd);
+          toaddMem = toadd;
+	}
+
+	rec->push_back(reco_.reconstruct(*i,first,toadd,coder,calibrations));
+      }
+      // return result
+      e.put(rec);    
+    } else if (subdet_==HcalForward) {
+      edm::Handle<HFDigiCollection> digi;
+      e.getByLabel(inputLabel_,digi);
+      
+      // create empty output
+      std::auto_ptr<HFRecHitCollection> rec(new HFRecHitCollection);
+      rec->reserve(digi->size());
+      // run the algorithm
+      int toaddMem = 0;
+      int first = firstSample_;
+      int toadd = samplesToAdd_;
+      HFDigiCollection::const_iterator i;
+      for (i=digi->begin(); i!=digi->end(); i++) {
+	HcalDetId cell = i->id();	 
+	DetId detcell=(DetId)cell;
+	// rof 27.03.09: drop ZS marked and passed digis:
+	if (dropZSmarkedPassed_)
+	  if (i->zsMarkAndPass()) continue;
+ 
+	const HcalCalibrations& calibrations=conditions->getHcalCalibrations(cell);
+	const HcalQIECoder* channelCoder = conditions->getHcalCoder (cell);
+	HcalCoderDb coder (*channelCoder, *shape);
+
+	//>>> firstSample & samplesToAdd
+        if(tsFromDB_) {
+	  const HcalRecoParam* param_ts = paramTS->getValues(detcell.rawId());
+	  first = param_ts->firstSample();    
+	  toadd = param_ts->samplesToAdd();    
+	}
+        if(toaddMem != toadd) {
+	  reco_.initPulseCorr(toadd);
+          toaddMem = toadd;
+	}
+
+	rec->push_back(reco_.reconstruct(*i,first,toadd,coder,calibrations));
+      }
+      // return result
+      e.put(rec);     
     } else if (subdet_==HcalOther && subdetOther_==HcalCalibration) {
-      process<HcalCalibDigiCollection, HcalCalibRecHitCollection>(e, eventSetup);
+      edm::Handle<HcalCalibDigiCollection> digi;
+      e.getByLabel(inputLabel_,digi);
+      
+      // create empty output
+      std::auto_ptr<HcalCalibRecHitCollection> rec(new HcalCalibRecHitCollection);
+      rec->reserve(digi->size());
+      // run the algorithm
+      int toaddMem = 0;
+      int first = firstSample_;
+      int toadd = samplesToAdd_;
+      HcalCalibDigiCollection::const_iterator i;
+      for (i=digi->begin(); i!=digi->end(); i++) {
+	HcalCalibDetId cell = i->id();	  
+	DetId detcell=(DetId)cell;
+	// rof 27.03.09: drop ZS marked and passed digis:
+	if (dropZSmarkedPassed_)
+	  if (i->zsMarkAndPass()) continue;
+
+	const HcalCalibrations& calibrations=conditions->getHcalCalibrations(cell);
+	const HcalQIECoder* channelCoder = conditions->getHcalCoder (cell);
+	HcalCoderDb coder (*channelCoder, *shape);
+
+	//>>> firstSample & samplesToAdd
+        if(tsFromDB_) {
+	  const HcalRecoParam* param_ts = paramTS->getValues(detcell.rawId());
+	  first = param_ts->firstSample();    
+	  toadd = param_ts->samplesToAdd();    
+	}
+        if(toaddMem != toadd) {
+	  reco_.initPulseCorr(toadd);
+          toaddMem = toadd;
+	}
+
+	rec->push_back(reco_.reconstruct(*i,first,toadd,coder,calibrations));
+      }
+      // return result
+      e.put(rec);     
     }
   } 
 }

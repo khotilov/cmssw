@@ -44,12 +44,6 @@
 class L1RCT;
 class L1RCTLookupTables;
 
-// HACK, separate out
-//class coral::ISession;
-#include "RelationalAccess/ISession.h"
-
-#include "CondCore/DBCommon/interface/DbSession.h"
-
 class L1RCTProducer : public edm::EDProducer
 {
  public:
@@ -63,16 +57,6 @@ class L1RCTProducer : public edm::EDProducer
 
   void updateConfiguration(const edm::EventSetup&);
 
-  void updateFedVector(const edm::EventSetup&, bool getFromOmds, int);
-/*   void getFedVectorFromRunInfo(const edm::EventSetup&); // or have these return a vector of ints? or a RunInfo?? that'll be pretty big... */
-/*   void getFedVectorFromOmds(const edm::EventSetup&); */
-  const std::vector<int> getFedVectorFromRunInfo(const edm::EventSetup&); // or have these return a vector of ints? or a RunInfo?? that'll be pretty big...
-  //  std::vector<int> getFedVectorFromOmds(const edm::EventSetup&);
-  const std::vector<int> getFedVectorFromOmds(const int);
-
-  void printFedVector(const std::vector<int>);
-  void printUpdatedFedMask();
-  void printUpdatedFedMaskVerbose();
 
  private:
   L1RCTLookupTables* rctLookupTables;
@@ -82,11 +66,7 @@ class L1RCTProducer : public edm::EDProducer
   std::vector<edm::InputTag> ecalDigis;
   std::vector<edm::InputTag> hcalDigis;
   std::vector<int> bunchCrossings; 
-  bool getFedsFromOmds;
-  unsigned int queryDelayInLS;
-  std::string connectionString;
-  std::string authpath;
-  std::string tableToRead;
+
 
   //Create a channel mask object to be updated at every Run....
   L1RCTChannelMask* fedUpdatedMask;
@@ -113,12 +93,7 @@ class L1RCTProducer : public edm::EDProducer
   static const int maxHF =32;
 
 
-/*   coral::ISession* connect(const std::string& connectionString, */
-/* 			   const std::string& user, */
-/* 			   const std::string& pass); */
 
-/*   cond::DbSession* connect( const std::string& connectionString, */
-/* 			    const std::string& authPath ) ; */
 
 
 

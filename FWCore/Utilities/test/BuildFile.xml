@@ -6,7 +6,7 @@
   <bin   file="EDMException_t.cpp">
   </bin>
   <bin   file="TestHelper_t.cpp">
-    <flags   TEST_RUNNER_ARGS=" /bin/bash FWCore/Utilities/test one.sh two.sh testFriendlyNames.sh testAdler32.sh"/>
+    <flags   TEST_RUNNER_ARGS=" /bin/bash FWCore/Utilities/test one.sh two.sh testFriendlyNames.sh"/>
   </bin>
   <bin   file="value_ptr_t.cpp">
   </bin>
@@ -17,8 +17,6 @@
   <bin   file="MallocOpts_t.cpp">
   </bin>
   <bin   file="Guid_t.cpp">
-  </bin>
-  <bin   file="typedefs_t.cpp">
   </bin>
 </environment>
 <bin   file="HRTime_t.cpp">

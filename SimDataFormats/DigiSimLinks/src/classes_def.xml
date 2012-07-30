@@ -1,7 +1,5 @@
 <lcgdict>
-<class name="DTDigiSimLink" ClassVersion="10">
- <version ClassVersion="10" checksum="1414990067"/>
-</class>
+<class name="DTDigiSimLink"/>
 <class name="std::vector<DTDigiSimLink>"/>
 <class name="std::map<DTLayerId,std::vector<DTDigiSimLink> >"/>
 <class name="MuonDigiCollection<DTLayerId,DTDigiSimLink>"/> 

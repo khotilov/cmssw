@@ -21,6 +21,8 @@
 // system include files
 #include <iostream>
 
+#include <boost/cstdint.hpp>
+
 // user include files
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerRecord.h"
@@ -100,7 +102,7 @@ void L1GlobalTriggerRecordProducer::produce(edm::Event& iEvent, const edm::Event
     }
 
     //
-    cms_uint16_t gtFinalOR = gtReadoutRecord->finalOR();
+    boost::uint16_t gtFinalOR = gtReadoutRecord->finalOR();
     int physicsDaqPartition = 0;
     bool gtDecision = static_cast<bool> (gtFinalOR & (1 << physicsDaqPartition));
     

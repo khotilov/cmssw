@@ -7,9 +7,9 @@
 ///
 ///  \author    : Gero Flucke
 ///  date       : October 2006
-///  $Revision: 1.34 $
-///  $Date: 2011/08/08 21:52:31 $
-///  (last update by $Author: flucke $)
+///  $Revision: 1.32 $
+///  $Date: 2011/02/16 13:11:57 $
+///  (last update by $Author: mussgill $)
 
 #include "Alignment/CommonAlignmentAlgorithm/interface/AlignmentAlgorithmBase.h"
 
@@ -95,26 +95,19 @@ class MillePedeAlignmentAlgorithm : public AlignmentAlgorithmBase
 			 const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
 			 unsigned int iHit, AlignmentParameters *&params);
 
-  /// Increase hit counting of MillePedeVariables behind each parVec[i]
-  /// (and also for parameters higher in hierarchy),
-  /// assuming 'parVec' and 'validHitVecY' to be parallel.
-  /// Returns number of valid y-hits.
-  unsigned int addHitCount(const std::vector<AlignmentParameters*> &parVec,
-			   const std::vector<bool> &validHitVecY) const;
-
   /// adds data from reference trajectory from a specific Hit
   void addRefTrackData2D(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
 			 unsigned int iTrajHit, TMatrixDSym &aHitCovarianceM,
 			 TMatrixF &aHitResidualsM, TMatrixF &aLocalDerivativesM);
   
-  /// adds data for virtual measurements from reference trajectory
-  void addVirtualMeas(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
-		      unsigned int iVirtualMeas);
+  /// adds data from reference trajectory from a specific multiple scattering measurement
+  void addMsMeas(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
+		 unsigned int iMsMeas);
 			   
- /// adds data for a specific virtual measurement from reference trajectory 
-  void addRefTrackVirtualMeas1D(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
-				unsigned int iVirtualMeas,TMatrixDSym &aHitCovarianceM,
-				TMatrixF &aHitResidualsM, TMatrixF &aLocalDerivativesM);
+ /// adds multiple scattering data from reference trajectory from a specific Hit
+  void addRefTrackMsMeas1D(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
+			   unsigned int iTrajHit,TMatrixDSym &aHitCovarianceM,
+			   TMatrixF &aHitResidualsM, TMatrixF &aLocalDerivativesM);
   
   /// recursively adding derivatives and labels, false if problems
   bool globalDerivativesHierarchy(const EventInfo &eventInfo, 
@@ -200,11 +193,10 @@ class MillePedeAlignmentAlgorithm : public AlignmentAlgorithmBase
   unsigned int              theMinNumHits;
   double                    theMaximalCor2D; /// maximal correlation allowed for 2D hit in TID/TEC.
                                              /// If larger, the 2D measurement gets diagonalized!!!
-  int                       theLastWrittenIov; // keeping track for output trees...
   std::vector<float>        theFloatBufferX;
   std::vector<float>        theFloatBufferY;
   std::vector<int>          theIntBuffer;
-  bool                      theDoSurveyPixelBarrel;
+  bool						theDoSurveyPixelBarrel;
 };
 
 #endif
