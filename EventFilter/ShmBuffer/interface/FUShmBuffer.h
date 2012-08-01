@@ -13,6 +13,7 @@
 #include <sys/sem.h>
 #include <errno.h>
 
+#include <string>
 
 namespace evf {
   
@@ -59,7 +60,7 @@ namespace evf {
     // public member functions
     //
     void           initialize(unsigned int shmid,unsigned int semid);
-    void           reset();
+    void           reset(bool);
     
     unsigned int   nRawCells()   const { return nRawCells_;  }
     unsigned int   nRecoCells()  const { return nRecoCells_; }
@@ -107,7 +108,7 @@ namespace evf {
     void           writeDqmEmptyEvent();
     
     void           scheduleRawEmptyCellForDiscard();
-    void           scheduleRawEmptyCellForDiscard(FUShmRawCell* cell);
+    bool           scheduleRawEmptyCellForDiscard(FUShmRawCell* cell, bool &pidstatus);
     void           scheduleRawEmptyCellForDiscardServerSide(FUShmRawCell* cell);
     
     bool           writeRecoInitMsg(unsigned int   outModId,
@@ -139,6 +140,7 @@ namespace evf {
 				     unsigned int   dataSize);
 				     
     void           sem_print();
+    std::string    sem_print_s();
     void           printEvtState(unsigned int index);
     void           printDqmState(unsigned int index);
     
