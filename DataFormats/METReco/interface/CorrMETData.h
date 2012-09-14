@@ -1,29 +1,37 @@
-// -*- C++ -*-
-// $Id: CorrMETData.h,v 1.4 2012/09/10 17:48:10 sakuma Exp $
 #ifndef METRECO_CORR_MET_DATA_H
 #define METRECO_CORR_MET_DATA_H
 
-/// \class CorrMETData
-/// 
-/// \short a MET correction term
-/// 
-/// CorrMETData represents a MET correction term.
-/// 
-/// \author Michael Schmitt, Richard Cavanaugh The University of Florida
+ /** \class CorrMETData
+ *
+ * \short Structure containing data common to all types of MET
+ *
+ * CorrMETData holds correction information for all types of MET.
+ *
+ * \author Michael Schmitt, Richard Cavanaugh The University of Florida
+ *
+ * \version   1st Version June 14, 2005.
+ *
+ ************************************************************/
 
-//____________________________________________________________________________||
-struct CorrMETData
-{
+#include <vector>
+
+//const int MET_LABEL_LEN = 24;
+
+struct CorrMETData {
+
+  //char label[MET_LABEL_LEN];
 
   double mex;
   double mey;
   double sumet;
   double significance;
 
-  CorrMETData() : mex(0.0), mey(0.0), sumet(0.0), significance(0.0) { }
-
-  CorrMETData(const CorrMETData& corr) : mex(corr.mex), mey(corr.mey), sumet(corr.sumet), significance(corr.significance) { }
+  CorrMETData() {
+    mex=0.;
+    mey=0.;
+    sumet=0.;
+    significance=0.;
+  }
 };
 
-//____________________________________________________________________________||
 #endif // METRECO_CORR_MET_DATA_H

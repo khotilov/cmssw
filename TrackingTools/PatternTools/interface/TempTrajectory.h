@@ -3,11 +3,13 @@
 
 #include "TrackingTools/PatternTools/interface/TrajectoryMeasurement.h"
 #include "DataFormats/TrajectorySeed/interface/PropagationDirection.h"
+#include "DataFormats/TrajectorySeed/interface/TrajectorySeed.h"
 #include "TrackingTools/TransientTrackingRecHit/interface/TransientTrackingRecHit.h"
 #include "DataFormats/Common/interface/OwnVector.h"
 
 #include <vector>
 #include <algorithm>
+#include <boost/shared_ptr.hpp>
 #include "TrackingTools/PatternTools/interface/bqueue.h"
 
 #include "TrackingTools/PatternTools/interface/Trajectory.h"
@@ -50,24 +52,62 @@ public:
    * copy vector<Trajectory> in the edm::Event
    */
   
-  TempTrajectory() : 
+  TempTrajectory() :  
     theChiSquared(0),
     theNumberOfFoundHits(0), theNumberOfLostHits(0),
-    theDirection(anyDirection), theDirectionValidity(false), 
-    theValid(false),theNLoops(0),theDPhiCache(0)
+    theDirection(alongMomentum), theDirectionValidity(false), 
+    theValid(true),theDPhiCache(0),theNLoops(0)
   {}
   
   
- 
+  /** Constructor of an empty trajectory with undefined direction.
+   *  The direction will be defined at the moment of the push of a second
+   *  measurement, from the relative radii of the first and second 
+   *  measurements.
+   */
+  
+  TempTrajectory( const TrajectorySeed& seed) : 
+    theSeed( new TrajectorySeed(seed) ),
+    theChiSquared(0),
+    theNumberOfFoundHits(0), theNumberOfLostHits(0),
+    theDirection(alongMomentum), theDirectionValidity(false),
+    theValid(true),theDPhiCache(0),theNLoops(0)  
+  {}
+  
   /** Constructor of an empty trajectory with defined direction.
    *  No check is made in the push method that measurements are
    *  added in the correct direction.
    */
-  explicit TempTrajectory(PropagationDirection dir) : 
-  theChiSquared(0), 
-  theNumberOfFoundHits(0), theNumberOfLostHits(0),
-  theDirection(dir), theDirectionValidity(true),
-  theValid(true),theNLoops(0),theDPhiCache(0)
+  TempTrajectory( const TrajectorySeed& seed, PropagationDirection dir) : 
+    theSeed( new TrajectorySeed(seed) ),
+    theChiSquared(0), 
+    theNumberOfFoundHits(0), theNumberOfLostHits(0),
+    theDirection(dir), theDirectionValidity(true),
+    theValid(true),theDPhiCache(0),theNLoops(0)
+  {}
+  
+  /** Constructor of an empty trajectory with defined direction.
+   *  No check is made in the push method that measurements are
+   *  added in the correct direction.
+   */
+  TempTrajectory( const boost::shared_ptr<const TrajectorySeed> & seed, PropagationDirection dir) : 
+    theSeed( seed ),
+    theChiSquared(0), 
+    theNumberOfFoundHits(0), theNumberOfLostHits(0),
+    theDirection(dir), theDirectionValidity(true),
+    theValid(true),theDPhiCache(0),theNLoops(0)
+  {}
+  
+  
+  /** Constructor of an empty trajectory with defined direction.
+   *  No check is made in the push method that measurements are
+   *  added in the correct direction.
+   */
+  TempTrajectory(PropagationDirection dir) : 
+    theChiSquared(0), 
+    theNumberOfFoundHits(0), theNumberOfLostHits(0),
+    theDirection(dir), theDirectionValidity(true),
+    theValid(true),theDPhiCache(0),theNLoops(0)
   {}
 
   
@@ -75,12 +115,12 @@ public:
 #if defined( __GXX_EXPERIMENTAL_CXX0X__)
   
   TempTrajectory(TempTrajectory const & rh) : 
+    theSeed(rh.theSeed),
     theData(rh.theData),
     theChiSquared(rh.theChiSquared), 
     theNumberOfFoundHits(rh.theNumberOfFoundHits), theNumberOfLostHits(rh.theNumberOfLostHits),
-    theDirection(rh.theDirection), theDirectionValidity(rh.theDirectionValidity),theValid(rh.theValid)
-    ,theNLoops(rh.theNLoops)
-    ,theDPhiCache(rh.theDPhiCache)
+    theDirection(rh.theDirection), theDirectionValidity(rh.theDirectionValidity),theValid(rh.theValid),
+    theDPhiCache(rh.theDPhiCache),theNLoops(rh.theNLoops)
   {}
   
   
@@ -88,14 +128,15 @@ public:
     DataContainer aData(rh.theData);
     using std::swap;
     swap(theData,aData);
+    theSeed = rh.theSeed;
     theChiSquared=rh.theChiSquared;
     theNumberOfFoundHits=rh.theNumberOfFoundHits;
     theNumberOfLostHits=rh.theNumberOfLostHits;
     theDirection=rh.theDirection; 
     theDirectionValidity=rh.theDirectionValidity;
     theValid=rh.theValid;
-    theNLoops=rh.theNLoops;
     theDPhiCache=rh.theDPhiCache;
+    theNLoops=rh.theNLoops;
  
     return *this;
 
@@ -103,16 +144,19 @@ public:
   
 
   TempTrajectory(TempTrajectory && rh) noexcept :
+    theSeed(std::move(rh.theSeed)),
     theData(std::move(rh.theData)),
     theChiSquared(rh.theChiSquared), 
     theNumberOfFoundHits(rh.theNumberOfFoundHits), theNumberOfLostHits(rh.theNumberOfLostHits),
     theDirection(rh.theDirection), theDirectionValidity(rh.theDirectionValidity),
     theValid(rh.theValid),
-    theNLoops(rh.theNLoops),
-    theDPhiCache(rh.theDPhiCache){}
+    theDPhiCache(rh.theDPhiCache),
+    theNLoops(rh.theNLoops)
+   {}
 
   TempTrajectory & operator=(TempTrajectory && rh) noexcept {
     using std::swap;
+    swap(theSeed,rh.theSeed);
     swap(theData,rh.theData);
     theChiSquared=rh.theChiSquared;
     theNumberOfFoundHits=rh.theNumberOfFoundHits;
@@ -120,8 +164,8 @@ public:
     theDirection=rh.theDirection;
     theDirectionValidity=rh.theDirectionValidity;
     theValid=rh.theValid;
-    theNLoops=rh.theNLoops;
     theDPhiCache=rh.theDPhiCache;
+    theNLoops=rh.theNLoops;
     return *this;
 
   }
@@ -132,38 +176,27 @@ public:
 
 
   /// construct TempTrajectory from standard Trajectory
-  explicit TempTrajectory( const Trajectory& traj);
+  TempTrajectory( const Trajectory& traj);
 
   /// destruct a TempTrajectory 
-  ~TempTrajectory() {}
+  // trivial destructor, but must be out-of-line for code size issues
+  // https://hypernews.cern.ch/HyperNews/CMS/get/code-perf/247.html
+  ~TempTrajectory() ;
 
     /** Add a new measurement to a Trajectory.
    *  The Chi2 of the trajectory is incremented by the value
    *  of tm.estimate() . 
    */
-  void push( const TrajectoryMeasurement& tm){
-    push( tm, tm.estimate());
-  }
-
-  void push(TrajectoryMeasurement&& tm){
-    push( std::forward<TrajectoryMeasurement>(tm), tm.estimate());
-  }
-
-  template<typename... Args>
-  void emplace(Args && ...args) {
-    theData.emplace_back(std::forward<Args>(args)...);
-    pushAux(theData.back().estimate());
-  }
-
+  void push( const TrajectoryMeasurement& tm);
+#if defined( __GXX_EXPERIMENTAL_CXX0X__)
+  void push(TrajectoryMeasurement&& tm);
+#endif
     /** Add a new sets of measurements to a Trajectory
    *  The sorting of hits in the other trajectory must match the one
    *  inside this trajectory (that is, both along or both opposite to momentum)
-   *  (the input segment will be reset to an empty one)
    */
-  void push(TempTrajectory const & segment);
-
-      
-
+  void push( const TempTrajectory & segment);
+ 
   /** Add a new sets of measurements to a Trajectory
    *  Exactly like push(TempTrajectory), but it doesn't copy the data
    *  (the input segment will be reset to an empty one)
@@ -175,24 +208,10 @@ public:
   /** same as the one-argument push, but the trajectory Chi2 is incremented 
    *  by chi2Increment. Useful e.g. in trajectory smoothing.
    */
-  void push( const TrajectoryMeasurement& tm, double chi2Increment) {
-      theData.push_back(tm);
-      pushAux(chi2Increment);
-  }
-
-  void push( TrajectoryMeasurement&& tm, double chi2Increment) {
-    theData.push_back(std::move(tm));
-    pushAux(chi2Increment);
-  }
-
-  
-  template<typename... Args>
-  void emplace(double chi2Increment, Args && ...args) { // works only because the first Arg is never a double!
-    theData.emplace_back(std::forward<Args>(args)...);
-    pushAux(chi2Increment);
-  }
-
-
+  void push( const TrajectoryMeasurement& tm, double chi2Increment);
+#if defined( __GXX_EXPERIMENTAL_CXX0X__)
+  void push( TrajectoryMeasurement&& tm, double chi2Increment);
+#endif
   /** Remove the last measurement from the trajectory.
    */
   void pop();
@@ -261,12 +280,19 @@ public:
   /// Method to invalidate a trajectory. Useful during ambiguity resolution.
   void invalidate() { theValid = false;}
 
+  /// Access to the seed used to reconstruct the Trajectory
+  const TrajectorySeed & seed() const { return *theSeed;}
+
 
   /** Definition of inactive Det from the Trajectory point of view.
    */
   static bool inactive(//const Det& det
 		       ){return false;}//FIXME
 
+  /** Definition of what it means for a hit to be "lost".
+   *  This definition is also used by the TrajectoryBuilder.
+   */
+  static bool lost( const TransientTrackingRecHit& hit);
 
   /// Redundant method, returns the layer of lastMeasurement() .
   const DetLayer* lastLayer() const {
@@ -274,7 +300,7 @@ public:
   }
 
   /// Convert to a standard Trajectory 
-  Trajectory toTrajectory() const;
+  Trajectory toTrajectory() const ;
 
   /// Pops out all the invalid hits on the tail
   void popInvalidTail() ;
@@ -296,16 +322,13 @@ public:
 
 
 private:
-  /** Definition of what it means for a hit to be "lost".
-   *  This definition is also used by the TrajectoryBuilder.
-   */
-  static bool lost( const TransientTrackingRecHit& hit) dso_internal;
 
-
-  void pushAux(double chi2Increment);
+  void pushAux( const TrajectoryMeasurement& tm, double chi2Increment);
 
 private:
 
+
+  boost::shared_ptr<const TrajectorySeed>    theSeed;
   DataContainer theData;
 
   float theChiSquared;
@@ -313,13 +336,12 @@ private:
   signed short theNumberOfFoundHits;
   signed short theNumberOfLostHits;
 
-  // PropagationDirection 
-  signed char theDirection;
-  bool        theDirectionValidity;
+  PropagationDirection theDirection;
+  bool                 theDirectionValidity;
   bool theValid;
 
-  signed char theNLoops;
   float theDPhiCache;
+  signed char theNLoops;
 
 
   void check() const;

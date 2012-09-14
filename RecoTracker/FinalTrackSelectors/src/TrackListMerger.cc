@@ -36,65 +36,6 @@
 
 #include "RecoTracker/TrackProducer/interface/ClusterRemovalRefSetter.h"
 
-#include <x86intrin.h>
-
-namespace {
-#ifdef STAT_TSB
-inline volatile unsigned long long rdtsc() {
- return __rdtsc();
-}
-
-  struct StatCount {
-    float maxDP=0.;
-    float maxDE=0.;
-    unsigned long long st;
-    long long totBegin=0;
-    long long totPre=0;
-    long long totEnd=0;
-    unsigned long long timeNo;  // no-overlap
-    unsigned long long timeOv;  // overlap
-    void begin(int tt) {
-      totBegin+=tt;
-    }
-    void start() { st=rdtsc(); }
-    void noOverlap() { timeNo += (rdtsc()-st);}
-    void overlap() { timeOv += (rdtsc()-st);}
-    void pre(int tt) { totPre+=tt;}
-    void end(int tt) { totEnd+=tt;}
-    void de(float d) { if (d>maxDE) maxDE=d;}
-    void dp(float d) { if (d>maxDP) maxDP=d;}
-
-
-    void print() const {
-      std::cout << "TrackListMerger stat\nBegin/Pre/End/maxDPhi/maxDEta/Overlap/NoOverlap "
-    		<<  totBegin <<'/'<< totPre <<'/'<< totEnd <<'/'<< maxDP <<'/'<< maxDE 
-		<<'/'<< timeOv/1000 <<'/'<< timeNo/1000
-		<< std::endl;
-    }
-    StatCount() {}
-    ~StatCount() { print();}
-  };
-
-#else
-  struct StatCount {
-    void begin(int){}
-    void pre(int){}
-    void end(int){}
-    void start(){}
-    void noOverlap(){}
-    void overlap(){}
-    void de(float){}
-    void dp(float){}
-
-
-  };
-#endif
-
-  StatCount statCount;
-
-}
-
-
 
 namespace cms
 {
@@ -204,34 +145,30 @@ namespace cms
       }
     }
     
-    unsigned int collsSize =trackColls.size();
     unsigned int rSize=0;
-    unsigned int trackCollSizes[collsSize];
-    unsigned int trackCollFirsts[collsSize];
-    for (unsigned int i=0; i!=collsSize; i++) {
+    unsigned int trackCollSizes[trackColls.size()];
+    unsigned int trackCollFirsts[trackColls.size()];
+    for (unsigned int i=0; i<trackColls.size(); i++) {
       trackCollSizes[i]=trackColls[i]->size();
       trackCollFirsts[i]=rSize;
       rSize+=trackCollSizes[i];
     }
     
-    statCount.begin(rSize);
-
+    
     //
     //  quality cuts first
     // 
     int i=-1;
     
-    int selected[rSize];
-    int indexG[rSize];
+    int selected[rSize]; 
     bool trkUpdated[rSize]; 
     int trackCollNum[rSize];
     int trackQuals[rSize];
     for (unsigned int j=0; j<rSize;j++) {
-      indexG[j]=-1; selected[j]=1; trkUpdated[j]=false; trackCollNum[j]=0; trackQuals[j]=0;
+      selected[j]=1; trkUpdated[j]=false; trackCollNum[j]=0; trackQuals[j]=0;
     }
-
-    int ngood=0;
-    for (unsigned int j=0; j!= collsSize; j++) {
+    
+    for (unsigned int j=0; j< trackColls.size(); j++) {
       const reco::TrackCollection *tC1=trackColls[j];
       
       edm::Handle<edm::ValueMap<int> > trackSelColl;
@@ -276,149 +213,110 @@ namespace cms
 	    selected[i]=0; 
 	    continue;
 	  }
-	  // good!
-	  indexG[i] = ngood++;
 	  //if ( beVerb) std::cout << "inverb " << track->pt() << " " << selected[i] << std::endl;
 	}//end loop over tracks
       }//end more than 0 track
     } // loop over trackcolls
     
     
-    statCount.pre(ngood);    
-
-    //cache the id and rechits of valid hits
-    typedef std::pair<unsigned int, const TrackingRecHit*> IHit;
-    std::vector<IHit> rh1[ngood];  // an array of vectors!
-    //const TrackingRecHit*  fh1[ngood];  // first hit...
-    unsigned char algo[ngood];
-    float score[ngood];
-
- 
-    for ( unsigned int j=0; j<rSize; j++) {
-      if (selected[j]==0) continue;
-      int i = indexG[j];
-      assert(i>=0);
-      unsigned int collNum=trackCollNum[j];
-      unsigned int trackNum=j-trackCollFirsts[collNum];
+    
+    //cache the rechits and valid hits
+    std::vector<const TrackingRecHit*> rh1[rSize];  // an array of vectors!
+    int validHits[rSize];
+    int lostHits[rSize];
+    for ( unsigned int i=0; i<rSize; i++) {
+      validHits[i]=0;
+      lostHits[i]=0;
+      if (selected[i]==0) continue;
+      unsigned int collNum=trackCollNum[i];
+      unsigned int trackNum=i-trackCollFirsts[collNum];
       const reco::Track *track=&((trackColls[collNum])->at(trackNum)); 
-
-      algo[i]=track->algo();
-      int validHits=track->numberOfValidHits();
-      int lostHits=track->numberOfLostHits();
-      score[i] = foundHitBonus_*validHits - lostHitPenalty_*lostHits - track->chi2();
-
- 
-      rh1[i].reserve(validHits) ; 
-      auto compById = [](IHit const &  h1, IHit const & h2) {return h1.first < h2.first;};
-      // fh1[i] = &(**track->recHitsBegin());
+      validHits[i]=track->numberOfValidHits();
+      lostHits[i]=track->numberOfLostHits();
+      
+      rh1[i].reserve(track->recHitsSize());
       for (trackingRecHit_iterator it = track->recHitsBegin();  it != track->recHitsEnd(); ++it) { 
-	const TrackingRecHit* hit = &(**it);  
-	unsigned int id = hit->rawId() ;
-	if(hit->geographicalId().subdetId()>2)  id &= (~3); // mask mono/stereo in strips...
-	if likely(hit->isValid()) { rh1[i].emplace_back(id,hit); std::push_heap(rh1[i].begin(),rh1[i].end(),compById); }
+	const TrackingRecHit* hit = &(**it);
+	rh1[i].push_back(hit);
       }
-      std::sort_heap(rh1[i].begin(),rh1[i].end(),compById);
     }
     
-    //DL here
-    if likely(ngood>2 && collsSize>1)
+    //DL here    
     for ( unsigned int ltm=0; ltm<listsToMerge_.size(); ltm++) {
+      if ( rSize==0 ) continue;
       int saveSelected[rSize];
-      bool notActive[collsSize];
-      for (unsigned int cn=0;cn!=collsSize;++cn)
-	notActive[cn]= find(listsToMerge_[ltm].begin(),listsToMerge_[ltm].end(),cn)==listsToMerge_[ltm].end();
-
       for ( unsigned int i=0; i<rSize; i++) saveSelected[i]=selected[i];
       
       //DL protect against 0 tracks? 
-      for ( unsigned int i=0; i<trackCollFirsts[collsSize-1]; i++) {
+      for ( unsigned int i=0; i<rSize-1; i++) {
 	if (selected[i]==0) continue;
 	unsigned int collNum=trackCollNum[i];
 	//nothing to do if this is the last collection
-	assert(collNum!=collsSize-1 );
+	if (collNum==(rSize-1)) continue;
 	
 	//check that this track is in one of the lists for this iteration
-	if (notActive[collNum]) continue;
-
-	int k1 = indexG[i];
-	unsigned nh1=rh1[k1].size();
+	std::vector<int>::iterator isActive=find(listsToMerge_[ltm].begin(),listsToMerge_[ltm].end(),collNum);
+	if ( isActive==listsToMerge_[ltm].end() ) continue;
+	unsigned int trackNum=i-trackCollFirsts[collNum];
+	const reco::Track *track=&((trackColls[collNum])->at(trackNum)); 
+	unsigned nh1=rh1[i].size();
 	int qualityMaskT1 = trackQuals[i];
 	
-	int nhit1 = nh1; // validHits[k1];
-	float score1 = score[k1];
+	int nhit1 = validHits[i];
+	int lhit1 = lostHits[i];
 	
-
-	// start at next collection
-	for ( unsigned int j=trackCollFirsts[collNum+1]; j<rSize; j++) {
+	for ( unsigned int j=i+1; j<rSize; j++) {
 	  if (selected[j]==0) continue;
 	  unsigned int collNum2=trackCollNum[j];
-	  assert ( collNum != collNum2);
+	  if ( collNum == collNum2) continue;
 	  
 	  //check that this track is in one of the lists for this iteration
-	  if (notActive[collNum2]) continue;
-
-	  int k2 = indexG[j];
-	  	  
+	  std::vector<int>::iterator isActive=find(listsToMerge_[ltm].begin(),listsToMerge_[ltm].end(),collNum2);
+	  if ( isActive==listsToMerge_[ltm].end() ) continue;
+	  
+	  unsigned int trackNum2=j-trackCollFirsts[collNum2];
+	  const reco::Track *track2=&((trackColls[collNum2])->at(trackNum2)); 
+	  
+	  //loop over rechits
+	  int noverlap=0;
+	  int firstoverlap=0;
+	  unsigned nh2=track2->recHitsSize();
+	  
+	  for ( unsigned ih=0; ih<nh1; ++ih ) { 
+	    const TrackingRecHit* it = rh1[i][ih];
+	    if (!it->isValid()) continue;
+	    for ( unsigned jh=0; jh<nh2; ++jh ) { 
+	      const TrackingRecHit *jt=rh1[j][jh];
+	      if (!jt->isValid() ) continue;
+	      if ( (it->geographicalId()|3) !=(jt->geographicalId()|3) ) continue;  // VI: mask mono/stereo...
+	      if (!use_sharesInput_){
+		float delta = fabs ( it->localPosition().x()-jt->localPosition().x() ); 
+		if ((it->geographicalId()==jt->geographicalId())&&(delta<epsilon_)) {
+		  noverlap++;
+		  if ( allowFirstHitShare_ && ( ih == 0 ) && ( jh == 0 ) ) firstoverlap=1;
+		}
+	      }else{
+		if ( it->sharesInput(jt,TrackingRecHit::some) ) {
+		  noverlap++;
+		  if ( allowFirstHitShare_ && ( ih == 0 ) && ( jh == 0 ) ) firstoverlap=1;
+		} // tracks share input
+	      } //else use_sharesInput
+	    } // rechits on second track  
+	  } //loop over ih (rechits on first track
+	  
 	  int newQualityMask = -9; //avoid resetting quality mask if not desired 10+ -9 =1
 	  if (promoteQuality_[ltm]) {
 	    int maskT1= saveSelected[i]>1? saveSelected[i]-10 : qualityMaskT1;
 	    int maskT2= saveSelected[j]>1? saveSelected[j]-10 : trackQuals[j];
 	    newQualityMask =(maskT1 | maskT2); // take OR of trackQuality 
 	  }
-	  unsigned int nh2=rh1[k2].size();
-	  int nhit2 = nh2; 
-
-
-	  auto share = use_sharesInput_ ? 
-	    [](const TrackingRecHit*  it,const TrackingRecHit*  jt, float)->bool { return it->sharesInput(jt,TrackingRecHit::some); } :
-	  [](const TrackingRecHit*  it,const TrackingRecHit*  jt, float eps)->bool {
-	    float delta = std::abs ( it->localPosition().x()-jt->localPosition().x() ); 
-	    return (it->geographicalId()==jt->geographicalId())&&(delta<eps);
-	  };
-
-	  statCount.start();
-
-	  //loop over rechits
-	  int noverlap=0;
-	  int firstoverlap=0;
-	  // check first hit  (should use REAL first hit?)
-	  if unlikely(allowFirstHitShare_ && rh1[k1][0].first==rh1[k2][0].first ) {
-	      const TrackingRecHit*  it = rh1[k1][0].second;
-	      const TrackingRecHit*  jt = rh1[k2][0].second;
-	      if (share(it,jt,epsilon_)) firstoverlap=1; 
-	    }
-
-
-	  // exploit sorting
-	  unsigned int jh=0;
-	  unsigned int ih=0;
-	  while (ih!=nh1 && jh!=nh2) {
-	    // break if not enough to go...
-	    // if ( nprecut-noverlap+firstoverlap > int(nh1-ih)) break;
-	    // if ( nprecut-noverlap+firstoverlap > int(nh2-jh)) break;
-	    auto const id1 = rh1[k1][ih].first; 
-	    auto const id2 = rh1[k2][jh].first; 
-	    if (id1<id2) ++ih;
-	    else if (id2<id1) ++jh;
-	    else {
-	      // in case of split-hit do full conbinatorics
-	      auto li=ih; while( (++li)!=nh1 && id1 == rh1[k1][li].first); 
-	      auto lj=jh; while( (++lj)!=nh2 && id2 == rh1[k2][lj].first);
-	      for (auto ii=ih; ii!=li; ++ii)
-		for (auto jj=jh; jj!=lj; ++jj) {
-		  const TrackingRecHit*  it = rh1[k1][ii].second;
-		  const TrackingRecHit*  jt = rh1[k2][jj].second;
-		  if (share(it,jt,epsilon_))  noverlap++;
-		}
-	      jh=lj; ih=li;
-	    } // equal ids
-	    
-	  } //loop over ih & jh
-	  
+	  int nhit2 = validHits[j];
+	  int lhit2 = lostHits[j];
 	  
 	  if ( (noverlap-firstoverlap) > (std::min(nhit1,nhit2)-firstoverlap)*shareFrac_ ) {
-	    float score2 = score[k2];
-	    constexpr float almostSame = 1.001f;
+	    double score1 = foundHitBonus_*nhit1 - lostHitPenalty_*lhit1 - track->chi2();
+	    double score2 = foundHitBonus_*nhit2 - lostHitPenalty_*lhit2 - track2->chi2();
+	    const double almostSame = 1.001;
 	    if ( score1 > almostSame * score2 ) {
 	      selected[j]=0;
 	      selected[i]=10+newQualityMask; // add 10 to avoid the case where mask = 1
@@ -429,7 +327,7 @@ namespace cms
 	      trkUpdated[j]=true;
 	    }else{
 	      // If tracks from both iterations are virtually identical, choose the one from the first iteration.
-	      if (algo[k1] <= algo[k2]) {
+	      if (track->algo() <= track2->algo()) {
 		selected[j]=0;
 		selected[i]=10+newQualityMask; // add 10 to avoid the case where mask = 1
 		trkUpdated[i]=true;
@@ -439,26 +337,14 @@ namespace cms
 		trkUpdated[j]=true;
 	      }
 	    }//end fi < fj
-	    statCount.overlap();
-	    /*
-	    if (at0[k1]&&at0[k2]) {
-	      statCount.dp(dphi);
-	      if (dz<1.f) statCount.de(deta);
-	    }
-	    */
 	  }//end got a duplicate
-	  else {
-	    statCount.noOverlap();
-	  }
 	  //stop if the ith track is now unselected
 	  if (selected[i]==0) break;
 	}//end track2 loop
       }//end track loop
     } //end loop over track list sets
     
-   
-
- 
+    
     
     // special case - if just doing the trkquals 
     if (trkQualMod_) {
@@ -491,8 +377,8 @@ namespace cms
     //  output selected tracks - if any
     //
     
-    reco::TrackRef trackRefs[rSize];
-    edm::RefToBase<TrajectorySeed> seedsRefs[rSize];
+    trackRefs.resize(rSize);
+    std::vector<edm::RefToBase<TrajectorySeed> > seedsRefs(rSize);
     
     unsigned int nToWrite=0;
     for ( unsigned int i=0; i<rSize; i++) 
@@ -647,9 +533,6 @@ namespace cms
       }
     }
     
-    statCount.end(outputTrks->size());
-
-
     e.put(outputTrks);
     if (copyExtras_) {
       e.put(outputTrkExtras);

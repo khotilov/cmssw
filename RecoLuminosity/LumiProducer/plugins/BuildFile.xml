@@ -87,14 +87,4 @@
   <use name="xerces-c"/>
   <flags EDM_PLUGIN="1"/>
 </library>
-<library file="LumiCorrectionSource.cc" name="LumiCorrectionSource">
-  <use name="RecoLuminosity/LumiProducer"/>
-  <use name="FWCore/PluginManager"/>
-  <use name="xerces-c"/>
-  <flags EDM_PLUGIN="1"/>
-</library>
-<library   file="fPoly.cc" name="RecoLuminosityLumiProducerfPoly">
-  <use name="RecoLuminosity/LumiProducer"/>
-  <use name="FWCore/PluginManager"/>
-  <flags   EDM_PLUGIN="1"/>
-</library>
+

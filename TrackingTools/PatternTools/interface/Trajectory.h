@@ -53,7 +53,7 @@ public:
     theSeed(), seedRef_(),
     theChiSquared(0), theChiSquaredBad(0),
     theNumberOfFoundHits(0), theNumberOfLostHits(0),
-    theDirection(anyDirection), theDirectionValidity(false), theValid(false),theDPhiCache(0),theNLoops(0)
+    theDirection(alongMomentum), theDirectionValidity(false), theValid(true),theDPhiCache(0),theNLoops(0)
     {}
 
 
@@ -63,11 +63,11 @@ public:
    *  measurements.
    */
     
-  explicit Trajectory( const TrajectorySeed& seed) : 
+  Trajectory( const TrajectorySeed& seed) : 
     theSeed( new TrajectorySeed(seed) ), seedRef_(),
     theChiSquared(0), theChiSquaredBad(0),
     theNumberOfFoundHits(0), theNumberOfLostHits(0),
-    theDirection(anyDirection), theDirectionValidity(false), theValid(true),theDPhiCache(0),theNLoops(0)
+    theDirection(alongMomentum), theDirectionValidity(false), theValid(true),theDPhiCache(0),theNLoops(0)
   {}
 
   /** Constructor of an empty trajectory with defined direction.
@@ -91,18 +91,6 @@ public:
     theChiSquared(0), theChiSquaredBad(0),
     theNumberOfFoundHits(0), theNumberOfLostHits(0),
     theDirection(dir), theDirectionValidity(true), theValid(true),theDPhiCache(0),theNLoops(0)
-  {}
-
-  /** Constructor of an empty trajectory with defined direction.
-   *  No check is made in the push method that measurements are
-   *  added in the correct direction.
-   */
-  explicit Trajectory(PropagationDirection dir) : 
-    theSeed(), seedRef_(),
-    theChiSquared(0), theChiSquaredBad(0),
-    theNumberOfFoundHits(0), theNumberOfLostHits(0),
-    theDirection(dir), theDirectionValidity(true), theValid(true),theDPhiCache(0),theNLoops(0)
-   
   {}
 
 
@@ -192,7 +180,7 @@ public:
    */
   TrajectoryMeasurement const & lastMeasurement() const {
     check(); 
-    if (theData.back().recHitR().hit()!=0) return theData.back();
+    if (theData.back().recHit()->hit()!=0) return theData.back();
     else if (theData.size()>2) return *(theData.end()-2);
     else throw cms::Exception("TrajectoryMeasurement::lastMeasurement - Too few measurements in trajectory");
   }
@@ -205,7 +193,7 @@ public:
    */
   TrajectoryMeasurement const & firstMeasurement() const {
     check(); 
-    if (theData.front().recHitR().hit()!=0) return theData.front();
+    if (theData.front().recHit()->hit()!=0) return theData.front();
     else if (theData.size()>2) return *(theData.begin()+1);
     else throw cms::Exception("TrajectoryMeasurement::firstMeasurement - Too few measurements in trajectory");
   }
@@ -318,7 +306,6 @@ public:
   void reverse() ;
 
   const boost::shared_ptr<const TrajectorySeed> & sharedSeed() const { return theSeed; }
-  void setSharedSeed(const boost::shared_ptr<const TrajectorySeed> & seed) { theSeed=seed;}
 
   /// accessor to the delta phi angle betweem the directions of the two measurements on the last 
   /// two layers crossed by the trajectory

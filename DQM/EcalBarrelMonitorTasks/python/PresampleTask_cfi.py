@@ -1,5 +1,6 @@
-ecalPresampleTask = dict(
-    MEs = dict(
-        Pedestal = dict(path = "Presample/Profile/PresampleTask pedestal G12", otype = 'SM', btype = 'Crystal', kind = 'TProfile2D')
-    )
+presampleTask = dict(
+)
+
+presampleTaskPaths = dict(
+    Pedestal = "Presample/Profile/PresampleTask pedestal G12"
 )

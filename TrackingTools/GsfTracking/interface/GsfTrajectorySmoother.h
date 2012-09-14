@@ -18,7 +18,7 @@ class MultiTrajectoryStateMerger;
  *  testing purposes) without combination with the forward fit. 
  */
 
-class GsfTrajectorySmoother GCC11_FINAL : public TrajectorySmoother {
+class GsfTrajectorySmoother : public TrajectorySmoother {
 
 private:
 
@@ -40,8 +40,7 @@ public:
 
   virtual ~GsfTrajectorySmoother();
 
-  virtual Trajectory trajectory(const Trajectory& aTraj) const;
-
+  virtual std::vector<Trajectory> trajectories(const Trajectory& aTraj) const;
   /** propagator used (full propagator, if material effects are
    * applied before the update, otherwise purely geometrical part)
    */

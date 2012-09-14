@@ -4,8 +4,8 @@
 /** \class KFTrajectoryFitter
  *  A Standard Kalman fit. Ported from ORCA
  *
- *  $Date: 2012/05/29 08:23:57 $
- *  $Revision: 1.14 $
+ *  $Date: 2011/01/06 17:04:16 $
+ *  $Revision: 1.13 $
  *  \author todorov, cerati
  */
 
@@ -19,7 +19,7 @@
 #include "TrackingTools/DetLayers/interface/MeasurementEstimator.h"
 #include "TrackingTools/DetLayers/interface/DetLayerGeometry.h"
 
-class KFTrajectoryFitter GCC11_FINAL: public TrajectoryFitter {
+class KFTrajectoryFitter : public TrajectoryFitter {
 
 private:
 
@@ -70,13 +70,13 @@ public:
     }
   }
   
-  Trajectory fitOne(const Trajectory& aTraj,fitType) const;
-  Trajectory fitOne(const TrajectorySeed& aSeed,
-		    const RecHitContainer& hits,fitType) const;
+  virtual std::vector<Trajectory> fit(const Trajectory& aTraj) const;
+  virtual std::vector<Trajectory> fit(const TrajectorySeed& aSeed,
+				      const RecHitContainer& hits) const;
 
-  Trajectory fitOne(const TrajectorySeed& aSeed,
-		    const RecHitContainer& hits, 
-		    const TSOS& firstPredTsos,fitType) const;
+  virtual std::vector<Trajectory> fit(const TrajectorySeed& aSeed,
+				      const RecHitContainer& hits, 
+				      const TSOS& firstPredTsos) const;
 
   const Propagator* propagator() const {return thePropagator;}
   const TrajectoryStateUpdator* updator() const {return theUpdator;}

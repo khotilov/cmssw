@@ -1,7 +1,7 @@
 #ifndef ClusterTask_H
 #define ClusterTask_H
 
-#include "DQWorkerTask.h"
+#include "DQM/EcalCommon/interface/DQWorkerTask.h"
 
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 #include "DataFormats/EgammaReco/interface/BasicClusterFwd.h"
@@ -14,12 +14,12 @@ namespace ecaldqm {
 
   class ClusterTask : public DQWorkerTask {
   public:
-    ClusterTask(edm::ParameterSet const&, edm::ParameterSet const&);
-    ~ClusterTask() {}
+    ClusterTask(const edm::ParameterSet &, const edm::ParameterSet&);
+    ~ClusterTask();
+
+    void bookMEs();
 
     bool filterRunType(const std::vector<short>&);
-
-    void setDependencies(DependencySet&);
 
     void beginRun(const edm::Run &, const edm::EventSetup &);
     void beginEvent(const edm::Event &, const edm::EventSetup &);
@@ -57,15 +57,11 @@ namespace ecaldqm {
       kJPsi, // h1f
       kZ, // h1f
       kHighMass, // h1f
-      kTrendNBC,
-      kTrendBCSize,
-      kTrendNSC,
-      kTrendSCSize,
       nMESets
     };
 
     // needs to be declared in each derived class
-    static void setMEOrdering(std::map<std::string, unsigned>&);
+    static void setMEData(std::vector<MEData>&);
 
   private:
     const CaloTopology *topology_;
@@ -73,6 +69,7 @@ namespace ecaldqm {
     const CaloSubdetectorGeometry* eeGeometry_;
     const EcalRecHitCollection *ebHits_, *eeHits_;
     int ievt_;
+    float lowEMax_;
     int massCalcPrescale_;
   };
 

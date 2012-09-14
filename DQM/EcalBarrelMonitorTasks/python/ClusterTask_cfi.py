@@ -1,35 +1,29 @@
-ecalClusterTask = dict(
-    massCalcPrescale = 1,
-    MEs = dict(
-        BCEMap = dict(path = 'Clusters/BasicClusters/ClusterTask BC energy', otype = 'Ecal3P', btype = 'SuperCrystal', kind = 'TProfile2D', zaxis = {'title': 'energy (GeV)'}),
-        BCEMapProjEta = dict(path = 'Clusters/BasicClusters/ClusterTask BC energy', otype = 'Ecal3P', btype = 'ProjEta', kind = 'TProfile', yaxis = {'title': 'energy (GeV)'}),
-        BCEMapProjPhi = dict(path = 'Clusters/BasicClusters/ClusterTask BC energy', otype = 'Ecal3P', btype = 'ProjPhi', kind = 'TProfile', yaxis = {'title': 'energy (GeV)'}),
-        BCOccupancy = dict(path = 'Clusters/BasicClusters/ClusterTask BC occupancy', otype = 'Ecal3P', btype = 'SuperCrystal', kind = 'TH2F'),
-        BCOccupancyProjEta = dict(path = 'Clusters/BasicClusters/ClusterTask BC occupancy', otype = 'Ecal3P', btype = 'ProjEta', kind = 'TH1F'),
-        BCOccupancyProjPhi = dict(path = 'Clusters/BasicClusters/ClusterTask BC occupancy', otype = 'Ecal3P', btype = 'ProjPhi', kind = 'TH1F'),
-        BCSizeMap = dict(path = 'Clusters/BasicClusters/ClusterTask BC size', otype = 'Ecal3P', btype = 'SuperCrystal', kind = 'TProfile2D'),
-        BCSizeMapProjEta = dict(path = 'Clusters/BasicClusters/ClusterTask BC size', otype = 'Ecal3P', btype = 'ProjEta', kind = 'TProfile'),
-        BCSizeMapProjPhi = dict(path = 'Clusters/BasicClusters/ClusterTask BC size', otype = 'Ecal3P', btype = 'ProjPhi', kind = 'TProfile'),
-        BCE = dict(path = 'Clusters/BasicClusters/ClusterTask BC energy 1D', otype = 'Ecal3P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 50, 'low': 0., 'high': 150., 'title': 'energy (GeV)'}),
-        BCNum = dict(path = 'Clusters/BasicClusters/ClusterTask BC number in event', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 20, 'low': 0., 'high': 100.}),
-        BCSize = dict(path = 'Clusters/BasicClusters/ClusterTask BC size 1D', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 50, 'low': 0., 'high': 100.}),
-        SCE = dict(path = 'Clusters/SuperClusters/ClusterTask SC energy', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 50, 'low': 0., 'high': 150., 'title': 'energy (GeV)'}),
-        SCELow = dict(path = 'Clusters/SuperClusters/ClusterTask SC energy low', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 50, 'low': 0., 'high': 10., 'title': 'energy (GeV)'}),
-        SCSeedEnergy = dict(path = 'Clusters/SuperClusters/ClusterTask SC seed energy', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 50, 'low': 0., 'high': 150., 'title': 'energy (GeV)'}),
-        SCClusterVsSeed = dict(path = 'Clusters/SuperClusters/ClusterTask SC energy vs seed energy', otype = 'Ecal2P', btype = 'User', kind = 'TH2F', xaxis = {'nbins': 50, 'low': 0., 'high': 150., 'title': 'energy (GeV)'}, yaxis = {'nbins': 50, 'low': 0., 'high': 150., 'title': 'energy (GeV)'}),
-        SCSeedOccupancy = dict(path = 'Clusters/SuperClusters/ClusterTask SC seed occupancy', otype = 'Ecal3P', btype = 'SuperCrystal', kind = 'TH2F'),
-        SingleCrystalCluster = dict(path = 'Clusters/SuperClusters/ClusterTask SC single-crystal cluster seed occupancy', otype = 'Ecal3P', btype = 'SuperCrystal', kind = 'TH2F'),
-        SCNum = dict(path = 'Clusters/SuperClusters/ClusterTask SC number in event', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 20, 'low': 0., 'high': 20.}),
-        SCNBCs = dict(path = 'Clusters/SuperClusters/ClusterTask SC size (BC)', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 15, 'low': 0., 'high': 15.}),
-        SCNcrystals = dict(path = 'Clusters/SuperClusters/ClusterTask SC size (crystal)', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 50, 'low': 0., 'high': 150.}),
-        SCR9 = dict(path = 'Clusters/SuperClusters/ClusterTask SC R9', otype = 'Ecal2P', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 50, 'low': 0., 'high': 1.2}),
-        Pi0 = dict(path = 'Clusters/DiCluster/ClusterTask dicluster mass Pi0', otype = 'None', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 100, 'low': 0., 'high': 0.4, 'title': 'mass (GeV)'}),
-        JPsi = dict(path = 'Clusters/DiCluster/ClusterTask dicluster mass JPsi', otype = 'None', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 100, 'low': 2.9, 'high': 3.3, 'title': 'mass (GeV)'}),
-        Z = dict(path = 'Clusters/DiCluster/ClusterTask dicluster mass Z0', otype = 'None', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 100, 'low': 60., 'high': 120., 'title': 'mass (GeV)'}),
-        HighMass = dict(path = 'Clusters/DiCluster/ClusterTask dicluster mass high', otype = 'None', btype = 'User', kind = 'TH1F', xaxis = {'nbins': 100, 'low': 120., 'high': 3000., 'title': 'mass (GeV)'}),
-        TrendNBC = dict(path = 'Trend/ClusterTask number of basic clusters', otype = 'Ecal2P', btype = 'Trend', kind = 'TProfile'),
-        TrendBCSize = dict(path = 'Trend/ClusterTask size of basic clusters', otype = 'Ecal2P', btype = 'Trend', kind = 'TProfile'),
-        TrendNSC = dict(path = 'Trend/ClusterTask number of super clusters', otype = 'Ecal2P', btype = 'Trend', kind = 'TProfile'),
-        TrendSCSize = dict(path = 'Trend/ClusterTask size of super clusters', otype = 'Ecal2P', btype = 'Trend', kind = 'TProfile')
+clusterTask = dict(
+    lowEMax = 10.,
+    massCalcPrescale = 1
     )
-)
+
+clusterTaskPaths = dict(
+   BCE          = 'Clusters/BasicClusters/ClusterTask BC E 1D',
+   BCNum        = 'Clusters/BasicClusters/ClusterTask BC number in event',
+   BCSize       = 'Clusters/BasicClusters/ClusterTask BC size 1D',
+   BCEMap       = 'Clusters/BasicClusters/ClusterTask BC E',
+   BCOccupancy  = 'Clusters/BasicClusters/ClusterTask BC occupancy',
+   BCSizeMap    = 'Clusters/BasicClusters/ClusterTask BC size',
+
+   SCE          = 'Clusters/SuperClusters/ClusterTask SC E',
+   SCELow       = 'Clusters/SuperClusters/ClusterTask SC E low',
+   SCSeedEnergy = 'Clusters/SuperClusters/ClusterTask SC seed energy',
+   SCClusterVsSeed = 'Clusters/SuperClusters/ClusterTask SC energy vs seed energy',
+   SCNum        = 'Clusters/SuperClusters/ClusterTask SC number in event',
+   SCNBCs       = 'Clusters/SuperClusters/ClusterTask SC size (BC)',
+   SCNcrystals  = 'Clusters/SuperClusters/ClusterTask SC size (crystal)',
+   SCR9         = 'Clusters/SuperClusters/ClusterTask SC R9',
+   SCSeedOccupancy = 'Clusters/SuperClusters/ClusterTask SC seed occupancy',
+   SCSingleCrystalCluster = 'Clusters/SuperClusters/ClusterTask SC single-crystal cluster seed occupancy',
+   Pi0          = 'Clusters/DiCluster/ClusterTask dicluster mass Pi0',
+   JPsi         = 'Clusters/DiCluster/ClusterTask dicluster mass JPsi',
+   Z            = 'Clusters/DiCluster/ClusterTask dicluster mass Z0',
+   HighMass     = 'Clusters/DiCluster/ClusterTask dicluster mass high'
+   )
+    

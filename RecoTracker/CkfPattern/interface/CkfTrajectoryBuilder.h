@@ -54,15 +54,6 @@ public:
   /// trajectories building starting from a seed
   virtual void trajectories(const TrajectorySeed& seed, TrajectoryContainer &ret) const;
 
-  // new interface returning the start Trajectory...
-  TempTrajectory buildTrajectories (const TrajectorySeed&,
-				    TrajectoryContainer &ret,
-				    const TrajectoryFilter*) const;
-  
-  
-  void  rebuildTrajectories(TempTrajectory const& startingTraj, const TrajectorySeed&,
-			    TrajectoryContainer& result) const {}
-
   /// set Event for the internal MeasurementTracker data member
   //  virtual void setEvent(const edm::Event& event) const;
 
@@ -78,10 +69,10 @@ public:
 
 
  protected:
-  virtual void findCompatibleMeasurements(const TrajectorySeed&seed, const TempTrajectory& traj, std::vector<TrajectoryMeasurement> & result) const;
+  virtual void findCompatibleMeasurements( const TempTrajectory& traj, std::vector<TrajectoryMeasurement> & result) const;
 
-  void limitedCandidates(const TrajectorySeed&seed, TempTrajectory& startingTraj, TrajectoryContainer& result) const;
-  void limitedCandidates(const boost::shared_ptr<const TrajectorySeed> & sharedSeed, TempTrajectoryContainer &candidates, TrajectoryContainer& result) const;
+  void limitedCandidates( TempTrajectory& startingTraj, TrajectoryContainer& result) const;
+  void limitedCandidates( TempTrajectoryContainer &candidates, TrajectoryContainer& result) const;
   
   void updateTrajectory( TempTrajectory& traj, const TM& tm) const;
 

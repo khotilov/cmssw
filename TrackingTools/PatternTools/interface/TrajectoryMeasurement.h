@@ -106,7 +106,6 @@ public:
     theUpdatedState(uTrajectoryStateOnSurface),
     theRecHit(aRecHit),
     theLayer(0), theEstimate(aEstimate) {}
-
   TrajectoryMeasurement(TrajectoryStateOnSurface fwdPredTrajectoryStateOnSurface,
 			TrajectoryStateOnSurface bwdPredTrajectoryStateOnSurface,
                         TrajectoryStateOnSurface uTrajectoryStateOnSurface,
@@ -119,6 +118,7 @@ public:
     theLayer(layer), theEstimate(aEstimate) {}
 
  
+#if defined( __GXX_EXPERIMENTAL_CXX0X__)
   TrajectoryMeasurement( TrajectoryMeasurement const & rh) :
     theFwdPredictedState(rh.theFwdPredictedState),
     theBwdPredictedState(rh.theBwdPredictedState),
@@ -138,7 +138,6 @@ public:
 
   }
 
-#if defined( __GXX_EXPERIMENTAL_CXX0X__)
 
   TrajectoryMeasurement( TrajectoryMeasurement && rh)  noexcept:
     theFwdPredictedState(std::move(rh.theFwdPredictedState)),
@@ -159,56 +158,52 @@ public:
     return *this;
 
   }
-  
+ 
 #endif
+
+
+  
+
 
   /** Access to forward predicted state (from fitter or builder).
    *  To be replaced by forwardPredictedState.
    */
-  TrajectoryStateOnSurface const & predictedState() const {
+  TrajectoryStateOnSurface  predictedState() const {
     return theFwdPredictedState;
   }
 
   /// Access to forward predicted state (from fitter or builder)
-  TrajectoryStateOnSurface const & forwardPredictedState() const {
+  TrajectoryStateOnSurface forwardPredictedState() const {
     return theFwdPredictedState;
   }
   /// Access to backward predicted state (from smoother)
-  TrajectoryStateOnSurface const & backwardPredictedState() const {
+  TrajectoryStateOnSurface backwardPredictedState() const {
     return theBwdPredictedState;
   }
 
   /** Access to updated state (combination of forward predicted state
    *  and hit for fitter, + backward predicted state for smoother)
    */
-  TrajectoryStateOnSurface const & updatedState() const {
+  TrajectoryStateOnSurface updatedState() const {
     return theUpdatedState;
   }
 
-  ConstRecHitPointer::element_type const & recHitR() const {
-    return *theRecHit.get();
-  }
-
-  ConstRecHitPointer const & recHitP() const {
+  ConstRecHitPointer recHit() const {
     return theRecHit;
   }
-
-  ConstRecHitPointer const & recHit() const {
-    return recHitP();
-  } 
 
   float estimate() const { return theEstimate;}
 
   const DetLayer* layer() const { return theLayer;}
 
-  void setLayer( DetLayer const * il) const { theLayer=il;}
+  void setLayer( const DetLayer* il) { theLayer=il;}
 
 private:
   TrajectoryStateOnSurface theFwdPredictedState;
   TrajectoryStateOnSurface theBwdPredictedState;
   TrajectoryStateOnSurface theUpdatedState;
   ConstRecHitPointer       theRecHit;
-  mutable DetLayer const * theLayer;
+  const DetLayer* theLayer;
   float theEstimate;
 };
 

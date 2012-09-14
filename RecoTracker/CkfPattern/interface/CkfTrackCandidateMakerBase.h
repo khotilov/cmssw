@@ -8,7 +8,6 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "TrackingTools/PatternTools/interface/TrajectoryBuilder.h"
-#include "RecoTracker/CkfPattern/interface/BaseCkfTrajectoryBuilder.h"
 
 #include "TrackingTools/TrajectoryCleaning/interface/TrajectoryCleaner.h"
 
@@ -50,7 +49,7 @@ namespace cms
     unsigned int theMaxNSeeds;
 
     std::string theTrajectoryBuilderName;
-    const BaseCkfTrajectoryBuilder*  theTrajectoryBuilder;
+    const TrajectoryBuilder*  theTrajectoryBuilder;
 
     std::string theTrajectoryCleanerName;
     const TrajectoryCleaner*               theTrajectoryCleaner;

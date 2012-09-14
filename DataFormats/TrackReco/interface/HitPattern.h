@@ -108,28 +108,17 @@
 //      std::cout << "number of of pixel barrel layers with measurement is "
 //                << p.pixelBarrelLayersWithMeasurement() << std::endl;
 //
+#include <ostream>
 #include "DataFormats/DetId/interface/DetId.h"
 #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
 #include "DataFormats/SiStripDetId/interface/StripSubdetector.h"
 #include "DataFormats/MuonDetId/interface/MuonSubdetId.h"
 #include "DataFormats/TrackingRecHit/interface/TrackingRecHitFwd.h"
-#include "FWCore/Utilities/interface/GCC11Compatibility.h"
-#include <algorithm>
-#include <ostream>
-
-
+#include "FWCore/Utilities/interface/Likely.h"
 namespace reco {
   class HitPattern {
   public:
     enum { MONO = 1, STEREO = 2 };
-
-   // number of 32 bit integers to store the full pattern
-    const static unsigned short PatternSize = 25;
-
-    // number of bits used for each hit
-    const static unsigned short HitSize = 11;    
- 
-    static const int MaxHits = (PatternSize * 32) / HitSize;
 
     // default constructor
     // init hit pattern array as 0x00000000, ..., 0x00000000
@@ -176,16 +165,6 @@ namespace reco {
 	if (typeFilter(pattern)&&filter(pattern)) ++count;
       }
       return count;
-    }
-
-    template<typename F>
-    void call(filterType typeFilter, F f) const {
-     for (int i=0; i<(PatternSize * 32) / HitSize; i++) {
-	uint32_t pattern = getHitPattern(i);
-	if (pattern == 0) break;
-	// f() return false to ask to stop looping 
-	if (typeFilter(pattern) && !f(pattern) ) break;
-     }
     }
 
     // print the pattern of the position-th hit
@@ -358,6 +337,11 @@ namespace reco {
     int numberOfDTStationsWithBothViews() const ;
   private:
 
+    // number of 32 bit integers to store the full pattern
+    const static unsigned short PatternSize = 25;
+
+    // number of bits used for each hit
+    const static unsigned short HitSize = 11;    
  
     // 1 bit to distinguish tracker and muon subsystems
     const static unsigned short SubDetectorOffset = 10; 
@@ -809,53 +793,6 @@ inline int HitPattern::numberOfInactiveTrackerHits() const {
   inline int HitPattern::outermostMuonStationWithBadHits()   const { return outermostMuonStationWithHits(3);  }
   inline int HitPattern::outermostMuonStationWithAnyHits()   const { return outermostMuonStationWithHits(-1); }
 
-#ifndef CMS_NOCXX11 // cint....
-
-  template<int N=reco::HitPattern::MaxHits>
-  struct PatternSet {
-    static constexpr int MaxHits=N;
-    unsigned char hit[N];
-    unsigned char nhit;
-  
-    unsigned char const * begin() const { return hit;}
-    unsigned char const * end() const { return hit+nhit;}
-    unsigned char  * begin()  { return hit;}
-    unsigned char  * end()  { return hit+nhit;}
-    int size() const { return nhit;}
-    unsigned char operator[](int i) const{ return hit[i];}
-    
-    PatternSet(): nhit(0){}
-    PatternSet(reco::HitPattern const & hp) {
-      fill(hp);
-    }
-    
-    void fill(reco::HitPattern const & hp) {
-      int lhit=0;
-      auto unpack =[&lhit,this](uint32_t pattern) -> bool {
-	unsigned char p = 255&(pattern>>3);
-	hit[lhit++]= p;
-	
-	// bouble sort
-	if (lhit>1)
-	  for (auto h=hit+lhit-1; h!=hit; --h) {
-	    if ( (*(h-1)) <= p) break; // { (*h)=p;break;}
-	    (*h)=*(h-1);  *(h-1)=p;
-	}
-	return lhit<MaxHits;
-      };
-      hp.call(reco::HitPattern::validHitFilter,unpack);
-      nhit=lhit;
-    }
-  };
-
-  template<int N>
-  inline PatternSet<N> commonHits(PatternSet<N> const & p1, PatternSet<N> const & p2) {
-    PatternSet<N> comm;
-    comm.nhit = std::set_intersection(p1.begin(),p1.end(),p2.begin(),p2.end(),comm.begin())-comm.begin();
-    return comm;
 }
-#endif // gcc11
-
-} // namespace reco
-
+  
 #endif

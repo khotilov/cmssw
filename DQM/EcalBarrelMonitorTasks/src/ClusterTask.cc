@@ -16,15 +16,16 @@
 
 namespace ecaldqm {
 
-  ClusterTask::ClusterTask(edm::ParameterSet const& _workerParams, edm::ParameterSet const& _commonParams) :
-    DQWorkerTask(_workerParams, _commonParams, "ClusterTask"),
+  ClusterTask::ClusterTask(const edm::ParameterSet &_params, const::edm::ParameterSet& _paths) :
+    DQWorkerTask(_params, _paths, "ClusterTask"),
     topology_(0),
     ebGeometry_(0),
     eeGeometry_(0),
     ebHits_(0),
     eeHits_(0),
     ievt_(0),
-    massCalcPrescale_(_workerParams.getUntrackedParameter<int>("massCalcPrescale"))
+    lowEMax_(0.),
+    massCalcPrescale_(0)
   {
     collectionMask_ = 
       (0x1 << kRun) |
@@ -35,15 +36,17 @@ namespace ecaldqm {
       (0x1 << kEBSuperCluster) |
       (0x1 << kEESuperCluster);
 
-    if(massCalcPrescale_ == 0)
-      throw cms::Exception("InvalidConfiguration") << "Mass calculation prescale is zero";
+    dependencies_.push_back(std::pair<Collections, Collections>(kEBSuperCluster, kEBRecHit));
+    dependencies_.push_back(std::pair<Collections, Collections>(kEESuperCluster, kEERecHit));
+
+    edm::ParameterSet const& taskParams(_params.getUntrackedParameterSet(name_));
+
+    lowEMax_ = taskParams.getUntrackedParameter<double>("lowEMax");
+    massCalcPrescale_ = taskParams.getUntrackedParameter<int>("massCalcPrescale");
   }
 
-  void
-  ClusterTask::setDependencies(DependencySet& _dependencies)
+  ClusterTask::~ClusterTask()
   {
-    _dependencies.push_back(Dependency(kEBSuperCluster, kEBRecHit));
-    _dependencies.push_back(Dependency(kEESuperCluster, kEERecHit));
   }
 
   void
@@ -72,6 +75,32 @@ namespace ecaldqm {
     eeHits_ = 0;
 
     ievt_++;
+  }
+
+  void
+  ClusterTask::bookMEs()
+  {
+    DQWorker::bookMEs();
+
+    MEs_[kBCE]->setAxisTitle("energy (GeV)", 1);
+    MEs_[kBCNum]->setAxisTitle("number of clusters", 1);
+    MEs_[kBCSize]->setAxisTitle("number of clusters", 1);
+    MEs_[kSCE]->setAxisTitle("energy (GeV)", 1);
+    MEs_[kSCELow]->setAxisTitle("energy (GeV)", 1);
+    MEs_[kSCSeedEnergy]->setAxisTitle("energy (GeV)", 1);
+    MEs_[kSCClusterVsSeed]->setAxisTitle("seed crystal energy (GeV)", 1);
+    MEs_[kSCClusterVsSeed]->setAxisTitle("cluster energy (GeV)", 2);
+    MEs_[kSCNum]->setAxisTitle("number of clusters", 1);
+    MEs_[kSCNBCs]->setAxisTitle("cluster size", 1);
+    MEs_[kSCNcrystals]->setAxisTitle("cluster size", 1);
+    MEs_[kSCR9]->setAxisTitle("R9", 1);
+    MEs_[kPi0]->setAxisTitle("mass (GeV)", 1);
+    MEs_[kJPsi]->setAxisTitle("mass (GeV)", 1);
+    MEs_[kZ]->setAxisTitle("mass (GeV)", 1);
+    MEs_[kHighMass]->setAxisTitle("mass (GeV)", 1);
+
+    for(int i(0); i < 2; i++)
+      MEs_[kSCELow]->getME(i)->getTH1()->GetXaxis()->SetLimits(0., lowEMax_);
   }
   
   bool
@@ -132,20 +161,19 @@ namespace ecaldqm {
       MEs_[kBCE]->fill(id, energy);
 
       MEs_[kBCEMap]->fill(id, energy);
-      MEs_[kBCEMapProjEta]->fill(position.eta(), energy);
+      MEs_[kBCEMapProjEta]->fill(id, energy);
       MEs_[kBCEMapProjPhi]->fill(id, energy);
 
       MEs_[kBCOccupancy]->fill(id);
-      MEs_[kBCOccupancyProjEta]->fill(position.eta());
+      MEs_[kBCOccupancyProjEta]->fill(id);
       MEs_[kBCOccupancyProjPhi]->fill(id);
 
       float size(bcItr->size());
 
       MEs_[kBCSize]->fill(id, size);
-      if(online_) MEs_[kTrendBCSize]->fill(id, double(iLumi), size);
 
       MEs_[kBCSizeMap]->fill(id, size);
-      MEs_[kBCSizeMapProjEta]->fill(position.eta(), size);
+      MEs_[kBCSizeMapProjEta]->fill(id, size);
       MEs_[kBCSizeMapProjPhi]->fill(id, size);
 
       int zside(position.z() > 0 ? 1 : 0);
@@ -167,17 +195,13 @@ namespace ecaldqm {
     }
 
     if(isBarrel){
-      MEs_[kBCNum]->fill(unsigned(BinService::kEB + 1), nBC[0] + nBC[1]);
-      if(online_) MEs_[kTrendNBC]->fill(unsigned(BinService::kEB + 1), double(iLumi), nBC[0] + nBC[1]);
+      MEs_[kBCNum]->fill((unsigned)BinService::kEB + 1, nBC[0] + nBC[1]);
     }else{
-      MEs_[kBCNum]->fill(unsigned(BinService::kEEm + 1), nBC[0]);
-      MEs_[kBCNum]->fill(unsigned(BinService::kEEp + 1), nBC[1]);
-      if(online_) MEs_[kTrendNBC]->fill(unsigned(BinService::kEE + 1), double(iLumi), nBC[0] + nBC[1]);
+      MEs_[kBCNum]->fill((unsigned)BinService::kEEm + 1, nBC[0]);
+      MEs_[kBCNum]->fill((unsigned)BinService::kEEp + 1, nBC[1]);
     }
 
     if(ievt_ % massCalcPrescale_ != 0) return;
-
-    const double pi(3.14159265);
 
     for(vector<reco::BasicCluster const*>::iterator bcItr1(lowMassCands.begin()); bcItr1 != lowMassCands.end(); ++bcItr1){
       reco::BasicCluster const& bc1(**bcItr1);
@@ -199,10 +223,8 @@ namespace ecaldqm {
 
 	float epair(energy1 + energy2);
 	float pzpair(abs(pz1 + pz2));
-
-        float m2(epair * epair - pzpair * pzpair - ptpair * ptpair);
-        if(m2 < 0.) continue;
 	
+	if(epair < pzpair + 1.e-10) continue;
 	float eta(0.5 * log((epair + pzpair)/(epair - pzpair)));
 	float phi(atan2(px1 + px2, py1 + py2));
 
@@ -210,13 +232,11 @@ namespace ecaldqm {
 	for(reco::BasicClusterCollection::const_iterator bcItr(_bcs.begin()); bcItr != _bcs.end(); ++bcItr){
 	  float dEta(bcItr->eta() - eta);
 	  float dPhi(bcItr->phi() - phi);
-          if(dPhi > 2. * pi) dPhi -= 2. * pi;
-          else if(dPhi < -2. * pi) dPhi += 2. * pi;
 	  if(sqrt(dEta * dEta + dPhi * dPhi) < 0.2) iso += bcItr->energy() * sin(bcItr->position().theta());
 	}
 	if(iso > 0.5) continue;
 
-	float mass(sqrt(m2));
+	float mass(sqrt(epair * epair - pzpair * pzpair - ptpair * ptpair));
 	MEs_[kPi0]->fill(mass);
 	MEs_[kJPsi]->fill(mass);
       }
@@ -241,7 +261,7 @@ namespace ecaldqm {
     reco::SuperCluster const* leading(0);
     reco::SuperCluster const* subLeading(0);
 
-    int nSC(0);
+    int nSC[] = {0, 0};
 
     for(reco::SuperClusterCollection::const_iterator scItr(_scs.begin()); scItr != _scs.end(); ++scItr){
       const math::XYZPoint &position(scItr->position());
@@ -259,12 +279,10 @@ namespace ecaldqm {
       float energy(scItr->energy());
 
       MEs_[kSCE]->fill(id, energy);
-      MEs_[kSCELow]->fill(id, energy);
+      if(energy < lowEMax_) MEs_[kSCELow]->fill(id, energy);
 
       MEs_[kSCNBCs]->fill(id, scItr->clustersSize());
       MEs_[kSCNcrystals]->fill(id, scItr->size());
-
-      if(online_) MEs_[kTrendSCSize]->fill(id, double(iLumi), scItr->size());
 
       if(!hits) continue;
       EcalRecHitCollection::const_iterator seedItr(hits->find(id));
@@ -281,7 +299,8 @@ namespace ecaldqm {
       float e3x3(EcalClusterTools::e3x3(*scItr->seed(), hits, topology_));
       MEs_[kSCR9]->fill(id, e3x3 / energy);
 
-      nSC++;
+      int zside(position.z() > 0 ? 1 : 0);
+      nSC[zside]++;
 
       if(ievt_ % massCalcPrescale_ != 0) continue;
 
@@ -296,12 +315,10 @@ namespace ecaldqm {
     }
 
     if(_collection == kEBSuperCluster){
-      MEs_[kSCNum]->fill(unsigned(BinService::kEB + 1), nSC);
-      if(online_) MEs_[kTrendNSC]->fill(unsigned(BinService::kEB + 1), double(iLumi), nSC);
-    }
-    else{
-      MEs_[kSCNum]->fill(unsigned(BinService::kEE + 1), nSC);
-      if(online_) MEs_[kTrendNSC]->fill(unsigned(BinService::kEE + 1), double(iLumi), nSC);
+      MEs_[kSCNum]->fill((unsigned)BinService::kEB + 1, nSC[0] + nSC[1]);
+    }else{
+      MEs_[kSCNum]->fill((unsigned)BinService::kEEm + 1, nSC[0]);
+      MEs_[kSCNum]->fill((unsigned)BinService::kEEp + 1, nSC[1]);
     }
 
     if(ievt_ % massCalcPrescale_ != 0) return;
@@ -312,9 +329,7 @@ namespace ecaldqm {
     float px(leading->energy() * sin(leading->position().theta()) * cos(leading->phi()) + subLeading->energy() * sin(subLeading->position().theta()) * cos(subLeading->phi()));
     float py(leading->energy() * sin(leading->position().theta()) * sin(leading->phi()) + subLeading->energy() * sin(subLeading->position().theta()) * sin(subLeading->phi()));
     float pz(leading->energy() * cos(leading->position().theta()) + subLeading->energy() * cos(subLeading->position().theta()));
-    float m2(e * e - px * px - py * py - pz * pz);
-    if(m2 < 0.) return;
-    float mass(sqrt(m2));
+    float mass(sqrt(e * e - px * px - py * py - pz * pz));
     MEs_[kZ]->fill(mass);
     MEs_[kHighMass]->fill(mass);
 
@@ -322,38 +337,96 @@ namespace ecaldqm {
 
   /*static*/
   void
-  ClusterTask::setMEOrdering(std::map<std::string, unsigned>& _nameToIndex)
+  ClusterTask::setMEData(std::vector<MEData>& _data)
   {
-    _nameToIndex["BCEMap"] = kBCEMap;
-    _nameToIndex["BCEMapProjEta"] = kBCEMapProjEta;
-    _nameToIndex["BCEMapProjPhi"] = kBCEMapProjPhi;
-    _nameToIndex["BCOccupancy"] = kBCOccupancy;
-    _nameToIndex["BCOccupancyProjEta"] = kBCOccupancyProjEta;
-    _nameToIndex["BCOccupancyProjPhi"] = kBCOccupancyProjPhi;
-    _nameToIndex["BCSizeMap"] = kBCSizeMap;
-    _nameToIndex["BCSizeMapProjEta"] = kBCSizeMapProjEta;
-    _nameToIndex["BCSizeMapProjPhi"] = kBCSizeMapProjPhi;
-    _nameToIndex["BCE"] = kBCE;
-    _nameToIndex["BCNum"] = kBCNum;
-    _nameToIndex["BCSize"] = kBCSize;
-    _nameToIndex["SCE"] = kSCE;
-    _nameToIndex["SCELow"] = kSCELow;
-    _nameToIndex["SCSeedEnergy"] = kSCSeedEnergy;
-    _nameToIndex["SCClusterVsSeed"] = kSCClusterVsSeed;
-    _nameToIndex["SCSeedOccupancy"] = kSCSeedOccupancy;
-    _nameToIndex["SingleCrystalCluster"] = kSingleCrystalCluster;
-    _nameToIndex["SCNum"] = kSCNum;
-    _nameToIndex["SCNBCs"] = kSCNBCs;
-    _nameToIndex["SCNcrystals"] = kSCNcrystals;
-    _nameToIndex["SCR9"] = kSCR9;
-    _nameToIndex["Pi0"] = kPi0;
-    _nameToIndex["JPsi"] = kJPsi;
-    _nameToIndex["Z"] = kZ;
-    _nameToIndex["HighMass"] = kHighMass;
-    _nameToIndex["TrendNBC"] = kTrendNBC;
-    _nameToIndex["TrendBCSize"] = kTrendBCSize;
-    _nameToIndex["TrendNSC"] = kTrendNSC;
-    _nameToIndex["TrendSCSize"] = kTrendSCSize;
+    BinService::AxisSpecs xaxis, yaxis, zaxis;
+
+    zaxis.low = 0.;
+    zaxis.high = 50.;
+    _data[kBCEMap] = MEData("BCEMap", BinService::kEcal3P, BinService::kSuperCrystal, MonitorElement::DQM_KIND_TPROFILE2D, 0, 0, &zaxis);
+    _data[kBCEMapProjEta] = MEData("BCEMap", BinService::kEcal3P, BinService::kProjEta, MonitorElement::DQM_KIND_TPROFILE);
+    _data[kBCEMapProjPhi] = MEData("BCEMap", BinService::kEcal3P, BinService::kProjPhi, MonitorElement::DQM_KIND_TPROFILE);
+
+    _data[kBCOccupancy] = MEData("BCOccupancy", BinService::kEcal3P, BinService::kSuperCrystal, MonitorElement::DQM_KIND_TH2F);
+    _data[kBCOccupancyProjEta] = MEData("BCOccupancy", BinService::kEcal3P, BinService::kProjEta, MonitorElement::DQM_KIND_TH1F);
+    _data[kBCOccupancyProjPhi] = MEData("BCOccupancy", BinService::kEcal3P, BinService::kProjPhi, MonitorElement::DQM_KIND_TH1F);
+
+    zaxis.high = 30.;
+    _data[kBCSizeMap] = MEData("BCSizeMap", BinService::kEcal3P, BinService::kSuperCrystal, MonitorElement::DQM_KIND_TPROFILE2D, 0, 0, &zaxis);
+    _data[kBCSizeMapProjEta] = MEData("BCSizeMap", BinService::kEcal3P, BinService::kProjEta, MonitorElement::DQM_KIND_TPROFILE);
+    _data[kBCSizeMapProjPhi] = MEData("BCSizeMap", BinService::kEcal3P, BinService::kProjPhi, MonitorElement::DQM_KIND_TPROFILE);
+
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 150.;
+    _data[kBCE] = MEData("BCE", BinService::kEcal3P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    xaxis.nbins = 20;
+    xaxis.low = 0.;
+    xaxis.high = 100.;
+    _data[kBCNum] = MEData("BCNum", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 100.;
+    _data[kBCSize] = MEData("BCSize", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 150.;
+    _data[kSCE] = MEData("SCE", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 10.;
+    _data[kSCELow] = MEData("SCELow", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 150.;
+    _data[kSCSeedEnergy] = MEData("SCSeedEnergy", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    yaxis.nbins = 50;
+    yaxis.low = 0.;
+    yaxis.high = 150.;
+    _data[kSCClusterVsSeed] = MEData("SCClusterVsSeed", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH2F, &xaxis, &yaxis);
+
+    _data[kSCSeedOccupancy] = MEData("SCSeedOccupancy", BinService::kEcal3P, BinService::kSuperCrystal, MonitorElement::DQM_KIND_TH2F);
+    _data[kSingleCrystalCluster] = MEData("SCSingleCrystalCluster", BinService::kEcal3P, BinService::kSuperCrystal, MonitorElement::DQM_KIND_TH2F);
+
+    xaxis.nbins = 20;
+    xaxis.low = 0.;
+    xaxis.high = 20.;
+    _data[kSCNum] = MEData("SCNum", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    xaxis.nbins = 15;
+    xaxis.low = 0.;
+    xaxis.high = 15.;
+    _data[kSCNBCs] = MEData("SCNBCs", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 150.;
+    _data[kSCNcrystals] = MEData("SCNcrystals", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 1.2;
+    _data[kSCR9] = MEData("SCR9", BinService::kEcal2P, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+
+
+    xaxis.nbins = 50;
+    xaxis.low = 0.;
+    xaxis.high = 0.5;
+    _data[kPi0] = MEData("Pi0", BinService::nObjType, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+    xaxis.low = 2.9;
+    xaxis.high = 3.3;
+    _data[kJPsi] = MEData("JPsi", BinService::nObjType, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+    xaxis.low = 40.;
+    xaxis.high = 110.;
+    _data[kZ] = MEData("Z", BinService::nObjType, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
+    xaxis.low = 110.;
+    xaxis.high = 3000.;
+    _data[kHighMass] = MEData("HighMass", BinService::nObjType, BinService::kUser, MonitorElement::DQM_KIND_TH1F, &xaxis);
   }
 
   DEFINE_ECALDQM_WORKER(ClusterTask);

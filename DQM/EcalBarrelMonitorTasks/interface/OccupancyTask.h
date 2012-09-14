@@ -1,7 +1,7 @@
 #ifndef OccupancyTask_H
 #define OccupancyTask_H
 
-#include "DQWorkerTask.h"
+#include "DQM/EcalCommon/interface/DQWorkerTask.h"
 
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
@@ -10,14 +10,14 @@ namespace ecaldqm {
 
   class OccupancyTask : public DQWorkerTask {
   public:
-    OccupancyTask(edm::ParameterSet const&, edm::ParameterSet const&);
+    OccupancyTask(const edm::ParameterSet &, const edm::ParameterSet&);
     ~OccupancyTask();
 
     bool filterRunType(const std::vector<short>&);
 
     void analyze(const void*, Collections);
 
-    void runOnDigis(const EcalDigiCollection &, Collections);
+    void runOnDigis(const EcalDigiCollection &);
     void runOnTPDigis(const EcalTrigPrimDigiCollection &);
     void runOnRecHits(const EcalRecHitCollection &, Collections);
 
@@ -42,13 +42,10 @@ namespace ecaldqm {
       kTPDigiThrProjEta, // h1f
       kTPDigiThrProjPhi, // h1f
       kTPDigiThrAll,
-      kTrendNDigi,
-      kTrendNRecHit,
-      kTrendNTPDigi,
       nMESets
     };
 
-    static void setMEOrdering(std::map<std::string, unsigned>&);
+    static void setMEData(std::vector<MEData>&);
 
   private:
     float recHitThreshold_;
@@ -60,7 +57,7 @@ namespace ecaldqm {
     switch(_collection){
     case kEBDigi:
     case kEEDigi:
-      runOnDigis(*static_cast<const EcalDigiCollection*>(_p), _collection);
+      runOnDigis(*static_cast<const EcalDigiCollection*>(_p));
       break;
     case kTrigPrimDigi:
       runOnTPDigis(*static_cast<const EcalTrigPrimDigiCollection*>(_p));

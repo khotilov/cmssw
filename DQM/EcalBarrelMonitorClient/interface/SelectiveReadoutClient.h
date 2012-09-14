@@ -1,13 +1,13 @@
 #ifndef SelectiveReadoutClient_H
 #define SelectiveReadoutClient_H
 
-#include "DQWorkerClient.h"
+#include "DQM/EcalCommon/interface/DQWorkerClient.h"
 
 namespace ecaldqm {
 
   class SelectiveReadoutClient : public DQWorkerClient {
   public:
-    SelectiveReadoutClient(edm::ParameterSet const&, edm::ParameterSet const&);
+    SelectiveReadoutClient(const edm::ParameterSet &, const edm::ParameterSet &);
     ~SelectiveReadoutClient() {}
 
     void producePlots();
@@ -21,19 +21,18 @@ namespace ecaldqm {
       nMESets
     };
 
+    static void setMEData(std::vector<MEData>&);
+
     enum Sources {
-      kFlagCounterMap,
-      kRUForcedMap,
-      kFullReadoutMap,
-      kZS1Map,
-      kZSMap,
-      kZSFullReadoutMap,
-      kFRDroppedMap,
+      sFlagCounterMap, // h2f counter
+      sRUForcedMap, // h2f counter
+      sFullReadoutMap, // h2f counter
+      sZS1Map, // h2f counter
+      sZSMap, // h2f counter
+      sZSFullReadoutMap, // h2f counter
+      sFRDroppedMap, // h2f counter
       nSources
     };
-
-    static void setMEOrdering(std::map<std::string, unsigned>&);
-
   };
 
 }

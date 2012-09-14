@@ -10,9 +10,9 @@
 // Original Author: Steve Wagner, stevew@pizero.colorado.edu
 // Created:         Sat Jan 14 22:00:00 UTC 2006
 //
-// $Author: innocent $
-// $Date: 2012/09/04 13:14:56 $
-// $Revision: 1.7 $
+// $Author: wmtan $
+// $Date: 2011/06/20 20:28:26 $
+// $Revision: 1.5 $
 //
 
 #include "FWCore/Framework/interface/EDProducer.h"
@@ -55,6 +55,7 @@ namespace cms
     reco::TrackExtraRefProd refTrkExtras;
     TrackingRecHitRefProd refTrkHits;
     edm::RefProd< std::vector<Trajectory> > refTrajs;
+    std::vector<reco::TrackRef> trackRefs;
     edm::RefProd< TrajectorySeedCollection > refTrajSeeds;
     
     bool copyExtras_;
@@ -64,10 +65,10 @@ namespace cms
     double maxNormalizedChisq_;
     double minPT_;
     unsigned int minFound_;
-    float epsilon_;
-    float shareFrac_;
-    float foundHitBonus_;
-    float lostHitPenalty_;
+    double epsilon_;
+    double shareFrac_;
+    double foundHitBonus_;
+    double lostHitPenalty_;
 
     std::vector< std::vector< int> > listsToMerge_;
     std::vector<bool> promoteQuality_;

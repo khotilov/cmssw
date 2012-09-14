@@ -6,9 +6,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
-#include<cassert>
-#include "TrackingTools/PatternTools/interface/TempTrajectory.h"
-
 class CkfDebugger;
 class Chi2MeasurementEstimatorBase;
 class DetGroup;
@@ -69,15 +66,7 @@ public:
 
   virtual ~BaseCkfTrajectoryBuilder();
 
-  // new interface returning the start Trajectory...
-  virtual TempTrajectory buildTrajectories (const TrajectorySeed& seed,
-					    TrajectoryContainer &ret,
-					    const TrajectoryFilter*) const  { assert(0==1); return TempTrajectory();}
-  
-  
-  virtual void  rebuildTrajectories(TempTrajectory const& startingTraj, const TrajectorySeed& seed,
-				    TrajectoryContainer& result) const { assert(0==1);}
-
+  virtual TrajectoryContainer trajectories(const TrajectorySeed&) const = 0;
 
   virtual void setEvent(const edm::Event& event) const;
   virtual void unset() const;
@@ -117,15 +106,13 @@ public:
   /** Called at end of track building, to see if track should be kept */
   bool qualityFilter( const TempTrajectory& traj, bool inOut = false) const;
   
-  void addToResult(boost::shared_ptr<const TrajectorySeed> const & seed, TempTrajectory& traj, TrajectoryContainer& result, bool inOut = false) const;    
-  void addToResult( TempTrajectory const& traj, TempTrajectoryContainer& result, bool inOut = false) const;    
-  void moveToResult( TempTrajectory&& traj, TempTrajectoryContainer& result, bool inOut = false) const;    
+  void addToResult( TempTrajectory& traj, TrajectoryContainer& result, bool inOut = false) const;    
+  void addToResult( TempTrajectory& traj, TempTrajectoryContainer& result, bool inOut = false) const;    
 
-  StateAndLayers findStateAndLayers(const TrajectorySeed& seed, const TempTrajectory& traj) const;
   StateAndLayers findStateAndLayers(const TempTrajectory& traj) const;
 
  private:
-  void seedMeasurements(const TrajectorySeed& seed, TempTrajectory & result) const;
+  void seedMeasurements(const TrajectorySeed& seed, std::vector<TrajectoryMeasurement> & result) const;
 
 
 
