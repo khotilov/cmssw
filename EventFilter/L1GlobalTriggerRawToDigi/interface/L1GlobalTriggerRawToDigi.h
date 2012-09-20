@@ -31,7 +31,6 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/Utilities/interface/InputTag.h"
-#include "FWCore/Utilities/interface/typedefs.h"
 
 // forward declarations
 class L1GtfeWord;
@@ -107,7 +106,7 @@ private:
     int m_daqGtFedId;
 
     /// mask for active boards
-    cms_uint16_t m_activeBoardsMaskGt;
+    boost::uint16_t m_activeBoardsMaskGt;
 
     // number of bunch crossing to be unpacked
     int m_unpackBxInEvent;

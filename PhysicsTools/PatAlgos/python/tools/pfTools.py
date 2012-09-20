@@ -6,6 +6,8 @@ from PhysicsTools.PatAlgos.tools.tauTools import *
 
 from PhysicsTools.PatAlgos.tools.helpers import listModules, applyPostfix
 
+from copy import deepcopy
+
 #def applyPostfix(process, label, postfix):
 #    ''' If a module is in patDefaultSequence use the cloned module.
 #    Will crash if patDefaultSequence has not been cloned with 'postfix' beforehand'''
@@ -35,14 +37,18 @@ def adaptPFMuons(process,module,postfix="" ):
     module.useParticleFlow = True
     module.userIsolation   = cms.PSet()
     module.isoDeposits = cms.PSet(
-        pfChargedHadrons = cms.InputTag("isoDepMuonWithCharged" + postfix),
-        pfNeutralHadrons = cms.InputTag("isoDepMuonWithNeutral" + postfix),
-        pfPhotons = cms.InputTag("isoDepMuonWithPhotons" + postfix)
+        pfChargedHadrons = cms.InputTag("muPFIsoDepositCharged" + postfix),
+        pfChargedAll = cms.InputTag("muPFIsoDepositChargedAll" + postfix),
+        pfPUChargedHadrons = cms.InputTag("muPFIsoDepositPU" + postfix),
+        pfNeutralHadrons = cms.InputTag("muPFIsoDepositNeutral" + postfix),
+        pfPhotons = cms.InputTag("muPFIsoDepositGamma" + postfix)
         )
     module.isolationValues = cms.PSet(
-        pfChargedHadrons = cms.InputTag("isoValMuonWithCharged" + postfix),
-        pfNeutralHadrons = cms.InputTag("isoValMuonWithNeutral" + postfix),
-        pfPhotons = cms.InputTag("isoValMuonWithPhotons" + postfix)
+        pfChargedHadrons = cms.InputTag("muPFIsoValueCharged04"+ postfix),
+        pfChargedAll = cms.InputTag("muPFIsoValueChargedAll04"+ postfix),
+        pfPUChargedHadrons = cms.InputTag("muPFIsoValuePU04" + postfix),
+        pfNeutralHadrons = cms.InputTag("muPFIsoValueNeutral04" + postfix),
+        pfPhotons = cms.InputTag("muPFIsoValueGamma04" + postfix)
         )
     # matching the pfMuons, not the standard muons.
     applyPostfix(process,"muonMatch",postfix).src = module.pfMuonSource
@@ -64,14 +70,18 @@ def adaptPFElectrons(process,module, postfix):
     module.useParticleFlow = True
     module.userIsolation   = cms.PSet()
     module.isoDeposits = cms.PSet(
-        pfChargedHadrons = cms.InputTag("isoDepElectronWithCharged" + postfix),
-        pfNeutralHadrons = cms.InputTag("isoDepElectronWithNeutral" + postfix),
-        pfPhotons = cms.InputTag("isoDepElectronWithPhotons" + postfix)
+        pfChargedHadrons = cms.InputTag("elPFIsoDepositCharged" + postfix),
+        pfChargedAll = cms.InputTag("elPFIsoDepositChargedAll" + postfix),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoDepositPU" + postfix),
+        pfNeutralHadrons = cms.InputTag("elPFIsoDepositNeutral" + postfix),
+        pfPhotons = cms.InputTag("elPFIsoDepositGamma" + postfix)
         )
     module.isolationValues = cms.PSet(
-        pfChargedHadrons = cms.InputTag("isoValElectronWithCharged" + postfix),
-        pfNeutralHadrons = cms.InputTag("isoValElectronWithNeutral" + postfix),
-        pfPhotons = cms.InputTag("isoValElectronWithPhotons" + postfix)
+        pfChargedHadrons = cms.InputTag("elPFIsoValueCharged04"+ postfix),
+        pfChargedAll = cms.InputTag("elPFIsoValueChargedAll04"+ postfix),
+        pfPUChargedHadrons = cms.InputTag("elPFIsoValuePU04" + postfix),
+        pfNeutralHadrons = cms.InputTag("elPFIsoValueNeutral04" + postfix),
+        pfPhotons = cms.InputTag("elPFIsoValueGamma04" + postfix)
         )
 
     # COLIN: since we take the egamma momentum for pat Electrons, we must
@@ -337,7 +347,7 @@ def switchToPFJets(process, input=cms.InputTag('pfNoTau'), algo='AK5', postfix =
                         outputModules = outputModules
                         )
     # check whether L1FastJet is in the list of correction levels or not
-    applyPostfix(process, "patJetCorrFactors", postfix).useRho = False    
+    applyPostfix(process, "patJetCorrFactors", postfix).useRho = False
     for corr in inputJetCorrLabel[1]:
         if corr == 'L1FastJet':
             applyPostfix(process, "patJetCorrFactors", postfix).useRho = True
@@ -360,7 +370,7 @@ def switchToPFJets(process, input=cms.InputTag('pfNoTau'), algo='AK5', postfix =
                                     if cor == essource:
                                         idx = getattr(process,prefix+'CombinedCorrector'+postfix).correctors.index(essource);
                                         getattr(process,prefix+'CombinedCorrector'+postfix).correctors[idx] = essource+postfix
-                                        
+
     applyPostfix(process, "patJets", postfix).embedCaloTowers   = False
     applyPostfix(process, "patJets", postfix).embedPFCandidates = True
 
@@ -396,10 +406,14 @@ def adaptPVs(process, pvCollection=cms.InputTag('offlinePrimaryVertices'), postf
         for namePvSrc in pvExchange:
             if hasattr(getattr(process,m),namePvSrc):
                 # only if the module is not coming from an added jet collection
+                interPostFixFlag = False
                 for pfix in interPostfixes:
-                    if not modName.endswith(pfix):
-                        setattr(getattr(process,m),namePvSrc,pvCollection)
-    
+                    if modName.endswith(pfix):
+                        interPostFixFlag = True
+                        break
+                if not interPostFixFlag:
+                    setattr(getattr(process,m),namePvSrc,deepcopy(pvCollection))
+
 
 def usePF2PAT(process, runPF2PAT=True, jetAlgo='AK5', runOnMC=True, postfix="", jetCorrections=('AK5PFchs', ['L1FastJet','L2Relative','L3Absolute']), pvCollection=cms.InputTag('offlinePrimaryVertices'), typeIMetCorrections=False, outputModules=['out']):
     # PLEASE DO NOT CLOBBER THIS FUNCTION WITH CODE SPECIFIC TO A GIVEN PHYSICS OBJECT.

@@ -10,7 +10,6 @@
 #include "FWCore/ServiceRegistry/interface/ServiceToken.h"
 #include "FWCore/Utilities/interface/BranchType.h"
 
-#include "boost/scoped_ptr.hpp"
 #include "boost/shared_ptr.hpp"
 
 #include <map>
@@ -18,7 +17,6 @@
 
 namespace edm {
   class EDLooperBase;
-  class HistoryAppender;
   class IOVSyncValue;
   class ParameterSet;
   class ProductRegistry;
@@ -58,12 +56,8 @@ namespace edm {
     // Write the luminosity block
     void writeLumi(ProcessHistoryID const& parentPhID, int runNumber, int lumiNumber);
 
-    void deleteLumiFromCache(ProcessHistoryID const& parentPhID, int runNumber, int lumiNumber);
-
     // Write the run
     void writeRun(ProcessHistoryID const& parentPhID, int runNumber);
-
-    void deleteRunFromCache(ProcessHistoryID const& parentPhID, int runNumber);
 
     // Call closeFile() on all OutputModules.
     void closeOutputFiles() {
@@ -222,7 +216,6 @@ namespace edm {
     boost::shared_ptr<eventsetup::EventSetupProvider> esp_;
     std::auto_ptr<Schedule>                       schedule_;
     std::map<ProcessHistoryID, ProcessHistoryID>  parentToChildPhID_;
-    boost::scoped_ptr<HistoryAppender>            historyAppender_;
     std::auto_ptr<ESInfo>                         esInfo_;
     std::auto_ptr<SubProcess>                     subProcess_;
   };

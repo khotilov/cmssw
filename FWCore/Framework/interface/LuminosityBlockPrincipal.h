@@ -13,6 +13,7 @@ is the DataBlock.
 ----------------------------------------------------------------------*/
 
 
+#include "DataFormats/Provenance/interface/BranchMapper.h"
 #include "DataFormats/Provenance/interface/LuminosityBlockAuxiliary.h"
 #include "DataFormats/Provenance/interface/RunID.h"
 #include "FWCore/Framework/interface/Principal.h"
@@ -22,11 +23,8 @@ is the DataBlock.
 #include <vector>
 
 namespace edm {
-
-  class HistoryAppender;
   class RunPrincipal;
   class UnscheduledHandler;
-
   class LuminosityBlockPrincipal : public Principal {
   public:
     typedef LuminosityBlockAuxiliary Auxiliary;
@@ -35,12 +33,13 @@ namespace edm {
         boost::shared_ptr<LuminosityBlockAuxiliary> aux,
         boost::shared_ptr<ProductRegistry const> reg,
         ProcessConfiguration const& pc,
-        boost::shared_ptr<RunPrincipal> rp,
-        HistoryAppender* historyAppender = 0);
+        boost::shared_ptr<RunPrincipal> rp);
 
     ~LuminosityBlockPrincipal() {}
 
-    void fillLuminosityBlockPrincipal(DelayedReader* reader = 0);
+    void fillLuminosityBlockPrincipal(
+        boost::shared_ptr<BranchMapper> mapper = boost::shared_ptr<BranchMapper>(),
+        DelayedReader* reader = 0);
 
     RunPrincipal const& runPrincipal() const {
       return *runPrincipal_;
@@ -86,7 +85,8 @@ namespace edm {
 
     void put(
         ConstBranchDescription const& bd,
-        WrapperOwningHolder const& edp);
+        WrapperOwningHolder const& edp,
+        ProductProvenance& productProvenance);
 
     void readImmediate() const;
 

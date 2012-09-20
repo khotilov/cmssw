@@ -66,7 +66,7 @@ MuonDTLocalMillepedeAlgorithm::MuonDTLocalMillepedeAlgorithm(const edm::Paramete
   if(workingmode == 0) {
     edm::LogInfo("Alignment") << "[MuonDTLocalMillepedeAlgorithm] Running on production mode."; 
     char nameOfFile[200];
-    snprintf(nameOfFile, sizeof(nameOfFile), "%s/MyNtupleResidual.root", ntuplePath.c_str());
+    sprintf(nameOfFile, "%s/MyNtupleResidual.root", ntuplePath.c_str());
     f = new TFile(nameOfFile, "RECREATE");
     f->cd();
     setBranchTrees();

@@ -22,6 +22,8 @@
 // system include files
 #include <iostream>
 
+#include <boost/cstdint.hpp>
+
 // user include files
 #include "DataFormats/L1GlobalTrigger/interface/L1GtTriggerMenuLite.h"
 

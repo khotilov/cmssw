@@ -10,7 +10,7 @@ import os
 import sys
 
 from Configuration.DataProcessing.Scenario import Scenario
-from Configuration.DataProcessing.Utils import stepALCAPRODUCER
+from Configuration.DataProcessing.Utils import stepALCAPRODUCER,addMonitoring
 import FWCore.ParameterSet.Config as cms
 from Configuration.PyReleaseValidation.ConfigBuilder import ConfigBuilder
 from Configuration.PyReleaseValidation.ConfigBuilder import Options
@@ -40,7 +40,8 @@ class HeavyIons(Scenario):
         skims = ['SiStripCalZeroBias',
                  'SiStripCalMinBias',
                  'TkAlMinBiasHI',
-                 'HcalCalMinBias']
+                 'HcalCalMinBias',
+                 'DtCalibHI']
         step = stepALCAPRODUCER(skims)
         options = Options()
         options.__dict__.update(defaultOptions.__dict__)
@@ -69,6 +70,7 @@ class HeavyIons(Scenario):
           
         #add the former top level patches here
         customisePromptHI(process)
+        addMonitoring(process)
         
         return process
 
@@ -108,9 +110,10 @@ class HeavyIons(Scenario):
 
         for tier in writeTiers: 
           addOutputModule(process, tier, tier)
-          
+
         #add the former top level patches here
         customiseExpressHI(process)
+        addMonitoring(process)
         
         return process
 
@@ -214,7 +217,7 @@ class HeavyIons(Scenario):
         return process
 
 
-    def alcaHarvesting(self, globalTag, **args):
+    def alcaHarvesting(self, globalTag, datasetName, **args):
         """
         _alcaHarvesting_
 
@@ -223,7 +226,7 @@ class HeavyIons(Scenario):
         """
         options = defaultOptions
         options.scenario = "HeavyIons"
-        options.step = "ALCAHARVEST:BeamSpotByRun+BeamSpotByLumi+SiStripQuality"
+        options.step = "ALCAHARVEST:BeamSpotByRun+BeamSpotByLumi"
         options.isMC = False
         options.isData = True
         options.beamspot = None

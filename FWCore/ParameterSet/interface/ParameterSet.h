@@ -244,8 +244,6 @@ namespace edm {
     ParameterSet const& registerIt();
 
     std::auto_ptr<ParameterSet> popParameterSet(std::string const& name);
-    void eraseSimpleParameter(std::string const& name);
-    void eraseOrSetUntrackedParameterSet(std::string const& name);
 
     std::auto_ptr<std::vector<ParameterSet> > popVParameterSet(std::string const& name);
 

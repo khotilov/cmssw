@@ -1,4 +1,4 @@
-// Last commit: $Id: FedConnections.cc,v 1.34 2010/04/20 09:28:13 dstrom Exp $
+// Last commit: $Id: FedConnections.cc,v 1.32 2009/04/03 16:11:53 lowette Exp $
 
 #include "OnlineDB/SiStripConfigDb/interface/SiStripConfigDb.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
@@ -40,10 +40,10 @@ SiStripConfigDb::FedConnectionsRange SiStripConfigDb::getFedConnections( std::st
 								tmp1,
 								iter->second.cabVersion().first,
 								iter->second.cabVersion().second,
-								//#ifdef USING_DATABASE_MASKING
+#ifdef USING_DATABASE_MASKING
 							        iter->second.maskVersion().first,
 							        iter->second.maskVersion().second,
-								//#endif
+#endif
 								false ); //@@ do not get DISABLED connections
 	    
 	    // Make local copy 
@@ -229,11 +229,10 @@ void SiStripConfigDb::uploadFedConnections( std::string partition ) {
 
 	    FedConnectionsV conns( range.begin(), range.end() );
 	    
-            SiStripPartition::Versions cabVersion = iter->second.cabVersion();
 	    deviceFactory(__func__)->setConnectionDescriptions( conns,
 								iter->second.partitionName(),
-								&(cabVersion.first),
-								&(cabVersion.second),
+								&(iter->second.cabVersion().first),
+								&(iter->second.cabVersion().second),
 								true ); // new major version
 
 	    // Some debug

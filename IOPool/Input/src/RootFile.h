@@ -36,18 +36,11 @@ namespace edm {
   //------------------------------------------------------------
   // Class RootFile: supports file reading.
 
-  class BranchMapper;
   class DuplicateChecker;
-  class EventSkipperByID;
-  class GroupSelectorRules;
-  class InputFile;
-  class ProvenanceReaderBase;
   class ProvenanceAdaptor;
-
-  class MakeProvenanceReader {
-  public:
-    virtual std::auto_ptr<ProvenanceReaderBase> makeReader(RootTree& eventTree) const = 0;
-  };
+  class GroupSelectorRules;
+  class EventSkipperByID;
+  class InputFile;
 
   class RootFile : private boost::noncopyable {
   public:
@@ -162,8 +155,7 @@ namespace edm {
     void initializeDuplicateChecker(std::vector<boost::shared_ptr<IndexIntoFile> > const& indexesIntoFiles,
                                     std::vector<boost::shared_ptr<IndexIntoFile> >::size_type currentIndexIntoFile);
 
-    std::auto_ptr<MakeProvenanceReader> makeProvenanceReaderMaker() const;
-    boost::shared_ptr<BranchMapper> makeBranchMapper();
+    boost::shared_ptr<BranchMapper> makeBranchMapper(RootTree& rootTree, BranchType const& type) const;
 
     std::string const file_;
     std::string const logicalFile_;
@@ -181,7 +173,6 @@ namespace edm {
     IndexIntoFile::IndexIntoFileItr indexIntoFileIter_;
     std::vector<EventProcessHistoryID> eventProcessHistoryIDs_;  // backward compatibility
     std::vector<EventProcessHistoryID>::const_iterator eventProcessHistoryIter_; // backward compatibility
-    boost::shared_ptr<RunAuxiliary> savedRunAuxiliary_; // backward compatibility
     bool skipAnyEvents_;
     bool noEventSort_;
     int whyNotFastClonable_;
@@ -198,14 +189,13 @@ namespace edm {
     InputSource::ProcessingMode processingMode_;
     int forcedRunOffset_;
     std::map<std::string, std::string> newBranchToOldBranch_;
-    TTree* eventHistoryTree_;			// backward compatibility
+    TTree* eventHistoryTree_;
     boost::shared_ptr<EventSelectionIDVector> eventSelectionIDs_;
     boost::shared_ptr<BranchListIndexes> branchListIndexes_;
-    boost::scoped_ptr<History> history_; // backward compatibility
+    boost::scoped_ptr<History> history_;
     boost::shared_ptr<BranchChildren> branchChildren_;
     boost::shared_ptr<DuplicateChecker> duplicateChecker_;
-    boost::scoped_ptr<ProvenanceAdaptor> provenanceAdaptor_; // backward comatibility
-    boost::scoped_ptr<MakeProvenanceReader> provenanceReaderMaker_;
+    boost::scoped_ptr<ProvenanceAdaptor> provenanceAdaptor_;
     mutable boost::scoped_ptr<EventPrincipal> secondaryEventPrincipal_;
     mutable boost::shared_ptr<BranchMapper> eventBranchMapper_;
     std::vector<ParentageID> parentageIDLookup_;

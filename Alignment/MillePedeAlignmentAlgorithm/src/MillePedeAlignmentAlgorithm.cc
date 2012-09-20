@@ -3,9 +3,9 @@
  *
  *  \author    : Gero Flucke
  *  date       : October 2006
- *  $Revision: 1.76 $
- *  $Date: 2011/08/08 21:52:32 $
- *  (last update by $Author: flucke $)
+ *  $Revision: 1.72 $
+ *  $Date: 2011/02/18 17:08:13 $
+ *  (last update by $Author: mussgill $)
  */
 
 #include "Alignment/MillePedeAlignmentAlgorithm/interface/MillePedeAlignmentAlgorithm.h"
@@ -83,16 +83,12 @@ MillePedeAlignmentAlgorithm::MillePedeAlignmentAlgorithm(const edm::ParameterSet
   theMonitor(0), theMille(0), thePedeLabels(0), thePedeSteer(0),
   theTrajectoryFactory(0),
   theMinNumHits(cfg.getParameter<unsigned int>("minNumHits")),
-  theMaximalCor2D(cfg.getParameter<double>("max2Dcorrelation")),
-  theLastWrittenIov(0)
+  theMaximalCor2D(cfg.getParameter<double>("max2Dcorrelation"))
 {
   if (!theDir.empty() && theDir.find_last_of('/') != theDir.size()-1) theDir += '/';// may need '/'
   edm::LogInfo("Alignment") << "@SUB=MillePedeAlignmentAlgorithm" << "Start in mode '"
                             << theConfig.getUntrackedParameter<std::string>("mode")
                             << "' with output directory '" << theDir << "'.";
-  if (this->isMode(myMilleBit)) {
-    theMille = new Mille((theDir + theConfig.getParameter<std::string>("binaryFile")).c_str());// add ', false);' for text output);
-  }
 }
 
 // Destructor ----------------------------------------------------------------
@@ -206,7 +202,7 @@ void MillePedeAlignmentAlgorithm::initialize(const edm::EventSetup &setup,
         << "'vstring mergeTreeFiles' and 'vstring mergeBinaryFiles' must be empty for "
         << "modes running mille.";
     }
-    //theMille = new Mille((theDir + theConfig.getParameter<std::string>("binaryFile")).c_str());// add ', false);' for text output);
+    theMille = new Mille((theDir + theConfig.getParameter<std::string>("binaryFile")).c_str());// add ', false);' for text output);
     const std::string moniFile(theConfig.getUntrackedParameter<std::string>("monitorFile"));
     if (moniFile.size()) theMonitor = new MillePedeMonitor((theDir + moniFile).c_str());
 
@@ -216,18 +212,24 @@ void MillePedeAlignmentAlgorithm::initialize(const edm::EventSetup &setup,
     theTrajectoryFactory = TrajectoryFactoryPlugin::get()->create(fctName, fctCfg);
   }
 
-  if (this->isMode(myPedeSteerBit)) {
-    // Get config for survey and set flag accordingly
-    const edm::ParameterSet pxbSurveyCfg(theConfig.getParameter<edm::ParameterSet>("surveyPixelBarrel"));
-    theDoSurveyPixelBarrel = pxbSurveyCfg.getParameter<bool>("doSurvey");
-    if (theDoSurveyPixelBarrel) this->addPxbSurvey(pxbSurveyCfg);
+  // FIXME: for PlotMillePede hit statistics stuff we also might want doIO(0)... ?
+  if (this->isMode(myPedeSteerBit) // for pedeRun and pedeRead we might want to merge
+      || !theConfig.getParameter<std::vector<std::string> >("mergeTreeFiles").empty()) {
+    this->doIO(0);
+
+  // Get config for survey and set flag accordingly
+  const edm::ParameterSet pxbSurveyCfg(theConfig.getParameter<edm::ParameterSet>("surveyPixelBarrel"));
+  theDoSurveyPixelBarrel = pxbSurveyCfg.getParameter<bool>("doSurvey");
+  if (theDoSurveyPixelBarrel) addPxbSurvey(pxbSurveyCfg);
   }
+
+  
 }
 
-//____________________________________________________
 bool MillePedeAlignmentAlgorithm::setParametersForRunRange(const RunRange &runrange)
 {
   if (this->isMode(myPedeReadBit)) {
+
     // restore initial positions, rotations and deformations
     theAlignmentParameterStore->restoreCachedTransformations();
 
@@ -240,7 +242,7 @@ bool MillePedeAlignmentAlgorithm::setParametersForRunRange(const RunRange &runra
     }
     theAlignmentParameterStore->applyParameters();
 
-    this->doIO(++theLastWrittenIov); // pre-increment!
+    this->doIO(2);
   }
   
   return true;
@@ -273,10 +275,9 @@ void MillePedeAlignmentAlgorithm::terminate()
     thePedeSteer->runPede(masterSteer);
   }
 
-  // parameters from pede are not yet applied,
-  // so we can still write start positions (but with hit statistics in case of mille): 
-  this->doIO(0);
-  theLastWrittenIov = 0;
+  if (this->isMode(myMilleBit)) { // if mille was run, we store trees with suffix _1...
+    this->doIO(1);
+  }
 }
 
 // Run the algorithm on trajectories and tracks -------------------------------
@@ -317,6 +318,7 @@ void MillePedeAlignmentAlgorithm::run(const edm::EventSetup &setup, const EventI
 }
 
 
+
 //____________________________________________________
 std::pair<unsigned int, unsigned int>
 MillePedeAlignmentAlgorithm::addReferenceTrajectory(const EventInfo &eventInfo, 
@@ -342,9 +344,9 @@ MillePedeAlignmentAlgorithm::addReferenceTrajectory(const EventInfo &eventInfo,
       } 
     } // end loop on hits
 
-    // add virtual measurements
-    for (unsigned int iVirtualMeas = 0; iVirtualMeas < refTrajPtr->numberOfVirtualMeas(); ++iVirtualMeas) {
-      this->addVirtualMeas(refTrajPtr, iVirtualMeas);
+// CHK add 'Multiple Scattering Measurements' for break points, broken lines
+    for (unsigned int iMsMeas = 0; iMsMeas < refTrajPtr->numberOfMsMeas(); ++iMsMeas) {
+      this->addMsMeas(refTrajPtr, iMsMeas);
     }
              
     // kill or end 'track' for mille, depends on #hits criterion
@@ -353,44 +355,20 @@ MillePedeAlignmentAlgorithm::addReferenceTrajectory(const EventInfo &eventInfo,
       hitResultXy.first = hitResultXy.second = 0; //reset
     } else {
       theMille->end();
-      // add x/y hit count to MillePedeVariables of parVec,
-      // returning number of y-hits of the reference trajectory
-      hitResultXy.second = this->addHitCount(parVec, validHitVecY);
+      // take care about hit statistics as well
+      for (unsigned int iHit = 0; iHit < validHitVecY.size(); ++iHit) {
+	if (!parVec[iHit]) continue; // in case a non-selected alignable was hit (flagXY == 0)
+	MillePedeVariables *mpVar = static_cast<MillePedeVariables*>(parVec[iHit]->userVariables());
+	mpVar->increaseHitsX(); // every hit has an x-measurement, cf. above...
+	if (validHitVecY[iHit]) {
+	  mpVar->increaseHitsY();
+	  ++hitResultXy.second;
+	}
+      }  
     }
   } // end if valid trajectory
 
   return hitResultXy;
-}
-
-//____________________________________________________
-unsigned int
-MillePedeAlignmentAlgorithm::addHitCount(const std::vector<AlignmentParameters*> &parVec,
-					 const std::vector<bool> &validHitVecY) const
-{
-  // Loop on all hit information in the input arrays and count valid y-hits:
-  unsigned int nHitY = 0;
-  for (unsigned int iHit = 0; iHit < validHitVecY.size(); ++iHit) {
-    Alignable *ali = (parVec[iHit] ? parVec[iHit]->alignable() : 0);
-    // Loop upwards on hierarchy of alignables to add hits to all levels 
-    // that are currently aligned. If only a non-selected alignable was hit,
-    // (i.e. flagXY == 0 in addReferenceTrajectory(..)), there is no loop at all...
-    while (ali) {
-      AlignmentParameters *pars = ali->alignmentParameters();
-      if (pars) { // otherwise hierarchy level not selected
-	// cast ensured by previous checks:
-	MillePedeVariables *mpVar = static_cast<MillePedeVariables*>(pars->userVariables());
-	// every hit has an x-measurement, cf. addReferenceTrajectory(..):
-	mpVar->increaseHitsX();
-	if (validHitVecY[iHit]) {
-	  mpVar->increaseHitsY();
-	  if (pars == parVec[iHit]) ++nHitY; // do not count hits twice
-	}
-      }
-      ali = ali->mother();
-    }
-  }
-  
-  return nHitY;
 }
 
 //____________________________________________________
@@ -624,27 +602,36 @@ unsigned int MillePedeAlignmentAlgorithm::doIO(int loop) const
                                  << "Problem " << ioerr << " in writeAlignableOriginalPositions";
       ++result;
     }
-  } else if (loop == 1) {
-    // only for first iov add hit counts, else 2x, 3x,... number of hits in IOV 2, 3,...
-    const std::vector<std::string> inFiles
-      (theConfig.getParameter<std::vector<std::string> >("mergeTreeFiles"));
-    const std::vector<std::string> binFiles
-      (theConfig.getParameter<std::vector<std::string> >("mergeBinaryFiles"));
-    if (inFiles.size() != binFiles.size()) {
-      edm::LogWarning("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO"
-                                   << "'vstring mergeTreeFiles' and 'vstring mergeBinaryFiles' "
-                                   << "differ in size";
+  } else {
+    if (loop > 1) {
+      const std::vector<std::string> inFiles
+        (theConfig.getParameter<std::vector<std::string> >("mergeTreeFiles"));
+      const std::vector<std::string> binFiles
+        (theConfig.getParameter<std::vector<std::string> >("mergeBinaryFiles"));
+      if (inFiles.size() != binFiles.size()) {
+        edm::LogWarning("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO"
+                                     << "'vstring mergeTreeFiles' and 'vstring mergeBinaryFiles' "
+                                     << "differ in size";
+      }
+      this->addHitStatistics(loop - 1, outFile, inFiles);
     }
-    this->addHitStatistics(0, outFile, inFiles); // add hit info from tree 0 in 'infiles'
-  }
-  MillePedeVariablesIORoot millePedeIO;
-  millePedeIO.writeMillePedeVariables(theAlignables, outFile.c_str(), loop, false, ioerr);
-  if (ioerr) {
-    edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO"
-                               << "Problem " << ioerr << " writing MillePedeVariables";
-    ++result;
+    MillePedeVariablesIORoot millePedeIO;
+    millePedeIO.writeMillePedeVariables(theAlignables, outFile.c_str(), loop, false, ioerr);
+    if (ioerr) {
+      edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO"
+                                 << "Problem " << ioerr << " writing MillePedeVariables";
+      ++result;
+    }
+// // problem with following writeOrigRigidBodyAlignmentParameters
+//     aliIO.writeAlignmentParameters(theAlignables, outFile.c_str(), loop, false, ioerr);
+//     if (ioerr) {
+//       edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO"
+//                                  << "Problem " << ioerr << " in writeAlignmentParameters, " << loop;
+//       ++result;
+//     }
   }
   
+  //  aliIO.writeAlignmentParameters(theAlignables, ("tmp"+outFile).c_str(), loop, false, ioerr);
   aliIO.writeOrigRigidBodyAlignmentParameters(theAlignables, outFile.c_str(), loop, false, ioerr);
   if (ioerr) {
     edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO" << "Problem " << ioerr
@@ -655,6 +642,12 @@ unsigned int MillePedeAlignmentAlgorithm::doIO(int loop) const
   if (ioerr) {
     edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO" << "Problem " << ioerr
                                << " in writeAlignableAbsolutePositions, " << loop;
+    ++result;
+  }
+  aliIO.writeAlignableRelativePositions(theAlignables, outFile.c_str(), loop, false, ioerr);
+  if (ioerr) {
+    edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::doIO" << "Problem " << ioerr
+                               << " in writeAlignableRelativePositions, " << loop;
     ++result;
   }
 
@@ -700,26 +693,41 @@ unsigned int MillePedeAlignmentAlgorithm::decodeMode(const std::string &mode) co
 }
 
 //__________________________________________________________________________________________________
-bool MillePedeAlignmentAlgorithm::addHitStatistics(int fromIov, const std::string &outFile,
+bool MillePedeAlignmentAlgorithm::addHitStatistics(int fromLoop, const std::string &outFile,
                                                    const std::vector<std::string> &inFiles) const
 {
   bool allOk = true;
   int ierr = 0;
   MillePedeVariablesIORoot millePedeIO;
-  for (std::vector<std::string>::const_iterator iFile = inFiles.begin();
-       iFile != inFiles.end(); ++iFile) {
-    const std::string inFile(theDir + *iFile); 
+  if (inFiles.empty()) {
     const std::vector<AlignmentUserVariables*> mpVars =
-      millePedeIO.readMillePedeVariables(theAlignables, inFile.c_str(), fromIov, ierr);
+      millePedeIO.readMillePedeVariables(theAlignables, outFile.c_str(), fromLoop, ierr);
     if (ierr || !this->addHits(theAlignables, mpVars)) {
       edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::addHitStatistics"
-				 << "Error " << ierr << " reading from " << inFile 
-				 << ", tree " << fromIov << ", or problems in addHits";
+                                 << "Error " << ierr << " reading from " << outFile 
+                                 << ", tree " << fromLoop << ", or problems in addHits";
       allOk = false;
     }
     for (std::vector<AlignmentUserVariables*>::const_iterator i = mpVars.begin();
-	 i != mpVars.end(); ++i) {
+         i != mpVars.end(); ++i){
       delete *i; // clean created objects
+    }
+  } else {
+    for (std::vector<std::string>::const_iterator iFile = inFiles.begin();
+         iFile != inFiles.end(); ++iFile) {
+      const std::string inFile(theDir + *iFile); 
+      const std::vector<AlignmentUserVariables*> mpVars =
+        millePedeIO.readMillePedeVariables(theAlignables, inFile.c_str(), fromLoop, ierr);
+      if (ierr || !this->addHits(theAlignables, mpVars)) {
+        edm::LogError("Alignment") << "@SUB=MillePedeAlignmentAlgorithm::addHitStatistics"
+                                   << "Error " << ierr << " reading from " << inFile 
+                                   << ", tree " << fromLoop << ", or problems in addHits";
+        allOk = false;
+      }
+      for (std::vector<AlignmentUserVariables*>::const_iterator i = mpVars.begin();
+           i != mpVars.end(); ++i) {
+        delete *i; // clean created objects
+      }
     }
   }
 
@@ -788,13 +796,13 @@ void MillePedeAlignmentAlgorithm::diagonalize
 
 //__________________________________________________________________________________________________
 void MillePedeAlignmentAlgorithm
-::addRefTrackVirtualMeas1D(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
-			   unsigned int iVirtualMeas, TMatrixDSym &aHitCovarianceM,
-			   TMatrixF &aHitResidualsM, TMatrixF &aLocalDerivativesM)
+::addRefTrackMsMeas1D(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
+                    unsigned int iMsMeas, TMatrixDSym &aHitCovarianceM,
+                    TMatrixF &aHitResidualsM, TMatrixF &aLocalDerivativesM)
 {
-  // This Method is valid for 1D measurements only
 
-  const unsigned int xIndex = iVirtualMeas + refTrajPtr->numberOfHitMeas();
+  // This Method is valid for 1D measurements only
+  const unsigned int xIndex = iMsMeas + refTrajPtr->numberOfHitMeas();
   // Covariance into a TMatrixDSym
   
   //aHitCovarianceM = new TMatrixDSym(1);
@@ -992,13 +1000,13 @@ int MillePedeAlignmentAlgorithm
 
 //__________________________________________________________________________________________________
 void MillePedeAlignmentAlgorithm
-::addVirtualMeas(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr, unsigned int iVirtualMeas)
+::addMsMeas(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr, unsigned int iMsMeas)
 {
   TMatrixDSym aHitCovarianceM(1);
   TMatrixF aHitResidualsM(1,1);
   TMatrixF aLocalDerivativesM(1, refTrajPtr->derivatives().num_col());
   // below method fills above 3 'matrices'
-  this->addRefTrackVirtualMeas1D(refTrajPtr, iVirtualMeas, aHitCovarianceM, aHitResidualsM, aLocalDerivativesM);
+  this->addRefTrackMsMeas1D(refTrajPtr, iMsMeas, aHitCovarianceM, aHitResidualsM, aLocalDerivativesM);
   
   // no global parameters (use dummy 0)
   TMatrixF aGlobalDerivativesM(1,1);
@@ -1170,3 +1178,99 @@ void MillePedeAlignmentAlgorithm::addPxbSurvey(const edm::ParameterSet &pxbSurve
 	outfile.close();
 }
 
+
+/*____________________________________________________
+void MillePedeAlignmentAlgorithm::addBeamSpotConstraint
+(const ReferenceTrajectoryBase::ReferenceTrajectoryPtr &refTrajPtr,
+ const edm::Event & iEvent )
+{
+  // --- get BS from Event:
+  const  reco::BeamSpot* bSpot;
+  edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
+  iEvent.getByType(recoBeamSpotHandle);
+  bSpot = recoBeamSpotHandle.product();
+  
+  //GlobalPoint gPointBs(0.,0.,0.);
+  GlobalPoint gPointBs(bSpot->x0(), bSpot->y0(), bSpot->z0());
+  const TrajectoryStateOnSurface trackTsos = refTrajPtr->trajectoryStates()[0];
+  // create a FTS from innermost TSOS:
+  FreeTrajectoryState innerFts = *(trackTsos.freeTrajectoryState());
+  //create a TrajectoryStateClosestToBeamLine: 
+  TrajectoryStateClosestToPointBuilder *tsctpBuilder = new TSCPBuilderNoMaterial();
+  TrajectoryStateClosestToPoint tsctp = tsctpBuilder->operator()(trackTsos,gPointBs);
+  FreeTrajectoryState pcaFts = tsctp.theState();
+  edm::LogInfo("CHK") << " beamspot TSCP " << tsctp.referencePoint() << tsctp.position()
+   << tsctp.perigeeParameters().vector();   
+  const AlgebraicVector5 perigeeVecPars =  tsctp.perigeeParameters().vector(); 
+  
+  PerigeeConversions perigeeConv;
+  const AlgebraicMatrix55& curv2perigee = perigeeConv.jacobianCurvilinear2Perigee(pcaFts);
+  edm::LogInfo("CHK") << " beamspot C2P " << curv2perigee;
+  
+  //propagation
+  AnalyticalPropagator propagator(&(innerFts.parameters().magneticField()), anyDirection);
+  std::pair< TrajectoryStateOnSurface, double > tsosWithPath = propagator.propagateWithPath(pcaFts,trackTsos.surface());
+  edm::LogInfo("CHK") << " beamspot s0 " << tsosWithPath.second;
+  edm::LogInfo("CHK") << " beamspot t2c " << refTrajPtr->trajectoryToCurv();
+  if (!tsosWithPath.first.isValid())  return; 
+  
+  // jacobian in curvilinear frame for propagation from the end point (inner TSOS) to the starting point (PCA) 
+  AnalyticalCurvilinearJacobian curvJac( pcaFts.parameters(),
+                                         tsosWithPath.first.globalPosition(),
+                                         tsosWithPath.first.globalMomentum(), 
+                                         tsosWithPath.second );
+  int ierr;
+  const AlgebraicMatrix55& matCurvJac = curvJac.jacobian().Inverse(ierr);
+  edm::LogInfo("CHK") << " beamspot CurvJac " << matCurvJac;
+  // jacobion trajectory to curvilinear
+  // const AlgebraicMatrix &locDerivMatrix = refTrajPtr->derivatives();
+  const AlgebraicMatrix55& traj2curv = asSMatrix<5,5>(refTrajPtr->trajectoryToCurv());   
+  //combine the transformation jacobian:
+  AlgebraicMatrix55 newJacobian = curv2perigee * matCurvJac * traj2curv;
+  edm::LogInfo("CHK") << " beamspot newJac " << newJacobian;
+
+  //get the Beam Spot residual
+  const float residuumIP = -perigeeVecPars[3];
+  const float sigmaIP = bSpot->BeamWidth();
+  edm::LogInfo("CHK2") << " beamspot-res " << residuumIP << " " << perigeeVecPars[0] << " " << perigeeVecPars[1] << " " << perigeeVecPars[2];
+      
+  std::vector<float> ipLocalDerivs(5);
+  for (unsigned int i = 0; i < ipLocalDerivs.size(); ++i) {
+    ipLocalDerivs[i] = newJacobian(3,i);
+  }
+
+  // to be fixed: null global derivatives is right but the size is detemined from SelPar.size! 
+  std::vector<float>  ipGlobalDerivs(4);
+  for (unsigned int i = 0; i < 4; ++i) {
+    ipGlobalDerivs[i] = 0.;
+  }
+  std::vector<int> ipGlobalLabels(4);
+  for (unsigned int i = 0; i < 4; ++i) {
+    ipGlobalLabels[i] = 0;
+  }
+
+  if(theAliBeamspot){
+  double phi = perigeeVecPars[2];
+  double dz  = perigeeVecPars[4];
+  ipGlobalDerivs[0] = sin(phi);
+  ipGlobalDerivs[1] = -cos(phi);
+  ipGlobalDerivs[2] = sin(phi)*dz;
+  ipGlobalDerivs[3] = -cos(phi)*dz;
+ 
+  ipGlobalLabels[0] = 250000;
+  ipGlobalLabels[1] = 250001;
+  ipGlobalLabels[2] = 250002;
+  ipGlobalLabels[3] = 250003;
+  }
+
+
+  theMille->mille(ipLocalDerivs.size(), &(ipLocalDerivs[0]),
+  	  ipGlobalDerivs.size(), &(ipGlobalDerivs[0]), &(ipGlobalLabels[0]),
+  	  residuumIP, sigmaIP);
+
+
+  // delete new objects:
+    delete tsctpBuilder;
+    tsctpBuilder = NULL;
+     
+} */

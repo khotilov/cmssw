@@ -3,10 +3,10 @@
 
 #include "FWCore/Framework/interface/Principal.h"
 
+#include "DataFormats/Provenance/interface/BranchMapper.h"
 #include "DataFormats/Provenance/interface/ProcessHistoryRegistry.h"
 #include "DataFormats/Provenance/interface/ProductRegistry.h"
 #include "FWCore/Framework/interface/DelayedReader.h"
-#include "FWCore/Framework/interface/HistoryAppender.h"
 #include "FWCore/Framework/interface/Selector.h"
 #include "FWCore/Utilities/interface/Algorithms.h"
 #include "FWCore/Utilities/interface/EDMException.h"
@@ -22,9 +22,6 @@
 //using boost::lambda::_1;
 
 namespace edm {
-
-  ProcessHistory Principal::emptyProcessHistory_;
-
   static
   void
   maybeThrowMissingDictionaryException(TypeID const& productType, bool isElement, std::vector<std::string> const& missingDictionaries) {
@@ -83,19 +80,17 @@ namespace edm {
 
   Principal::Principal(boost::shared_ptr<ProductRegistry const> reg,
                        ProcessConfiguration const& pc,
-                       BranchType bt,
-                       HistoryAppender* historyAppender) :
+                       BranchType bt) :
     EDProductGetter(),
     processHistoryPtr_(new ProcessHistory),
     processHistoryID_(processHistoryPtr_->id()),
     processConfiguration_(&pc),
     groups_(reg->constProductList().size(), SharedGroupPtr()),
     preg_(reg),
+    branchMapperPtr_(new BranchMapper),
     reader_(),
     productPtrs_(),
-    branchType_(bt),
-    historyAppender_(historyAppender) {
-
+    branchType_(bt) {
     //Now that these have been set, we can create the list of Branches we need.
     std::string const source("source");
     ProductRegistry::ProductList const& prodsList = reg->productList();
@@ -189,8 +184,9 @@ namespace edm {
   // "Zero" the principal so it can be reused for another Event.
   void
   Principal::clearPrincipal() {
-    processHistoryPtr_ = 0;
-    processHistoryID_ = ProcessHistoryID();
+    processHistoryPtr_->clear();
+    processHistoryID_ = processHistoryPtr_->id();
+    branchMapperPtr_->reset();
     reader_ = 0;
     for (Principal::const_iterator i = begin(), iEnd = end(); i != iEnd; ++i) {
       (*i)->resetProductData();
@@ -200,40 +196,23 @@ namespace edm {
 
   // Set the principal for the Event, Lumi, or Run.
   void
-  Principal::fillPrincipal(ProcessHistoryID const& hist, DelayedReader* reader) {
+  Principal::fillPrincipal(ProcessHistoryID const& hist, boost::shared_ptr<BranchMapper> mapper, DelayedReader* reader) {
+    if(mapper) {
+      branchMapperPtr_ = mapper;
+    }
     if(reader) {
       reader_ = reader;
     }
-
-    ProcessHistory const* inputProcessHistory = 0;
-    if (historyAppender_ && productRegistry().anyProductProduced()) {
-      CachedHistory const& cachedHistory = 
-        historyAppender_->appendToProcessHistory(hist,
-                                                *processConfiguration_);
-      processHistoryPtr_ = cachedHistory.processHistory();
-      processHistoryID_ = cachedHistory.processHistoryID();
-      inputProcessHistory = cachedHistory.inputProcessHistory();
+    if(hist.isValid()) {
+      ProcessHistoryRegistry& history(*ProcessHistoryRegistry::instance());
+      assert(history.notEmpty());
+      bool found = history.getMapped(hist, *processHistoryPtr_);
+      assert(found);
+      processHistoryID_ = processHistoryPtr_->id();
     }
-    else {
-      if (hist.isValid()) {
-        ProcessHistoryRegistry* registry = ProcessHistoryRegistry::instance();
-        inputProcessHistory = registry->getMapped(hist);
-        if (inputProcessHistory == 0) {
-          throw Exception(errors::LogicError)
-            << "Principal::fillPrincipal\n"
-            << "Input ProcessHistory not found in registry\n"
-            << "Contact a Framework developer\n";
-        }
-      } else {
-        inputProcessHistory = &emptyProcessHistory_;
-      }
-      processHistoryID_ = hist;
-      processHistoryPtr_ = inputProcessHistory;        
-    }
-
-    preg_->productLookup().reorderIfNecessary(branchType_, *inputProcessHistory,
+    preg_->productLookup().reorderIfNecessary(branchType_, *processHistoryPtr_,
                                          processConfiguration_->processName());
-    preg_->elementLookup().reorderIfNecessary(branchType_, *inputProcessHistory,
+    preg_->elementLookup().reorderIfNecessary(branchType_, *processHistoryPtr_,
                                          processConfiguration_->processName());
   }
 
@@ -281,6 +260,12 @@ namespace edm {
           << ")\n";
     }
     addGroup_(group);
+  }
+
+  void
+  Principal::setProcessHistory(Principal const& principal) {
+    *processHistoryPtr_ = *principal.processHistoryPtr_;
+    processHistoryID_ = processHistoryPtr_->id();
   }
 
   Principal::ConstGroupPtr const
@@ -660,6 +645,7 @@ namespace edm {
       groups_[index].swap(other.groups_[indexO]);
     }
     reader_->mergeReaders(other.reader());
+    branchMapperPtr_->mergeMappers(other.branchMapperPtr());
   }
 
   WrapperHolder

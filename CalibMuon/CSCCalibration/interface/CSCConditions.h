@@ -12,7 +12,6 @@
 #include "CondFormats/DataRecord/interface/CSCBadChambersRcd.h"
 #include "CondFormats/DataRecord/interface/CSCDBChipSpeedCorrectionRcd.h"
 #include "CondFormats/DataRecord/interface/CSCChamberTimeCorrectionsRcd.h"
-#include "CondFormats/DataRecord/interface/CSCDBGasGainCorrectionRcd.h"
 #include <vector>
 #include <bitset>
 
@@ -24,7 +23,6 @@ class CSCBadWires;
 class CSCBadChambers;
 class CSCDBChipSpeedCorrection;
 class CSCChamberTimeCorrections;
-class CSCDBGasGainCorrection;
 
 /**  Encapsulates a user interface into the CSC conditions
  *
@@ -96,12 +94,6 @@ public:
   /// average gain over entire CSC system (logically const although must be cached here).
   float averageGain() const;
 
-  /// gas gain correction as a function of detId (w/layer), strip, and wire
-  float gasGainCorrection( const CSCDetId & detId, int strip, int wire ) const;
-
-  /// did we request reading gas gain correction info from db?
-  bool useGasGainCorrections() const { return useGasGainCorrections_; }
-
 private:
 
   edm::ESHandle<CSCDBGains> theGains;
@@ -113,12 +105,10 @@ private:
   edm::ESHandle<CSCBadChambers> theBadChambers;
   edm::ESHandle<CSCDBChipSpeedCorrection> theChipCorrections;
   edm::ESHandle<CSCChamberTimeCorrections> theChamberTimingCorrections;
-  edm::ESHandle<CSCDBGasGainCorrection> theGasGainCorrections;
 
   bool readBadChannels_; // flag whether or not to even attempt reading bad channel info from db
   bool readBadChambers_; // flag whether or not to even attempt reading bad chamber info from db
   bool useTimingCorrections_; // flag whether or not to even attempt reading timing correction info from db
-  bool useGasGainCorrections_; // flag whether or not to even attempt reading gas-gain correction info from db
 
   // cache bad channel words once created
   std::vector< std::bitset<80> > badStripWords;

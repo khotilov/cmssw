@@ -1,7 +1,5 @@
 <lcgdict>
-  <class name="PSimHit" ClassVersion="10">
-   <version ClassVersion="10" checksum="1181355938"/>
-  </class>
+  <class name="PSimHit"/>
   <class name="std::vector<PSimHit>"/>
   <class name="edm::Wrapper<std::vector<PSimHit> >" splitLevel="0"/>
   <class name="std::vector<const PSimHit*>"/>

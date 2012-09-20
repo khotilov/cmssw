@@ -16,6 +16,7 @@
 #include "DataFormats/Provenance/interface/BranchType.h"
 #include "DataFormats/Provenance/interface/ConstBranchDescription.h"
 #include "DataFormats/Provenance/interface/ProductTransientIndex.h"
+#include "DataFormats/Provenance/interface/Transient.h"
 #include "DataFormats/Provenance/interface/TransientProductLookupMap.h"
 
 #include "boost/array.hpp"
@@ -109,34 +110,18 @@ namespace edm {
 
     ConstProductList& constProductList() const {
        //throwIfNotFrozen();
-       return transient_.constProductList_;
+       return transients_.get().constProductList_;
     }
 
-    TransientProductLookupMap& productLookup() const {return transient_.productLookup_;}
+    TransientProductLookupMap& productLookup() const {return transients_.get().productLookup_;}
 
-    TransientProductLookupMap& elementLookup() const {return transient_.elementLookup_;}
+    TransientProductLookupMap& elementLookup() const {return transients_.get().elementLookup_;}
 
     //returns the appropriate ProductTransientIndex else 0xFFFFFFFF if no BranchID is available
     static ProductTransientIndex const kInvalidIndex = 0xFFFFFFFF;
     ProductTransientIndex indexFrom(BranchID const& iID) const;
-
-    bool productProduced(BranchType branchType) const {return transient_.productProduced_[branchType];}
-    bool anyProductProduced() const {return transient_.anyProductProduced_;}
-    BranchListIndex producedBranchListIndex() const {return transient_.producedBranchListIndex_;}
-
-    void setProducedBranchListIndex(BranchListIndex blix) const {
-      transient_.producedBranchListIndex_ = blix;
-    }
-
-    std::vector<std::string>& missingDictionaries() const {
-      return transient_.missingDictionaries_;
-    }
-
-    void initializeTransients() const {transient_.reset();}
-
     struct Transients {
       Transients();
-      void reset();
       bool frozen_;
       ConstProductList constProductList_;
       // Is at least one (run), (lumi), (event) product produced this process?
@@ -157,13 +142,25 @@ namespace edm {
       std::vector<std::string> missingDictionaries_;
     };
 
-  private:
-    void setProductProduced(BranchType branchType) const {
-      transient_.productProduced_[branchType] = true;
-      transient_.anyProductProduced_ = true;
+    bool productProduced(BranchType branchType) const {return transients_.get().productProduced_[branchType];}
+    bool anyProductProduced() const {return transients_.get().anyProductProduced_;}
+    BranchListIndex producedBranchListIndex() const {return transients_.get().producedBranchListIndex_;}
+
+    void setProducedBranchListIndex(BranchListIndex blix) const {
+      transients_.get().producedBranchListIndex_ = blix;
     }
 
-    bool& frozen() const {return transient_.frozen_;}
+    std::vector<std::string>& missingDictionaries() const {
+      return transients_.get().missingDictionaries_;
+    }
+
+  private:
+    void setProductProduced(BranchType branchType) const {
+      transients_.get().productProduced_[branchType] = true;
+      transients_.get().anyProductProduced_ = true;
+    }
+
+    bool& frozen() const {return transients_.get().frozen_;}
 
     void initializeLookupTables() const;
     virtual void addCalled(BranchDescription const&, bool iFromListener);
@@ -171,7 +168,7 @@ namespace edm {
     void throwIfFrozen() const;
 
     ProductList productList_;
-    mutable Transients transient_;
+    mutable Transient<Transients> transients_;
   };
 
   inline

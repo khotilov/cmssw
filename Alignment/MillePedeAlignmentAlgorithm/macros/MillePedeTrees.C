@@ -1,5 +1,5 @@
 // Original Author: Gero Flucke
-// last change    : $Date: 2011/07/27 12:48:35 $
+// last change    : $Date: 2010/10/26 21:34:25 $
 // by             : $Author: flucke $
 
 #include "TTree.h"
@@ -25,8 +25,9 @@
 
 MillePedeTrees::MillePedeTrees(const char *fileName, Int_t iter, const char *treeNameAdd)
   : fTree(NULL), fOrgPos("AlignablesOrgPos_0"),
-    fMisPos("AlignablesAbsPos_0"), fMisPar("AlignmentParameters_0"), 
-    fPos(Form("AlignablesAbsPos_%d", iter)),
+    fMisPos("AlignablesAbsPos_0"), fMisRelPos("AlignablesRelPos_0"),
+    fMisPar("AlignmentParameters_0"), 
+    fPos(Form("AlignablesAbsPos_%d", iter)), fRelPos(Form("AlignablesRelPos_%d", iter)),
     fPar(Form("AlignmentParameters_%d", iter)), fMp(Form("MillePedeUser_%d", iter)),
     fUseSignedR(false), fBowsParameters(false)
 {
@@ -45,7 +46,8 @@ TTree* MillePedeTrees::CreateTree(const char *fileName, const TString &treeNameA
   TFile *file = TFile::Open(fileName);
   if (!file) return NULL;
 
-  TString *allTreeNames[] = {&fOrgPos, &fPos, &fMisPos, &fMisPar, &fPar, &fMp};
+  TString *allTreeNames[] = {&fOrgPos, &fPos, &fMisPos, &fMisRelPos, &fMisPar, &fRelPos,
+                             &fPar, &fMp};
   const unsigned int nTree = sizeof(allTreeNames) / sizeof(allTreeNames[0]);
 
   unsigned int iTree = 0;
@@ -506,8 +508,9 @@ TString MillePedeTrees::DeformValue(UInt_t i, const TString &whichOne) const
 {
   //start,result,diff
   if (whichOne == "diff") {
-    return Parenth((PosT() += Form("DeformValues[%u]", i)) += Min()
-		   += MisPosT() += Form("DeformValues[%u]", i));
+    ::Error("MillePedeTrees::DeformValue",
+	    "whichOne == diff not yet implemented!");
+    return "2";
   } else {
     TString tree;
     if (whichOne == "result") tree = PosT();
@@ -526,7 +529,9 @@ TString MillePedeTrees::NumDeformValues(const TString &whichOne) const
 {
   //start,result,diff
   if (whichOne == "diff") {
-    return Fun("TMath::Min", (PosT() += "NumDeform,") += MisPosT() += "NumDeform");
+    ::Error("MillePedeTrees::NumDeformValues",
+	    "whichOne == diff not yet implemented!");
+    return "0";
   } else {
     TString tree;
     if (whichOne == "result") tree = PosT();
@@ -802,20 +807,6 @@ TString MillePedeTrees::Name(const TString &pos) const
     ::Error("MillePedeTrees::Name", "unknown position %s", pos.Data());
     return "";
   }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-TString MillePedeTrees::NamePos(UInt_t iPos) const
-{
-  switch (iPos) {
-  case 0: return "x";
-  case 1: return "y";
-  case 2: return "z";
-  }
-
-  ::Error("MillePedeTrees::NamePos", "unknown position %d", iPos);
-  return "";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -57,7 +57,6 @@ class CSCMake2DRecHit
   
   bool useCalib;
   bool useTimingCorrections;
-  bool useGasGainCorrections;
   int stripWireDeltaTime;
   bool useGatti;
   float maxGattiChi2;

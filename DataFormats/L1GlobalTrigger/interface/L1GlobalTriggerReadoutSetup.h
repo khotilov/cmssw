@@ -22,9 +22,10 @@
 #include <vector>
 #include <map>
 
+#include <boost/cstdint.hpp>
+
 // user include files
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetupFwd.h"
-#include "FWCore/Utilities/interface/typedefs.h"
 
 // forward declarations
 

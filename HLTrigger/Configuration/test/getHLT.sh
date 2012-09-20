@@ -1,8 +1,8 @@
 #! /bin/bash
 
 # ConfDB configurations to use
-MASTER="/dev/CMSSW_4_2_0/HLT"        # no explicit version, take te most recent
-TARGET="/dev/CMSSW_4_2_0/\$TABLE"    # no explicit version, take te most recent
+MASTER="/dev/CMSSW_4_4_2/HLT"        # no explicit version, take te most recent
+TARGET="/dev/CMSSW_4_4_2/\$TABLE"    # no explicit version, take te most recent
 TABLES="GRun HIon"                   # $TABLE in the above variable will be expanded to these TABLES
 
 # print extra messages ?
@@ -65,7 +65,8 @@ function getConfigForOnline() {
 # local L1T="tag[,connect]" - record is hardwired as L1GtTriggerMenuRcd
 # local L1TPP="L1GtTriggerMenu_L1Menu_Collisions2011_v6_mc,sqlite_file:/afs/cern.ch/user/g/ghete/public/L1Menu/L1Menu_Collisions2011_v6/sqlFile/L1Menu_Collisions2011_v6_mc.db"
   local L1TPP="L1GtTriggerMenu_L1Menu_Collisions2011_v6_mc"
-  local L1THI="L1GtTriggerMenu_L1Menu_CollisionsHeavyIons2010_v2_mc"
+# local L1THI="L1GtTriggerMenu_L1Menu_CollisionsHeavyIons2011_v0_mc,sqlite_file:/afs/cern.ch/user/g/ghete/public/L1Menu/L1Menu_CollisionsHeavyIons2011_v0/sqlFile/L1Menu_CollisionsHeavyIons2011_v0_mc.db"
+local L1THI="L1GtTriggerMenu_L1Menu_CollisionsHeavyIons2011_v0_mc"
 
 
   log "    dumping full HLT for $NAME"
@@ -97,8 +98,9 @@ getConfigForCVS  $MASTER FULL
 getContentForCVS $MASTER
 for TABLE in $TABLES; do
   getConfigForCVS $(eval echo $TARGET) $TABLE
+# getDatasetsForCVS $(eval echo $TARGET) HLTrigger_Datasets_${TABLE}_cff.py
 done
-for TABLE in "GRun"; do
+for TABLE in "HIon"; do
   getDatasetsForCVS $(eval echo $TARGET) HLTrigger_Datasets_cff.py
 done
 log "Done"

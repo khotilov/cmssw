@@ -6,56 +6,73 @@
 BranchMapper: Manages the per event/lumi/run per product provenance.
 
 ----------------------------------------------------------------------*/
+#include <iosfwd>
+#include <set>
+#include <map>
+
+#include "boost/shared_ptr.hpp"
+
 #include "DataFormats/Provenance/interface/BranchID.h"
 #include "DataFormats/Provenance/interface/ProductProvenance.h"
 #include "DataFormats/Provenance/interface/ProcessHistoryID.h"
 
-#include "boost/scoped_ptr.hpp"
-#include "boost/shared_ptr.hpp"
-#include "boost/utility.hpp"
-
-#include <iosfwd>
-#include <memory>
-#include <set>
-
 /*
   BranchMapper
+
 */
 
 namespace edm {
-  class ProvenanceReaderBase;
-
-  class BranchMapper : private boost::noncopyable {
+  class ProductID;
+  class BranchMapper {
   public:
     BranchMapper();
-    explicit BranchMapper(std::auto_ptr<ProvenanceReaderBase> reader);
 
-    ~BranchMapper();
+    explicit BranchMapper(bool delayedRead);
+
+    virtual ~BranchMapper();
+
+    void write(std::ostream& os) const;
 
     ProductProvenance const* branchIDToProvenance(BranchID const& bid) const;
 
-    void insertIntoSet(ProductProvenance const& provenanceProduct) const;
+    void insert(ProductProvenance const& provenanceProduct);
 
-    void mergeMappers(boost::shared_ptr<BranchMapper> other);
+    void mergeMappers(boost::shared_ptr<BranchMapper> other) {nextMapper_ = other;}
+
+    void setDelayedRead(bool value) {delayedRead_ = value;}
+
+    BranchID oldProductIDToBranchID(ProductID const& oldProductID) const {
+      return oldProductIDToBranchID_(oldProductID);
+    }
+
+    ProcessHistoryID const& processHistoryID() const {return processHistoryID_;}
+
+    ProcessHistoryID& processHistoryID() {return processHistoryID_;}
 
     void reset();
   private:
-    void readProvenance() const;
-
     typedef std::set<ProductProvenance> eiSet;
 
-    mutable eiSet entryInfoSet_;
-    boost::shared_ptr<BranchMapper> nextMapper_;
-    mutable bool delayedRead_;
-    mutable boost::scoped_ptr<ProvenanceReaderBase> provenanceReader_;
-  };
+    void readProvenance() const;
+    virtual void readProvenance_() const {}
+    virtual void reset_() {}
+    
+    virtual BranchID oldProductIDToBranchID_(ProductID const& oldProductID) const;
 
-  class ProvenanceReaderBase {
-  public:
-    ProvenanceReaderBase() {}
-    virtual ~ProvenanceReaderBase();
-    virtual void readProvenance(BranchMapper const& mapper) const = 0;
+    eiSet entryInfoSet_;
+
+    boost::shared_ptr<BranchMapper> nextMapper_;
+
+    mutable bool delayedRead_;
+
+    ProcessHistoryID processHistoryID_;
   };
   
+  inline
+  std::ostream&
+  operator<<(std::ostream& os, BranchMapper const& p) {
+    p.write(os);
+    return os;
+  }
 }
 #endif
