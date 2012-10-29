@@ -10,21 +10,18 @@ import string
 
 
 ### Reference release
-RefRelease='CMSSW_4_4_0_pre8'
+RefRelease='CMSSW_4_2_0_pre1'
 
 ### Relval release (set if different from $CMSSW_VERSION)
-NewRelease='CMSSW_4_4_0_pre9'
+NewRelease='CMSSW_4_2_0_pre1'
 
 ### startup and ideal sample list
 
 ### This is the list of STARTUP-conditions relvals 
 startupsamples= [
-#    'RelValSingleMuPt10', 
-    'RelValSingleMuPt100',
-#    'RelValSingleElectronPt35', 
-#    'RelValTTbar', 
-#    'RelValMinBias', 
-#    'RelValQCD_Pt_3000_3500'
+    'RelValTTbar', 
+    'RelValMinBias', 
+    'RelValQCD_Pt_3000_3500'
 ]
 ### the list can be empty if you want to skip the validation for all the samples
 #startupsamples= []
@@ -50,7 +47,7 @@ idealsamples= [
 ]
 
 ### the list can be empty if you want to skip the validation for all the samples
-idealsamples= []
+#idealsamples= []
 
 ### This is the list of IDEAL-conditions relvals (with PileUP
 # idealsamples= ['RelValZmumuJets_Pt_20_300_GEN']
@@ -63,11 +60,11 @@ Version='v1'
 #Version='BX2808-v1'
 
 ### Ideal and Statup tags
-IdealTag='MC_44_V4'
-StartupTag='START44_V4'
+IdealTag='MC_311_V1'
+StartupTag='START311_V1'
 
-RefIdealTag='MC_44_V3'
-RefStartupTag='START44_V3'
+RefIdealTag='MC_311_V1'
+RefStartupTag='START311_V1'
 ### PileUp: "PU" . No PileUp: "noPU"
 PileUp='noPU'
 #PileUp='PU'
@@ -75,13 +72,13 @@ PileUp='noPU'
 
 
 ### Track algorithm name and quality. Can be a list.
-Algos= ['ootb']
-#Algos= ['ootb', 'iter0', 'iter1','iter2','iter3','iter4','iter5', 'iter6']
-Qualities=['']
-#Qualities=['', 'highPurity']
+#Algos= ['ootb']
+Algos= ['ootb', 'iter0', 'iter1','iter2','iter3','iter4','iter5']
+#Qualities=['']
+Qualities=['', 'highPurity']
 
 ### Leave unchanged unless the track collection name changes
-Tracksname='generalTracks'
+Tracksname=''
 
 # Sequence. Possible values:
 #   -only_validation
@@ -95,9 +92,9 @@ Tracksname='generalTracks'
 #   -comparison_only
 
 
-#Sequence='comparison_only'
+Sequence='comparison_only'
 #Sequence='harvesting'
-Sequence='only_validation'
+#Sequence='only_validation'
 
 
 
@@ -172,8 +169,8 @@ def do_validation(samples, GlobalTag, trackquality, trackalgorithm):
     global Sequence, Version, RefSelection, RefRepository, NewSelection, NewRepository, defaultNevents, Events, castorHarvestedFilesDirectory
     global cfg, macro, Tracksname
     print 'Tag: ' + GlobalTag
-    tracks_map = { 'ootb':'general_AssociatorByHitsRecoDenom','iter0':'cutsRecoZero_AssociatorByHitsRecoDenom','iter1':'cutsRecoFirst_AssociatorByHitsRecoDenom','iter2':'cutsRecoSecond_AssociatorByHitsRecoDenom','iter3':'cutsRecoThird_AssociatorByHitsRecoDenom','iter4':'cutsRecoFourth_AssociatorByHitsRecoDenom','iter5':'cutsRecoFifth_AssociatorByHitsRecoDenom','iter6':'cutsRecoSixth_AssociatorByHitsRecoDenom'}
-    tracks_map_hp = { 'ootb':'cutsRecoHp_AssociatorByHitsRecoDenom','iter0':'cutsRecoZeroHp_AssociatorByHitsRecoDenom','iter1':'cutsRecoFirstHp_AssociatorByHitsRecoDenom','iter2':'cutsRecoSecondHp_AssociatorByHitsRecoDenom','iter3':'cutsRecoThirdHp_AssociatorByHitsRecoDenom','iter4':'cutsRecoFourthHp_AssociatorByHitsRecoDenom','iter5':'cutsRecoFifthHp_AssociatorByHitsRecoDenom','iter6':'cutsRecoSixthHp_AssociatorByHitsRecoDenom'}
+    tracks_map = { 'ootb':'general_AssociatorByHitsRecoDenom','iter0':'cutsRecoZero_AssociatorByHitsRecoDenom','iter1':'cutsRecoFirst_AssociatorByHitsRecoDenom','iter2':'cutsRecoSecond_AssociatorByHitsRecoDenom','iter3':'cutsRecoThird_AssociatorByHitsRecoDenom','iter4':'cutsRecoFourth_AssociatorByHitsRecoDenom','iter5':'cutsRecoFifth_AssociatorByHitsRecoDenom'}
+    tracks_map_hp = { 'ootb':'cutsRecoHp_AssociatorByHitsRecoDenom','iter0':'cutsRecoZeroHp_AssociatorByHitsRecoDenom','iter1':'cutsRecoFirstHp_AssociatorByHitsRecoDenom','iter2':'cutsRecoSecondHp_AssociatorByHitsRecoDenom','iter3':'cutsRecoThirdHp_AssociatorByHitsRecoDenom','iter4':'cutsRecoFourthHp_AssociatorByHitsRecoDenom','iter5':'cutsRecoFifthHp_AssociatorByHitsRecoDenom'}
     if(trackalgorithm=='iter0' or trackalgorithm=='ootb'):
         mineff='0.5'
         maxeff='1.025'
@@ -188,31 +185,20 @@ def do_validation(samples, GlobalTag, trackquality, trackalgorithm):
         maxfake='0.8'
     #build the New Selection name
     NewSelection=GlobalTag + '_' + PileUp
-    #if( trackquality !=''):
-    #    NewSelection+='_'+trackquality
-    #if(trackalgorithm!=''and not(trackalgorithm=='ootb' and trackquality !='')):
-    #    NewSelection+='_'+trackalgorithm
-    #if(trackquality =='') and (trackalgorithm==''):
-    #    if(Tracksname==''):
-    #        NewSelection+='_ootb'
-    #        Tracks='generalTracks'
-    #    else:
-    #       NewSelection+= Tracks
-    #if(Tracksname==''):
-    #    Tracks='cutsRecoTracks'
-    #else:
-    #    Tracks=Tracksname
-
     if( trackquality !=''):
         NewSelection+='_'+trackquality
-    if(trackalgorithm != 'ootb'):
+    if(trackalgorithm!=''and not(trackalgorithm=='ootb' and trackquality !='')):
         NewSelection+='_'+trackalgorithm
-    if(trackalgorithm == 'ootb' and trackquality == ''):
-        NewSelection+='_'+trackalgorithm
-    Tracks=Tracksname
-    if (not(trackalgorithm == 'ootb' and trackquality =='')):
-        Tracks = 'cutsRecoTracks'
-
+    if(trackquality =='') and (trackalgorithm==''):
+        if(Tracksname==''):
+            NewSelection+='_ootb'
+            Tracks='generalTracks'
+        else:
+           NewSelection+= Tracks
+    if(Tracksname==''):
+        Tracks='cutsRecoTracks'
+    else:
+        Tracks=Tracksname
     NewSelection+=NewSelectionLabel
     listofdatasets = open('listofdataset.txt' , 'w' )
     #loop on all the requested samples
@@ -221,12 +207,12 @@ def do_validation(samples, GlobalTag, trackquality, trackalgorithm):
         templatemacroFile = open(macro, 'r')
         print 'Get information from DBS for sample', sample
         newdir=NewRepository+'/'+NewRelease+'/'+NewSelection+'/'+sample 
-        cfgFileName=sample+GlobalTag
+	cfgFileName=sample+GlobalTag
         #check if the sample is already done
         if(os.path.isfile(newdir+'/building.pdf' )!=True):    
 
             if( Sequence=="harvesting"):
-                harvestedfile='./DQM_V0001_R000000001__' + GlobalTag+ '__' + sample + '__Validation.root'
+            	harvestedfile='./DQM_V0001_R000000001__' + GlobalTag+ '__' + sample + '__Validation.root'
             elif( Sequence=="preproduction"):
                 harvestedfile='./DQM_V0001_R000000001__' + sample+ '-' + GlobalTag + '_preproduction_312-v1__GEN-SIM-RECO_1.root'
             elif( Sequence=="comparison_only"):
@@ -372,8 +358,8 @@ def do_validation(samples, GlobalTag, trackquality, trackalgorithm):
 
                     print "copy py file for sample: " , sample
                     os.system('cp '+cfgFileName+'.py ' + newdir)
-    
-    
+	
+	
         else:
             print 'Validation for sample ' + sample + ' already done. Skipping this sample. \n'
 
@@ -424,3 +410,4 @@ for algo in Algos:
         if(quality =='') and (algo==''):
             RefSelection+='_ootb'
         do_validation(startupsamples, StartupTag, quality , algo)
+        

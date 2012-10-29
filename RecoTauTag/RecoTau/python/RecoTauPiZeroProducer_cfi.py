@@ -10,10 +10,10 @@ ak5PFJetsRecoTauGreedyPiZeros = cms.EDProducer(
     massHypothesis = cms.double(0.136),
     outputSelection = cms.string('pt > 1.5'),
     builders = cms.VPSet(
-        builders.comboStrips
+        builders.comboStrips,
     ),
     ranking = cms.VPSet(
-        ranking.greedy
+        ranking.greedy,
     ),
 )
 
@@ -25,13 +25,12 @@ ak5PFJetsRecoTauPiZeros = cms.EDProducer(
     outputSelection = cms.string('pt > 1.5'),
     builders = cms.VPSet(
         builders.combinatoricPhotonPairs,
-        #builders.strips
-        builders.modStrips 
+        builders.strips,
     ),
     ranking = cms.VPSet(
         ranking.nearPiZeroMassBarrel, # Prefer pi zeros +- 0.05 GeV correct mass
         ranking.nearPiZeroMassEndcap,
-        ranking.isInStrip             # Allow incorrect masses if in strip
+        ranking.isInStrip,      # Allow incorrect masses if in strip
     ),
 )
 
@@ -43,7 +42,7 @@ ak5PFJetsLegacyTaNCPiZeros = cms.EDProducer(
     outputSelection = cms.string('pt > 1.5'),
     builders = cms.VPSet(
         builders.allSinglePhotons,
-        builders.combinatoricPhotonPairs
+        builders.combinatoricPhotonPairs,
     ),
     ranking = cms.VPSet(
         ranking.legacyPFTauDecayModeSelection
@@ -57,11 +56,10 @@ ak5PFJetsLegacyHPSPiZeros = cms.EDProducer(
     massHypothesis = cms.double(0.136),
     outputSelection = cms.string('pt > 0'),
     builders = cms.VPSet(
-        #builders.strips
-        builders.modStrips 
+        builders.strips,
     ),
     ranking = cms.VPSet(
         ranking.isInStrip
-    )
+    ),
 )
 

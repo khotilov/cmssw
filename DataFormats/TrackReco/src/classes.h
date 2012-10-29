@@ -4,7 +4,6 @@
 #include "Math/Cartesian3D.h" 
 #include "Math/Polar3D.h" 
 #include "Math/CylindricalEta3D.h" 
-#include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h" 
 #include "DataFormats/TrackReco/interface/TrackExtra.h"
 #include "DataFormats/TrackReco/interface/TrackExtraFwd.h" 
@@ -88,9 +87,5 @@ namespace {
 
     edm::ValueMap<reco::TrackRefVector> vm_trv;
     edm::Wrapper<edm::ValueMap<reco::TrackRefVector> > w_vm_trv;
-
-    edm::helpers::KeyVal<edm::RefProd<std::vector<reco::Track> >,edm::RefProd<std::vector<TrajectorySeed> > > x1;
-    edm::AssociationMap<edm::OneToMany<std::vector<reco::Track>,std::vector<TrajectorySeed>,unsigned int> > x2;
-    edm::Wrapper<edm::AssociationMap<edm::OneToMany<std::vector<reco::Track>,std::vector<TrajectorySeed>,unsigned int> > > x3;
   };
 }

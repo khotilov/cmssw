@@ -17,14 +17,12 @@ is the DataBlock.
 
 #include "boost/shared_ptr.hpp"
 
+#include "DataFormats/Provenance/interface/BranchMapper.h"
 #include "DataFormats/Provenance/interface/RunAuxiliary.h"
 #include "FWCore/Framework/interface/Principal.h"
 
 namespace edm {
-
-  class HistoryAppender;
   class UnscheduledHandler;
-
   class RunPrincipal : public Principal {
   public:
     typedef RunAuxiliary Auxiliary;
@@ -33,11 +31,12 @@ namespace edm {
     RunPrincipal(
         boost::shared_ptr<RunAuxiliary> aux,
         boost::shared_ptr<ProductRegistry const> reg,
-        ProcessConfiguration const& pc,
-        HistoryAppender* historyAppender = 0);
+        ProcessConfiguration const& pc);
     ~RunPrincipal() {}
 
-    void fillRunPrincipal(DelayedReader* reader = 0);
+    void fillRunPrincipal(
+        boost::shared_ptr<BranchMapper> mapper = boost::shared_ptr<BranchMapper>(),
+        DelayedReader* reader = 0);
 
     RunAuxiliary const& aux() const {
       return *aux_;
@@ -67,11 +66,17 @@ namespace edm {
       return aux_->mergeAuxiliary(aux);
     }
 
+    // ----- Mark this RunPrincipal as having been updated in the current Process.
+    void addToProcessHistory();
+
+    void checkProcessHistory() const;
+
     void setUnscheduledHandler(boost::shared_ptr<UnscheduledHandler>) {}
 
     void put(
         ConstBranchDescription const& bd,
-        WrapperOwningHolder const& edp);
+        WrapperOwningHolder const& edp,
+        ProductProvenance& productProvenance);
 
     void readImmediate() const;
 

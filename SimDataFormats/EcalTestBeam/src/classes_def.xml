@@ -1,6 +1,4 @@
 <lcgdict>
-  <class name="PEcalTBInfo" ClassVersion="10">
-   <version ClassVersion="10" checksum="1603772803"/>
-  </class>
+  <class name="PEcalTBInfo"/>
   <class name="edm::Wrapper<PEcalTBInfo>"/>
 </lcgdict>

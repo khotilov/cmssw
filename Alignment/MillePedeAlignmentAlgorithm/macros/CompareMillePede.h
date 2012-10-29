@@ -1,5 +1,5 @@
 // Original Author: Gero Flucke
-// last change    : $Date: 2011/06/29 20:36:10 $
+// last change    : $Date: 2010/08/12 09:15:30 $
 // by             : $Author: flucke $
 #ifndef COMPAREMILLEPEDE_H
 #define COMPAREMILLEPEDE_H
@@ -11,7 +11,7 @@ class CompareMillePede
 
 {
  public:
-  CompareMillePede(const char *fileName1, const char *fileName2, Int_t iov1 = 1, Int_t iov2 = 1,
+  CompareMillePede(const char *fileName1, const char *fileName2, Int_t iter1 = 2, Int_t iter2 = 2,
 		   Int_t hieraLevel = 0);// iter=1/2: singlerun/merged; heiraLev: -1 ignore, 0 lowest level, etc.
   virtual ~CompareMillePede();
 
@@ -23,8 +23,6 @@ class CompareMillePede
   void DrawParamDeltaMis(Option_t *option="");//"add": keep old canvas, "free1/2": if free param in file 1/2 
   void DrawParamDeltaMisVsLoc(Option_t *option="");//"add": keep old canvas, "free1/2": if free param in file 1/2
   void DrawNumHits(Option_t *opt="");//"add": keep old canvas
-
-  void DrawAbsPos(Option_t *opt="");//"start": at start (else end), "add": keep old canvas
 
   bool IsConsistent(); // check correct order of alignables, if false draw some hists
   TString DeltaPar(UInt_t iPar) const; // par_2 - par_1

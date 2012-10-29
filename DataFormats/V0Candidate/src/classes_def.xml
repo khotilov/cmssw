@@ -1,9 +1,6 @@
 <lcgdict>
 <selection>
-  <class name="reco::V0Candidate" ClassVersion="11">
-   <version ClassVersion="11" checksum="1540426017"/>
-   <version ClassVersion="10" checksum="1361748283"/>
-  </class>
+  <class name="reco::V0Candidate"/>
   <class name="std::vector<reco::V0Candidate>" />
   <class name="edm::Wrapper<std::vector<reco::V0Candidate> >" />
 </selection>

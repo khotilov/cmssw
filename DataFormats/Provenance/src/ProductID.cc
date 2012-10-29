@@ -17,5 +17,6 @@ namespace edm {
   void ProductID::swap(ProductID& other) {
     std::swap(processIndex_, other.processIndex_);
     std::swap(productIndex_, other.productIndex_);
+    std::swap(oldID_, other.oldID_);
   }
 }

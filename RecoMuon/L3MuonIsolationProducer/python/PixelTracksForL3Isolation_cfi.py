@@ -12,8 +12,7 @@ pixelTracksForL3Isolation.RegionFactoryPSet.RegionPSet = cms.PSet(
     vertexSrc = cms.string(''),
     originRadius = cms.double(0.2),
     vertexZConstrained = cms.bool(False),
-    ptMin = cms.double(1.0),
-    measurementTrackerName = cms.string("")
+    ptMin = cms.double(1.0)
 )
 
 

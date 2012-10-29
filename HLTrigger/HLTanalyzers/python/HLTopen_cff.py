@@ -18,6 +18,19 @@ hltL1NonIsoR9shape = cms.EDProducer( "EgammaHLTR9Producer",
 
 HLTEgammaR9ShapeSequence = cms.Sequence( hltL1IsoR9shape + hltL1NonIsoR9shape )
 
+hltMuTrackJpsiPixelTrackSelector.MinMasses  = cms.vdouble ( 2.0, 60.0 )
+hltMuTrackJpsiPixelTrackSelector.MaxMasses  = cms.vdouble ( 4.6, 120.0 )
+hltMu5Track1JpsiPixelMassFiltered.MinMasses = cms.vdouble ( 2.0, 60.0 )
+hltMu5Track1JpsiPixelMassFiltered.MaxMasses = cms.vdouble ( 4.6, 120.0 )
+hltMu5TkMuJpsiTrackMassFiltered.MinMasses   = cms.vdouble ( 2.5, 60.0 )
+hltMu5TkMuJpsiTrackMassFiltered.MaxMasses   = cms.vdouble ( 4.1, 120.0 )
+hltMu5Track2JpsiTrackMassFiltered.MinMasses = cms.vdouble ( 2.7, 60.0 )
+hltMu5Track2JpsiTrackMassFiltered.MaxMasses = cms.vdouble ( 3.5, 120.0 )
+
+hltMu5L2Mu2JpsiTrackMassFiltered.MinMasses = cms.vdouble ( 1.8, 50.0 )
+hltMu5L2Mu2JpsiTrackMassFiltered.MaxMasses = cms.vdouble ( 4.5, 130.0 )
+
+
 #hltLowMassDisplacedL3Filtered.MaxEta      = cms.double(3.0)
 #hltLowMassDisplacedL3Filtered.MinPtPair   = cms.double( 0.0 )
 #hltLowMassDisplacedL3Filtered.MinPtMin    = cms.double( 0.0 )
@@ -30,12 +43,11 @@ HLTEgammaR9ShapeSequence = cms.Sequence( hltL1IsoR9shape + hltL1NonIsoR9shape )
 
 #HLTDisplacemumuSequence = cms.Sequence(  hltL1sL1DoubleMu0 + hltDimuonL1Filtered0 + hltDimuonL2PreFiltered0 + hltLowMassDisplacedL3Filtered + hltDisplacedmumuVtxProducerLowMass + hltDisplacedmumuFilterLowMass)
 
-
-
 # create the jetMET HLT reco path
 DoHLTJets = cms.Path(HLTBeginSequence + 
     HLTBeginSequence +
     HLTRecoJetSequenceAK5Corrected +
+    HLTRecoJetSequenceAK5L1FastJetCorrected +
     HLTRecoMETSequence +
     HLTDoLocalHcalWithoutHOSequence                  
 )
@@ -53,9 +65,23 @@ DoHltMuon = cms.Path(
     HLTL2muonisorecoSequence + 
     HLTL3muonrecoSequence + 
     HLTL3muonisorecoSequence +
+    HLTL3muonTkIso10recoSequence + 
     HLTMuTrackJpsiPixelRecoSequence + 
     HLTMuTrackJpsiTrackRecoSequence +
 ##    HLTDisplacemumuSequence +
+
+    HLTDoLocalPixelSequence +
+    hltPixelTracks +
+    HLTDoLocalStripSequence +
+    hltMuTrackSeeds +
+    hltMuCkfTrackCandidates +
+    hltMuCtfTracks +
+    hltDiMuonMerging +
+    HLTL3muonrecoNocandSequence +
+    hltDiMuonLinks +
+    hltGlbTrkMuons +
+    hltGlbTrkMuonCands +
+    
     HLTEndSequence )
 
 # create the Egamma HLT reco paths
@@ -129,7 +155,7 @@ DoHLTElectron = cms.Path(
     hltL1IsoElectronTrackIsol + 
     hltL1NonIsoElectronTrackIsol +
     hltHFEMClusters +
-    hltHFRecoEcalCandidate
+    hltHFRecoEcalTightCandidate
 )
 
 

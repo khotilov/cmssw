@@ -79,7 +79,7 @@ private:
   double xSection_, filterEff_, treeWeight;
 
   edm::InputTag recjets_,reccorjets_,genjets_,recmet_,recoPFMet_,genmet_,ht_,recoPFJets_,calotowers_,hltresults_,genEventInfo_;
-  edm::InputTag hltjets_, hltcorjets_;
+  edm::InputTag hltjets_, hltcorjets_, hltcorL1L2L3jets_;
   edm::InputTag muon_;
   std::string l1extramc_, l1extramu_;
   edm::InputTag m_l1extramu;
@@ -95,8 +95,8 @@ private:
   edm::InputTag gtReadoutRecord_,gtObjectMap_; 
   edm::InputTag gctBitCounts_,gctRingSums_;
 
-  edm::InputTag MuCandTag2_,MuIsolTag2_,MuNoVtxCandTag2_,MuCandTag3_,MuIsolTag3_;
-  edm::InputTag oniaPixelTag_,oniaTrackTag_,DiMuVtx_;
+  edm::InputTag MuCandTag2_,MuIsolTag2_,MuNoVtxCandTag2_,MuCandTag3_,MuIsolTag3_,MuTrkIsolTag3_;
+  edm::InputTag oniaPixelTag_,oniaTrackTag_,DiMuVtx_,TrackerMuonTag_;
   edm::InputTag HLTTau_, PFTau_, PFTauTightCone_;
   edm::InputTag PFJets_;
   

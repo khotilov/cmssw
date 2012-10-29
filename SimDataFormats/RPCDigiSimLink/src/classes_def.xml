@@ -1,8 +1,6 @@
 <lcgdict>
 
- <class name="RPCDigiSimLink" ClassVersion="10">
-  <version ClassVersion="10" checksum="3210258543"/>
- </class>
+ <class name="RPCDigiSimLink"/>
  <class name="edm::DetSet<RPCDigiSimLink>"/>
  <class name="std::vector<RPCDigiSimLink>"/>
  <class name="edm::DetSetVector<RPCDigiSimLink>"/>

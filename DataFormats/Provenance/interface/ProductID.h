@@ -27,22 +27,26 @@ namespace edm {
   class ProductID {
   public:
     ProductID() : processIndex_(0),
-		  productIndex_(0) {}
+		  productIndex_(0),
+		  oldID_(0) {}
     explicit
-    ProductID(ProductIndex productIndex) : processIndex_(0), productIndex_(productIndex) {}
+    ProductID(ProductIndex productIndex) : processIndex_(0), productIndex_(productIndex), oldID_(0) {}
     ProductID(ProcessIndex processIndex, ProductIndex productIndex) :
-      processIndex_(processIndex), productIndex_(productIndex) {}
+      processIndex_(processIndex), productIndex_(productIndex), oldID_(0) {}
     bool isValid() const {return productIndex_ != 0;}
     ProcessIndex processIndex() const {return processIndex_;}
     ProcessIndex productIndex() const {return productIndex_;}
     ProductIndex id() const {return productIndex_;} // backward compatibility
     void reset() {processIndex_ = productIndex_ = 0;}
 
+    unsigned int oldID() const {return oldID_;}
+    unsigned int & oldID() {return oldID_;}
     void swap(ProductID& other);
 
   private:
     ProcessIndex processIndex_;
     ProductIndex productIndex_;
+    unsigned int oldID_;
   };
 
   inline

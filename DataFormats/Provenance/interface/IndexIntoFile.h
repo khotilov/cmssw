@@ -74,11 +74,6 @@ once in this separate vector. Everywhere else it is needed
 it stored as an index into this vector because the
 ProcessHistoryID itself is large and it would take more
 memory to store them repeatedly in the other vectors.
-Note that the ProcessHistoryID's referenced in this
-class are always the "reduced" ProcessHistoryID's,
-not the ProcessHistoryID of the full ProcessHistory.
-You cannot use them to directly access the ProcessHistory
-from the ProcessHistoryRegistry.
 
 runOrLumiEntries_ is a std::vector<RunOrLumiEntry>.
 This vector holds one element per entry in the run
@@ -113,7 +108,7 @@ eventNumbers_ is a std::vector containing EventNumber_t's.
 Each element is a 4 byte int.  eventEntries_ is a
 std::vector containing EventEntry's.  Each EventEntry
 contains a 4 byte event number and an 8 byte entry number.
-If filled, both vectors contain the same number of
+If filled, both vectors contain the same number of 
 entries with identical event numbers sorted in the
 same order.  The only difference is that one includes
 the entry numbers and thus takes more memory.
@@ -165,18 +160,18 @@ The interface is too complex for general use.
 
 */
 
-#include "DataFormats/Provenance/interface/EventID.h"
 #include "DataFormats/Provenance/interface/ProcessHistoryID.h"
 #include "DataFormats/Provenance/interface/RunID.h"
+#include "DataFormats/Provenance/interface/EventID.h"
+#include "DataFormats/Provenance/interface/Transient.h"
 #include "FWCore/Utilities/interface/value_ptr.h"
-
 #include "boost/shared_ptr.hpp"
 
+#include <map>
+#include <vector>
 #include <cassert>
 #include <iosfwd>
-#include <map>
 #include <set>
-#include <vector>
 
 namespace edm {
 
@@ -214,7 +209,7 @@ namespace edm {
       ///
       /// In numerical order the criteria are in order of precedence are:
       ///
-      ///   1. processHistoryID index (which are normally in order of appearance in the process)
+      ///   1. processHistoryID index (which are normally in order of appearance in the process) 
       ///
       ///   2. run number
       ///
@@ -323,7 +318,6 @@ namespace edm {
         bool isRun() const {return lumi() == invalidLumi;}
 
         void setOrderPHIDRun(EntryNumber_t v) {orderPHIDRun_ = v;}
-        void setOrderPHIDRunLumi(EntryNumber_t v) {orderPHIDRunLumi_ = v;}
         void setProcessHistoryIDIndex(int v) {processHistoryIDIndex_ = v;}
 
         bool operator<(RunOrLumiEntry const& right) const {
@@ -372,7 +366,7 @@ namespace edm {
         RunOrLumiIndexes(int processHistoryIDIndex, RunNumber_t run, LuminosityBlockNumber_t lumi, int indexToGetEntry);
 
         int processHistoryIDIndex() const {return processHistoryIDIndex_;}
-        RunNumber_t run() const {return run_;}
+      	RunNumber_t run() const {return run_;}
         LuminosityBlockNumber_t lumi() const {return lumi_;}
         int indexToGetEntry() const {return indexToGetEntry_;}
         long long beginEventNumbers() const {return beginEventNumbers_;}
@@ -396,7 +390,7 @@ namespace edm {
       private:
 
         int processHistoryIDIndex_;
-        RunNumber_t run_;
+      	RunNumber_t run_;
         LuminosityBlockNumber_t lumi_;    // 0 indicates this is a run entry
         int indexToGetEntry_;
 
@@ -430,11 +424,11 @@ namespace edm {
         bool operator<(EventEntry const& right) const {
           return event() < right.event();
         }
-
+ 
         bool operator==(EventEntry const& right) const {
           return event() == right.event();
         }
-
+ 
       private:
         EventNumber_t event_;
         EntryNumber_t entry_;
@@ -449,7 +443,7 @@ namespace edm {
       public:
         SortedRunOrLumiItr(IndexIntoFile const* indexIntoFile, unsigned runOrLumi);
 
-        IndexIntoFile const* indexIntoFile() const {return indexIntoFile_;}
+	IndexIntoFile const* indexIntoFile() const {return indexIntoFile_;}
         unsigned runOrLumi() const {return runOrLumi_;}
 
         bool operator==(SortedRunOrLumiItr const& right) const;
@@ -463,7 +457,7 @@ namespace edm {
                       EntryNumber_t& beginEventEntry,
                       EntryNumber_t& endEventEntry);
 
-        RunOrLumiIndexes const& runOrLumiIndexes() const;
+	RunOrLumiIndexes const& runOrLumiIndexes() const;
 
       private:
 
@@ -492,7 +486,7 @@ namespace edm {
 
         virtual IndexIntoFileItrImpl* clone() const = 0;
 
-        EntryType getEntryType() const {return type_;}
+	EntryType getEntryType() const {return type_;}
 
         void next ();
 
@@ -512,8 +506,6 @@ namespace edm {
         virtual EntryNumber_t entry() const = 0;
         virtual LuminosityBlockNumber_t peekAheadAtLumi() const = 0;
         virtual EntryNumber_t peekAheadAtEventEntry() const = 0;
-        EntryNumber_t firstEventEntryThisRun();
-        EntryNumber_t firstEventEntryThisLumi();
         virtual bool skipLumiInRun() = 0;
 
         void advanceToNextRun();
@@ -670,16 +662,8 @@ namespace edm {
         LuminosityBlockNumber_t peekAheadAtLumi() const { return impl_->peekAheadAtLumi(); }
 
         /// Same as entry() except when the the current type is kRun or kLumi.
-        /// In that case instead of always returning -1 (invalid), it will return
-        /// the event entry that will be processed next and which is in the current
-        /// run and lumi. If there is none it still returns -1 (invalid).
+        /// In that case instead of always returning 0 (invalid), it will return the event entry that will be processed next
         EntryNumber_t peekAheadAtEventEntry() const { return impl_->peekAheadAtEventEntry(); }
-
-        /// Returns the TTree entry of the first event which would be processed in the
-        /// current run/lumi if all the events in the run/lumi were processed in the
-        /// current processing order. If there are none it returns -1 (invalid).
-        EntryNumber_t firstEventEntryThisRun() const { return impl_->firstEventEntryThisRun(); }
-        EntryNumber_t firstEventEntryThisLumi() const { return impl_->firstEventEntryThisLumi(); }
 
         // This is intentionally not implemented.
         // It would be difficult to implement for the no sort mode,
@@ -704,7 +688,7 @@ namespace edm {
         /// or after the next event if there is not a current event,
         /// but do not modify the type or run/lumi
         /// indexes unless it is necessary because there
-        /// are no more events in the current run or lumi.
+	/// are no more events in the current run or lumi.
         void skipEventForward(int& phIndexOfSkippedEvent,
                               RunNumber_t& runOfSkippedEvent,
                               LuminosityBlockNumber_t& lumiOfSkippedEvent,
@@ -789,7 +773,7 @@ namespace edm {
         bool operator<(IndexRunKey const& right) const {
           if (processHistoryIDIndex_ == right.processHistoryIDIndex()) {
             return run_ < right.run();
-          }
+	  }
           return processHistoryIDIndex_ < right.processHistoryIDIndex();
         }
 
@@ -819,7 +803,7 @@ namespace edm {
               return lumi_ < right.lumi();
             }
             return run_ < right.run();
-          }
+	  }
           return processHistoryIDIndex_ < right.processHistoryIDIndex();
         }
 
@@ -855,7 +839,7 @@ namespace edm {
               return lumi_ < right.lumi();
             }
             return run_ < right.run();
-          }
+	  }
           return processHistoryIDIndex_ < right.processHistoryIDIndex();
         }
 
@@ -872,7 +856,28 @@ namespace edm {
       class EventFinder {
       public:
         virtual ~EventFinder() {}
-        virtual EventNumber_t getEventNumberOfEntry(EntryNumber_t entry) const = 0;
+	virtual EventNumber_t getEventNumberOfEntry(EntryNumber_t entry) const = 0;
+      };
+
+      //*****************************************************************************
+      //*****************************************************************************
+
+      struct Transients {
+	Transients();
+        int previousAddedIndex_;
+        std::map<IndexRunKey, EntryNumber_t> runToFirstEntry_;
+        std::map<IndexRunLumiKey, EntryNumber_t> lumiToFirstEntry_;
+        EntryNumber_t beginEvents_;
+        EntryNumber_t endEvents_;
+        int currentIndex_;
+        RunNumber_t currentRun_;
+        LuminosityBlockNumber_t currentLumi_;
+	EntryNumber_t numberOfEvents_;
+	boost::shared_ptr<EventFinder> eventFinder_;
+        std::vector<RunOrLumiIndexes> runOrLumiIndexes_;
+        std::vector<EventNumber_t> eventNumbers_;
+        std::vector<EventEntry> eventEntries_;
+        std::vector<EventNumber_t> unsortedEventNumbers_;
       };
 
       //*****************************************************************************
@@ -911,7 +916,7 @@ namespace edm {
       /// The number of events needs to be set before filling the transient event vectors.
       /// It is used to resize them.
       void setNumberOfEvents(EntryNumber_t nevents) const {
-        transient_.numberOfEvents_ = nevents;
+        transients_.get().numberOfEvents_ = nevents;
       }
 
       /// Calling this enables the functions that fill the event vectors to get the event numbers.
@@ -919,7 +924,7 @@ namespace edm {
       /// This implies the client needs to define a class that inherits from
       /// EventFinder and then create one.  This function is used to pass in a
       /// pointer to its base class.
-      void setEventFinder(boost::shared_ptr<EventFinder> ptr) const {transient_.eventFinder_ = ptr;}
+      void setEventFinder(boost::shared_ptr<EventFinder> ptr) const {transients_.get().eventFinder_ = ptr;}
 
       /// Fills a vector of 4 byte event numbers.
       /// Not filling it reduces the memory used by IndexIntoFile.
@@ -961,7 +966,7 @@ namespace edm {
       /// If something external to IndexIntoFile is reading through the EventAuxiliary
       /// then it could use this to fill in the event numbers so that IndexIntoFile
       /// will not read through it again.
-      std::vector<EventNumber_t>& unsortedEventNumbers() const {return transient_.unsortedEventNumbers_;}
+      std::vector<EventNumber_t>& unsortedEventNumbers() const {return transients_.get().unsortedEventNumbers_;}
 
       /// Clear some vectors and eventFinder when an input file is closed.
       /// This reduces the memory used by IndexIntoFile
@@ -980,40 +985,11 @@ namespace edm {
       /// with releases before 3_8_0 which do not contain an IndexIntoFile.
       std::vector<ProcessHistoryID>& setProcessHistoryIDs() {return processHistoryIDs_;}
 
-      /// Used for backward compatibility to convert objects created with releases
-      /// that used the full ProcessHistoryID in IndexIntoFile to use the reduced
-      /// ProcessHistoryID.
-      void reduceProcessHistoryIDs();
-
       //*****************************************************************************
       //*****************************************************************************
 
       /// Used internally and for test purposes.
       std::vector<RunOrLumiEntry> const& runOrLumiEntries() const {return runOrLumiEntries_;}
-
-      //*****************************************************************************
-      //*****************************************************************************
-
-      void initializeTransients() const {transient_.reset();}
-
-      struct Transients {
-        Transients();
-        void reset();
-        int previousAddedIndex_;
-        std::map<IndexRunKey, EntryNumber_t> runToFirstEntry_;
-        std::map<IndexRunLumiKey, EntryNumber_t> lumiToFirstEntry_;
-        EntryNumber_t beginEvents_;
-        EntryNumber_t endEvents_;
-        int currentIndex_;
-        RunNumber_t currentRun_;
-        LuminosityBlockNumber_t currentLumi_;
-        EntryNumber_t numberOfEvents_;
-        boost::shared_ptr<EventFinder> eventFinder_;
-        std::vector<RunOrLumiIndexes> runOrLumiIndexes_;
-        std::vector<EventNumber_t> eventNumbers_;
-        std::vector<EventEntry> eventEntries_;
-        std::vector<EventNumber_t> unsortedEventNumbers_;
-      };
 
     private:
 
@@ -1022,28 +998,28 @@ namespace edm {
       void fillRunOrLumiIndexes() const;
 
       void fillUnsortedEventNumbers() const;
-      void resetEventFinder() const {transient_.eventFinder_.reset();}
-      std::vector<EventEntry>& eventEntries() const {return transient_.eventEntries_;}
-      std::vector<EventNumber_t>& eventNumbers() const {return transient_.eventNumbers_;}
+      void resetEventFinder() const {transients_.get().eventFinder_.reset();}
+      std::vector<EventEntry>& eventEntries() const {return transients_.get().eventEntries_;}
+      std::vector<EventNumber_t>& eventNumbers() const {return transients_.get().eventNumbers_;}
       void sortEvents() const;
       void sortEventEntries() const;
-      int& previousAddedIndex() const {return transient_.previousAddedIndex_;}
-      std::map<IndexRunKey, EntryNumber_t>& runToFirstEntry() const {return transient_.runToFirstEntry_;}
-      std::map<IndexRunLumiKey, EntryNumber_t>& lumiToFirstEntry() const {return transient_.lumiToFirstEntry_;}
-      EntryNumber_t& beginEvents() const {return transient_.beginEvents_;}
-      EntryNumber_t& endEvents() const {return transient_.endEvents_;}
-      int& currentIndex() const {return transient_.currentIndex_;}
-      RunNumber_t& currentRun() const {return transient_.currentRun_;}
-      LuminosityBlockNumber_t& currentLumi() const {return transient_.currentLumi_;}
-      std::vector<RunOrLumiIndexes>& runOrLumiIndexes() const {return transient_.runOrLumiIndexes_;}
-      size_t numberOfEvents() const {return transient_.numberOfEvents_;}
+      int& previousAddedIndex() const {return transients_.get().previousAddedIndex_;}
+      std::map<IndexRunKey, EntryNumber_t>& runToFirstEntry() const {return transients_.get().runToFirstEntry_;}
+      std::map<IndexRunLumiKey, EntryNumber_t>& lumiToFirstEntry() const {return transients_.get().lumiToFirstEntry_;}
+      EntryNumber_t& beginEvents() const {return transients_.get().beginEvents_;}
+      EntryNumber_t& endEvents() const {return transients_.get().endEvents_;}
+      int& currentIndex() const {return transients_.get().currentIndex_;}
+      RunNumber_t& currentRun() const {return transients_.get().currentRun_;}
+      LuminosityBlockNumber_t& currentLumi() const {return transients_.get().currentLumi_;}
+      std::vector<RunOrLumiIndexes>& runOrLumiIndexes() const {return transients_.get().runOrLumiIndexes_;}
+      size_t numberOfEvents() const {return transients_.get().numberOfEvents_;}
       EventNumber_t getEventNumberOfEntry(EntryNumber_t entry) const {
-        return transient_.eventFinder_->getEventNumberOfEntry(entry);
+        return transients_.get().eventFinder_->getEventNumberOfEntry(entry);
       }
 
-      mutable Transients transient_;
+      mutable Transient<Transients> transients_;
 
-      std::vector<ProcessHistoryID> processHistoryIDs_; // of reduced process histories
+      std::vector<ProcessHistoryID> processHistoryIDs_;
       std::vector<RunOrLumiEntry> runOrLumiEntries_;
   };
 

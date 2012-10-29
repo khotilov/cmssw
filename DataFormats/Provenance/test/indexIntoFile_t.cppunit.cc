@@ -8,15 +8,13 @@
 #include "DataFormats/Provenance/interface/ProcessConfiguration.h"
 #include "DataFormats/Provenance/interface/ProcessHistory.h"
 #include "DataFormats/Provenance/interface/ProcessHistoryRegistry.h"
-
+#include <memory>
 // This is very ugly, but I am told OK for white box  unit tests 
 #define private public
 #include "DataFormats/Provenance/interface/IndexIntoFile.h"
 #undef private
 
-#include <string>
 #include <iostream>
-#include <memory>
 
 using namespace edm;
 
@@ -110,7 +108,6 @@ public:
   void testSkip3();
   void testFind();
   void testDuplicateCheckerFunctions();
-  void testReduce();
 
   ProcessHistoryID nullPHID;
   ProcessHistoryID fakePHID1;
@@ -285,9 +282,6 @@ void TestIndexIntoFile::testRunOrLumiEntry() {
   edm::IndexIntoFile::RunOrLumiEntry r6 (1, 2, 10, 4, 5, 6, 7, 8);
   CPPUNIT_ASSERT(r2 < r6);
   CPPUNIT_ASSERT(!(r6 < r2));
-
-  r3.setOrderPHIDRunLumi(1001);
-  CPPUNIT_ASSERT(r3.orderPHIDRunLumi() == 1001);
 }
 
 void TestIndexIntoFile::testRunOrLumiIndexes() {
@@ -883,7 +877,7 @@ void TestIndexIntoFile::testAddEntryAndFixAndSort() {
   CPPUNIT_ASSERT(eventEntries.empty());
   CPPUNIT_ASSERT(indexIntoFile.runOrLumiIndexes().capacity() == 0);
   CPPUNIT_ASSERT(indexIntoFile.runOrLumiIndexes().empty());
-  CPPUNIT_ASSERT(indexIntoFile.transient_.eventFinder_.get() == 0);
+  CPPUNIT_ASSERT(indexIntoFile.transients_.get().eventFinder_.get() == 0);
 }
 
 void TestIndexIntoFile::testEmptyIndex() {
@@ -1002,14 +996,6 @@ void TestIndexIntoFile::testIterEndWithEvent() {
     else if (i == 15) check(iterFirst, kLumi,  6, 9,  9, 0, 1);
     else if (i == 16) check(iterFirst, kEvent, 6, 9,  9, 0, 1);
     else CPPUNIT_ASSERT(false);
-
-    if (i == 0) CPPUNIT_ASSERT(iterFirst.firstEventEntryThisRun() == 0);
-    if (i == 10) CPPUNIT_ASSERT(iterFirst.firstEventEntryThisRun() == 0);
-    if (i == 12) CPPUNIT_ASSERT(iterFirst.firstEventEntryThisRun() == 6);
-
-    if (i == 0) CPPUNIT_ASSERT(iterFirst.firstEventEntryThisLumi() == 0);
-    if (i == 10) CPPUNIT_ASSERT(iterFirst.firstEventEntryThisLumi() == 4);
-    if (i == 12) CPPUNIT_ASSERT(iterFirst.firstEventEntryThisLumi() == IndexIntoFile::invalidIndex);
   }
   CPPUNIT_ASSERT(i == 17);
 
@@ -1105,14 +1091,6 @@ void TestIndexIntoFile::testIterEndWithEvent() {
     else if (i == 15) check(iterNum, kLumi,  6, 9,  8, 0, 1);
     else if (i == 16) check(iterNum, kEvent, 6, 9,  8, 0, 1);
     else CPPUNIT_ASSERT(false);
-
-    if (i == 0) CPPUNIT_ASSERT(iterNum.firstEventEntryThisRun() == 3);
-    if (i == 10) CPPUNIT_ASSERT(iterNum.firstEventEntryThisRun() == 3);
-    if (i == 12) CPPUNIT_ASSERT(iterNum.firstEventEntryThisRun() == 6);
-
-    if (i == 0) CPPUNIT_ASSERT(iterNum.firstEventEntryThisLumi() == 3);
-    if (i == 10) CPPUNIT_ASSERT(iterNum.firstEventEntryThisLumi() == 5);
-    if (i == 12) CPPUNIT_ASSERT(iterNum.firstEventEntryThisLumi() == IndexIntoFile::invalidIndex);
   }
   CPPUNIT_ASSERT(i == 17);
 
@@ -1605,9 +1583,6 @@ void TestIndexIntoFile::testIterEndWithLumi() {
     else if (i == 3)  check(iterFirst, kLumi,  2, 3, -1, 0, 0);
     else if (i == 4)  check(iterFirst, kLumi,  2, 4, -1, 0, 0);
     else CPPUNIT_ASSERT(false);
-
-    CPPUNIT_ASSERT(iterFirst.firstEventEntryThisRun() == IndexIntoFile::invalidEntry);
-    CPPUNIT_ASSERT(iterFirst.firstEventEntryThisLumi() == IndexIntoFile::invalidEntry);
   }
   CPPUNIT_ASSERT(i == 5);
 
@@ -1623,9 +1598,6 @@ void TestIndexIntoFile::testIterEndWithLumi() {
     else if (i == 3)  check(iterNum, kLumi,  2, 3, -1, 0, 0);
     else if (i == 4)  check(iterNum, kLumi,  2, 4, -1, 0, 0);
     else CPPUNIT_ASSERT(false);
-
-    CPPUNIT_ASSERT(iterNum.firstEventEntryThisRun() == IndexIntoFile::invalidEntry);
-    CPPUNIT_ASSERT(iterNum.firstEventEntryThisLumi() == IndexIntoFile::invalidEntry);
   }
   CPPUNIT_ASSERT(i == 5);
 
@@ -1659,9 +1631,6 @@ void TestIndexIntoFile::testIterEndWithRun() {
     else if (i == 2)  check(iterFirst, kRun,  2, -1, -1, 0, 0);
     else if (i == 3)  check(iterFirst, kRun,  3, -1, -1, 0, 0);
     else CPPUNIT_ASSERT(false);
-
-    CPPUNIT_ASSERT(iterFirst.firstEventEntryThisRun() == IndexIntoFile::invalidEntry);
-    CPPUNIT_ASSERT(iterFirst.firstEventEntryThisLumi() == IndexIntoFile::invalidEntry);
   }
   CPPUNIT_ASSERT(i == 4);
 
@@ -1676,9 +1645,6 @@ void TestIndexIntoFile::testIterEndWithRun() {
     else if (i == 2)  check(iterNum, kRun,   2, -1, -1, 0, 0);
     else if (i == 3)  check(iterNum, kRun,   3, -1, -1, 0, 0);
     else CPPUNIT_ASSERT(false);
-
-    CPPUNIT_ASSERT(iterNum.firstEventEntryThisRun() == IndexIntoFile::invalidEntry);
-    CPPUNIT_ASSERT(iterNum.firstEventEntryThisLumi() == IndexIntoFile::invalidEntry);
   }
   CPPUNIT_ASSERT(i == 4);
 
@@ -2515,9 +2481,4 @@ void TestIndexIntoFile::testDuplicateCheckerFunctions() {
     CPPUNIT_ASSERT(iter->event() == 4);
     
   }
-}
-
-void TestIndexIntoFile::testReduce() {
-  // This test is implemented in FWCore/Integration/test/ProcessHistory_t.cpp
-  // because of dependency issues.
 }

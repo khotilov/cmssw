@@ -34,7 +34,6 @@ namespace edm {
     void toDigest(cms::Digest &digest) const;
 
     bool isTracked() const {return isTracked_;}
-    void setIsTracked(bool v) { isTracked_ = v; }
 
     ParameterSetID id() const {return theID_;}
   

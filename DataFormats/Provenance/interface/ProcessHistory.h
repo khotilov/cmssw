@@ -1,12 +1,13 @@
 #ifndef DataFormats_Provenance_ProcessHistory_h
 #define DataFormats_Provenance_ProcessHistory_h
 
-#include "DataFormats/Provenance/interface/ProcessConfiguration.h"
-#include "DataFormats/Provenance/interface/ProcessHistoryID.h"
-
 #include <iosfwd>
 #include <string>
 #include <vector>
+
+#include "DataFormats/Provenance/interface/ProcessConfiguration.h"
+#include "DataFormats/Provenance/interface/ProcessHistoryID.h"
+#include "DataFormats/Provenance/interface/Transient.h"
 
 namespace edm {
   class ProcessHistory {
@@ -25,9 +26,9 @@ namespace edm {
 
     typedef collection_type::size_type size_type;
 
-    ProcessHistory() : data_(), transient_() {}
-    explicit ProcessHistory(size_type n) : data_(n), transient_() {}
-    explicit ProcessHistory(collection_type const& vec) : data_(vec), transient_() {}
+    ProcessHistory() : data_(), transients_() {}
+    explicit ProcessHistory(size_type n) : data_(n), transients_() {}
+    explicit ProcessHistory(collection_type const& vec) : data_(vec), transients_() {}
 
     void push_back(const_reference t) {data_.push_back(t); phid() = ProcessHistoryID();}
     void swap(ProcessHistory& other) {data_.swap(other.data_); phid().swap(other.phid());}
@@ -68,20 +69,15 @@ namespace edm {
       phid() = ProcessHistoryID();
     }
 
-    void reduce();
-
-    void initializeTransients() const {transient_.reset();}
-
     struct Transients {
       Transients() : phid_() {}
-      void reset() {phid_.reset();}
       ProcessHistoryID phid_;
     };
 
   private:
-    ProcessHistoryID& phid() const {return transient_.phid_;}
+    ProcessHistoryID& phid() const {return transients_.get().phid_;}
     collection_type data_;
-    mutable Transients transient_;
+    mutable Transient<Transients> transients_;
   };
 
   // Free swap function

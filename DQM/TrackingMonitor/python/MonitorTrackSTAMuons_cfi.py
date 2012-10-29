@@ -36,7 +36,8 @@ MonitorTrackSTAMuons = cms.EDAnalyzer("TrackingMonitor",
     doGoodTrackPlots           = cms.bool(False),
     doMeasurementStatePlots    = cms.bool(True),
     doProfilesVsLS             = cms.bool(False),
-
+    doRecHitVsPhiVsEtaPerTrack = cms.bool(False),
+    doGoodTrackRecHitVsPhiVsEtaPerTrack = cms.bool(False),                          
 
     #which seed plots to do
     doSeedNumberHisto = cms.bool(False),
@@ -44,6 +45,7 @@ MonitorTrackSTAMuons = cms.EDAnalyzer("TrackingMonitor",
     doSeedPTHisto = cms.bool(False),
     doSeedETAHisto = cms.bool(False),
     doSeedPHIHisto = cms.bool(False),
+    doSeedPHIVsETAHisto = cms.bool(False),
     doSeedThetaHisto = cms.bool(False),
     doSeedQHisto = cms.bool(False),
     doSeedDxyHisto= cms.bool(False),

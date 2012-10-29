@@ -21,7 +21,6 @@ siStripZeroSuppression = cms.EDProducer("SiStripZeroSuppression",
     produceCalculatedBaseline = cms.bool(False),
     produceBaselinePoints = cms.bool(False),
     storeInZScollBadAPV = cms.bool(True),
-    mergeCollections = cms.bool(False),
-    doAPVRestore = cms.bool(True),
-    useCMMeanMap= cms.bool(False)
+    mergeCollections = cms.bool(False)
+    
 )

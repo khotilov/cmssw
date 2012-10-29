@@ -1,8 +1,7 @@
 #include "DataFormats/Provenance/interface/ProductProvenance.h"
 #include "DataFormats/Provenance/interface/ParentageRegistry.h"
-
-#include <cassert>
 #include <ostream>
+#include <cassert>
 
 /*----------------------------------------------------------------------
 
@@ -14,36 +13,30 @@ namespace edm {
     noParentage_(false)
   {}
 
-  void
-  ProductProvenance::Transients::reset() {
-    parentagePtr_.reset();
-    noParentage_ = false;
-  }
-
   ProductProvenance::ProductProvenance() :
     branchID_(),
     parentageID_(),
-    transient_()
+    transients_()
   {}
 
   ProductProvenance::ProductProvenance(BranchID const& bid) :
     branchID_(bid),
     parentageID_(),
-    transient_()
+    transients_()
   {}
 
    ProductProvenance::ProductProvenance(BranchID const& bid,
 				    ParentageID const& edid) :
     branchID_(bid),
     parentageID_(edid),
-    transient_()
+    transients_()
   {}
 
    ProductProvenance::ProductProvenance(BranchID const& bid,
 				    boost::shared_ptr<Parentage> pPtr) :
     branchID_(bid),
     parentageID_(pPtr->id()),
-    transient_() {
+    transients_() {
        parentagePtr() = pPtr;
        ParentageRegistry::instance()->insertMapped(*pPtr);
   }
@@ -52,7 +45,7 @@ namespace edm {
 		   std::vector<BranchID> const& parents) :
     branchID_(bid),
     parentageID_(),
-    transient_() {
+    transients_() {
       parentagePtr() = boost::shared_ptr<Parentage>(new Parentage);
       parentagePtr()->parents() = parents;
       parentageID_ = parentagePtr()->id();

@@ -1,5 +1,3 @@
 <lcgdict>
-  <class name="LocalError" ClassVersion="10">
-   <version ClassVersion="10" checksum="1469115693"/>
-  </class>
+  <class name="LocalError"/>
 </lcgdict>

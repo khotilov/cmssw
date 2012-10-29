@@ -30,8 +30,8 @@
 #include "DataFormats/Provenance/interface/RunAuxiliary.h"
 #include "DataFormats/Provenance/interface/RunID.h"
 #include "DataFormats/Provenance/interface/Timestamp.h"
+#include "DataFormats/Provenance/interface/Transient.h"
 #include "DataFormats/Provenance/interface/ESRecordAuxiliary.h"
-#include "FWCore/Utilities/interface/typedefs.h"
 #include <map>
 #include <set>
 #include <vector>
@@ -41,7 +41,9 @@
 
 // These below are for backward compatibility only
 // Note: ModuleDescription is still used, but is no longer persistent
+#include "DataFormats/Provenance/interface/BranchEntryDescription.h"
 #include "DataFormats/Provenance/interface/EventEntryInfo.h"
+#include "DataFormats/Provenance/interface/EntryDescription.h"
 #include "DataFormats/Provenance/interface/EventEntryDescription.h"
 #include "DataFormats/Provenance/interface/EntryDescriptionID.h"
 #include "DataFormats/Provenance/interface/EventAux.h"
