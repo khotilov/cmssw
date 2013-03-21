@@ -1,11 +1,3 @@
-c = 7
-
-title0="PFMET (in RECO and AOD)"
-
-dict0 = {
-'0':['pfMet','reco::PFMETCollection','MET in reconstructed particles in the particle flow algorithm']
-}
-
 
 full_title = "RecoMET collections (in RECO and AOD)"
 
