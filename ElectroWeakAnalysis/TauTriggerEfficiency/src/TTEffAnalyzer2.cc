@@ -52,6 +52,8 @@
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/LorentzVectorFwd.h"
 
+#include "CMGTools/External/interface/PileupJetIdentifier.h"
+
 #include "TH1F.h"
 #include "TTree.h"
 #include "TFile.h"
@@ -78,6 +80,7 @@ private:
   edm::InputTag pfTauSrc_;
   edm::InputTag pileupSummaryInfoSrc_;
   edm::InputTag pfJetSrc_;
+  edm::InputTag pfJetPUIDFlagSrc_;
 
   edm::InputTag lheSrc;
   edm::InputTag visibleTauSrc;
@@ -207,6 +210,9 @@ private:
   std::vector<float> PFJetEta_;
   std::vector<float> PFJetPhi_;
   std::vector<int> PFJetMCMatch_;
+  std::vector<bool> PFJet_JetPUIDloose_;
+  std::vector<bool> PFJet_JetPUIDmedium_;
+  std::vector<bool> PFJet_JetPUIDtight_;
 
   // L1 per-event
   float L1MET_;
@@ -268,6 +274,7 @@ TTEffAnalyzer2::TTEffAnalyzer2(const edm::ParameterSet& iConfig):
   pfTauSrc_(iConfig.getParameter<edm::InputTag>("LoopingOver")),
   pileupSummaryInfoSrc_(iConfig.getParameter<edm::InputTag>("PileupSummaryInfoSource")),
   pfJetSrc_(iConfig.getParameter<edm::InputTag>("Jets")),
+  pfJetPUIDFlagSrc_(iConfig.getParameter<edm::InputTag>("JetPUIDsrc")),
   lheSrc(iConfig.getParameter<edm::InputTag>("lheSrc")),
   visibleTauSrc(iConfig.getParameter<edm::InputTag>("VisibleTauSrc")),
   genParticleSrc(iConfig.getParameter<edm::InputTag>("GenParticleCollection")),
@@ -389,6 +396,9 @@ TTEffAnalyzer2::TTEffAnalyzer2(const edm::ParameterSet& iConfig):
   tree_->Branch("PFJetEta", &PFJetEta_);
   tree_->Branch("PFJetPhi", &PFJetPhi_);
   tree_->Branch("PFJetMCMatch", &PFJetMCMatch_);
+  tree_->Branch("PFJetPUIDloose", &PFJet_JetPUIDloose_);
+  tree_->Branch("PFJetPUIDmedium", &PFJet_JetPUIDmedium_);
+  tree_->Branch("PFJetPUIDtight", &PFJet_JetPUIDtight_);
 
   tree_->Branch("L1JetIsTau", &l1JetIsTau_);
   tree_->Branch("L1JetPt", &l1JetPt_);
@@ -480,6 +490,9 @@ void TTEffAnalyzer2::reset() {
   PFJetEta_.clear();
   PFJetPhi_.clear();
   PFJetMCMatch_.clear();
+  PFJet_JetPUIDloose_.clear();
+  PFJet_JetPUIDmedium_.clear();
+  PFJet_JetPUIDtight_.clear();
 
   l1JetIsTau_.clear();
   l1JetPt_.clear();
@@ -827,6 +840,8 @@ void TTEffAnalyzer2::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   // Jets
   edm::PtrVector<pat::Jet> selectedPFJets;
   edm::Handle<edm::View<pat::Jet> > hjets;
+  edm::Handle<edm::ValueMap<int> > hflag;
+  iEvent.getByLabel(pfJetPUIDFlagSrc_, hflag);
   if(iEvent.getByLabel(pfJetSrc_, hjets)){
   for(size_t i=0; i<hjets->size(); ++i) {
     edm::Ptr<pat::Jet> jet = hjets->ptrAt(i);
@@ -842,6 +857,24 @@ void TTEffAnalyzer2::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       // Matching to MC truth
       int mcMatch = MCMatch(iEvent,*jet);
       PFJetMCMatch_.push_back(mcMatch);
+
+      // Jet PU ID
+      bool puidLoose  = true;
+      bool puidMedium = true;
+      bool puidTight  = true;
+
+      if(hflag.isValid()){
+	int flag = (*hflag)[jet];
+
+	puidLoose =  PileupJetIdentifier::passJetId(flag, PileupJetIdentifier::kLoose);
+	puidMedium = PileupJetIdentifier::passJetId(flag, PileupJetIdentifier::kMedium);
+	puidTight  = PileupJetIdentifier::passJetId(flag, PileupJetIdentifier::kTight);
+      }
+
+      PFJet_JetPUIDloose_.push_back(puidLoose);
+      PFJet_JetPUIDmedium_.push_back(puidMedium);
+      PFJet_JetPUIDtight_.push_back(puidTight);
+
 
       selectedPFJets.push_back(jet);
 

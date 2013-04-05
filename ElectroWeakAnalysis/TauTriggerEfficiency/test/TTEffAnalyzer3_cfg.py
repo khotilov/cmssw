@@ -247,6 +247,7 @@ process.TTEffAnalysisHLTPFTauHPS = cms.EDAnalyzer("TTEffAnalyzer2",
 
 #        Jets = cms.InputTag("ak5PFJetsL1L2L3"),
 	Jets = cms.InputTag("selectedPatJets"),
+	JetPUIDsrc = cms.InputTag("puJetMva", "fullId"), # options: 'full' (BDT based), 'cutbased', 'philv1', 'simple'
 
 	lheSrc 			= cms.InputTag("source", "", "LHE"),
 	VisibleTauSrc		= cms.InputTag("VisibleTaus","HadronicTauOneAndThreeProng"),
