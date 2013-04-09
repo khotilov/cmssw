@@ -1,0 +1,10 @@
+<library   name="MuonAnalysisPFMuonToolsPlugins" file="*.cc">
+  <use   name="DataFormats/MuonReco"/>
+  <use   name="DataFormats/ParticleFlowCandidate"/>
+  <use   name="RecoParticleFlow/PFProducer"/>
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="FWCore/Utilities"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>

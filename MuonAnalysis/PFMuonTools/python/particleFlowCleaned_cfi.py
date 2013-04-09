@@ -1,0 +1,27 @@
+import FWCore.ParameterSet.Config as cms
+
+particleFlowCleaned = cms.EDProducer('PFMuonCleaner',
+                                     postMuonCleaning = cms.bool(True),
+                                     maxDPtOPt      = cms.double(1.),
+                                     minTrackerHits = cms.int32(8),
+                                     minPixelHits   = cms.int32(1),
+                                     trackQuality   = cms.string('highPurity'),
+                                     dzPV = cms.double(0.2),
+                                     ptErrorScale   = cms.double(8.),
+                                     minPtForPostCleaning = cms.double(20.),
+                                     eventFactorForCosmics =cms.double(10.),
+                                     metSignificanceForCleaning = cms.double(3.),
+                                     metSignificanceForRejection = cms.double(4.),
+                                     metFactorForCleaning = cms.double(4.),
+                                     eventFractionForCleaning =cms.double(0.5),
+                                     eventFractionForRejection = cms.double(0.8),
+                                     metFactorForRejection =cms.double(4.),
+                                     metFactorForHighEta   = cms.double(25.),
+                                     ptFactorForHighEta   = cms.double(2.),
+                                     metFactorForFakes    = cms.double(4.),
+                                     minMomentumForPunchThrough = cms.double(100.),
+                                     minEnergyForPunchThrough = cms.double(100.),
+                                     punchThroughFactor = cms.double(3.),
+                                     punchThroughMETFactor = cms.double(4.),
+                                     cosmicRejectionDistance = cms.double(1.)
+)
