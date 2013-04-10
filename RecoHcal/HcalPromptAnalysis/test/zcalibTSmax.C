@@ -147,8 +147,7 @@
       for (int j=1;j<=ny;j++) {
 	  double ccc1 =  Ceff->GetBinContent(i,j)   ;
 	  Diffe_HB->SetBinContent(i,j,0.);
-	  //	  if(ccc1 < 0.5 || ccc1> 8.5 )  Diffe_HB->SetBinContent(i,j,ccc1);
-	  Diffe_HB->SetBinContent(i,j,ccc1);
+	  if(ccc1 < 0.5 || ccc1> 8.5 )  Diffe_HB->SetBinContent(i,j,ccc1);
       }
     }
       gPad->SetGridy();
