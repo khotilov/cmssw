@@ -9,7 +9,11 @@ test/remoteMonitoring_NZS_cfg.py
 scripts in dir. /test:
 ======================
 
+*****   for normal channels:
+============================
+
              (for HBdepth1,2 & HEdepth1,2,3 & HFdepth1,2 & HOdepth4)
+
 1. zerrors.C      - analysis of CapIdErrors using global and local runs
                     Example of histo names used for automatic running at Dima site:
                      TH2F *tvod1= (TH2F*)hfile1->Get("h_mapDepth1Error_HB");
@@ -31,24 +35,71 @@ scripts in dir. /test:
                      TH2F *twod1= (TH2F*)hfile1->Get("h_mapDepth1TSmaxA225_HB");
                      TH2F *twod0= (TH2F*)hfile1->Get("h_mapDepth1_HB");
 
-   ztsmean.C      - analysis of "bad" channels with mean signal position at tails of TS range
+5. ztsmean.C      - analysis of "bad" channels with mean signal position at tails of TS range
+                                                     "h_ADCAmpl_HB"
+                     TH2F *twod1= (TH2F*)hfile1->Get("h_mapDepth1ADCAmpl225_HB");
+                     TH2F *twod0= (TH2F*)hfile1->Get("h_mapDepth1_HB");
+
+
+6. zadcamplitude.C - analysis of "bad" channels looking for channels with low adc signal
                                                      "h_TSmeanA_HB"
                      TH2F *twod1= (TH2F*)hfile1->Get("h_mapDepth1TSmeanA225_HB");
                      TH2F *twod0= (TH2F*)hfile1->Get("h_mapDepth1_HB");
 
 
-5. zcalib.C       - analysis of "bad" calibration channels if maximum of adc 
-                     signal outside normal position (for HB, HE, HO, HF):
+******   for calibration channels:
+==================================
+
+                                   (for HB, HE, HO, HF)
+
+7. zcalibRatio.C       - analysis of "bad" calibration channels if maximum of adc 
+                                signal outside normal position:
                                                      "h_RatioCalib_HB"
                      TH2F *twod1= (TH2F*)hfile1->Get("h_mapRatioCalib047_HB");
                      TH2F *twod0= (TH2F*)hfile1->Get("h_map_HB");
 
-6. zdifampl.C     - relative difference of channel response, collected over all TS, in 2 LED runs
-                                with aim to see > 2% change to start PMT/HPD gain tuning 
+8. zcalibWidth.C      - analysis of "bad" calibration channels if shape width 
+                                                  outside normal position:
+                                                     "h_WidthCalib_HB"
+                     TH2F *twod1= (TH2F*)hfile1->Get("h_mapWidthCalib047_HB");
+                     TH2F *twod0= (TH2F*)hfile1->Get("h_map_HB");
+
+9. zcalibTSmean.C    - analysis of "bad" calibration channels if mean signal position 
+                                             outside normal case:
+                                                     "h_TSmeanCalib_HB"
+                     TH2F *twod1= (TH2F*)hfile1->Get("h_mapTSmeanCalib047_HB");
+                     TH2F *twod0= (TH2F*)hfile1->Get("h_map_HB");
+
+10. zcalibTSmax.C   - analysis of "bad" calibration channels if maximum of signal position
+                                                          outside normal case:
+                                                     "h_TSmaxCalib_HB"
+                     TH2F *twod1= (TH2F*)hfile1->Get("h_mapTSmaxCalib047_HB");
+                     TH2F *twod0= (TH2F*)hfile1->Get("h_map_HB");
+
+11. zcalibADC.C    - analysis of "bad" calibration channels if adc signal collected over all TSs 
+                      is too low (adc signal limits: 10 - 10000. for LED runs)
+                                                     "h_ADCCalib_HB"
+                     TH2F *twod1= (TH2F*)hfile1->Get("h_mapADCCalib047_HB");
+                     TH2F *twod0= (TH2F*)hfile1->Get("h_map_HB");
+    zcalibADC1.C   - analysis of "bad" calibration channels if adc signal collected over all TSs 
+                      is too low (adc signal limits: 0.1 - 100.1 for Laser runs)
+                                                     "h_ADCCalib1_HB"
+                     TH2F *twod1= (TH2F*)hfile1->Get("h_mapADCCalib047_HB");
+                     TH2F *twod0= (TH2F*)hfile1->Get("h_map_HB");
+
+******    monitoring of normal channel averaged response degradation: 
+====================================================================
+
+12. zdifampl.C     - relative difference of averaged channel response, collected over all TS, 
+                      in 2 LED runs with aim to see > 2% change to start PMT/HPD gain tuning 
+
                      TH2F *twod1= (TH2F*)hfile1->Get("h_mapDepth1AmplE34_HB");
                      TH2F *twod0= (TH2F*)hfile1->Get("h_mapDepth1_HB");
 
-7a. zRunRatio34.C  - rates of "bad" channels as function of iRun(LS)
+******     special task of run(LS) quality monitoring:
+======================================================
+
+13. zRunRatio34.C  - rates of "bad" channels as function of iRun(LS)
                                     (for HBdepth1,2;HEdepth1,2,3)
       TH1F *twod1= (TH1F*)hfile1->Get("h_runbadrate_depth1_HB");
       TH1F *twod1= (TH1F*)hfile1->Get("h_runbadrate1_depth1_HB");
@@ -56,19 +107,22 @@ scripts in dir. /test:
       TH1F *twod1= (TH1F*)hfile1->Get("h_runbadrate3_depth1_HB");
       TH1F *twod0= (TH1F*)hfile1->Get("h_runbadrate0_depth1_HB");
 
-7b. zRunNbadchan.C - average number of "bad" channels as function of iRun(LS)
+14. zRunNbadchan.C - average number of "bad" channels as function of iRun(LS)
                                     (for HBdepth1,2;HEdepth1,2,3)
                                       "h_nbadchannels_depth1_HB"
       TH1F *twod1= (TH1F*)hfile1->Get("h_runnbadchannels_depth1_HB");
       TH1F *twod0= (TH1F*)hfile1->Get("h_runbadrate0_depth1_HB");
 
 
-========================================
+============================================================================
 obsolete scripts:
 ================
 zgain.C        - relative difference of channel response, collected over all TS, in 2 LED runs. 
                  with aim to see > 2% change to start PMT/HPD gain tuning (for HB, HE, HO, HF )
-========================================
+zcalib.C       - analysis of "bad" calibration channels if maximum of adc 
+                     signal outside normal position:
+
+========================================================================================
 
 to run job&scripts:
 ==================
@@ -87,4 +141,6 @@ cmsRun remoteMonitoring_LED_cfg.py  (to produce test.root file)
 
 root -b zrms.C    ( to produce zrms.ps file)
 
-================================================================
+gv zrms.ps
+
+========================================================================================

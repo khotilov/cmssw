@@ -11,7 +11,7 @@ Implementation:
 <Notes on implementation>
 */
 //
-// $Id: VeRawAnalyzer.cc,v 1.4 2013/03/27 13:22:15 zhokin Exp $
+// $Id: VeRawAnalyzer.cc,v 1.5 2013/04/02 08:45:12 zhokin Exp $
 //
 
 // system include files
@@ -129,9 +129,11 @@ private:
   edm::ESHandle<HcalDbService> conditions;
   const HcalQIEShape* shape;
   
+  /////////////////////////////////////////////
   int verbosity;
   int MAPcreation;
 
+  /////////////////////////////////////////////
   bool recordNtuples_;
   bool recordHistoes_;
   bool studyRunDependenceHist_;
@@ -142,7 +144,9 @@ private:
   bool studyTSmeanShapeHist_;
   bool studyDiffAmplHist_;
   bool studyCalibCellsHist_;
+  bool studyADCAmplHist_;
 
+  /////////////////////////////////////////////
   double ratioHBMin_;
   double ratioHBMax_;
   double ratioHEMin_;
@@ -155,6 +159,7 @@ private:
   int nbadchannels2_;
   int nbadchannels3_;
 
+  /////////////////////////////////////////////
   double rmsHBMin_;
   double rmsHBMax_;
   double rmsHEMin_;
@@ -164,6 +169,7 @@ private:
   double rmsHOMin_;
   double rmsHOMax_;
 
+  /////////////////////////////////////////////
   double TSpeakHBMin_;
   double TSpeakHBMax_;
   double TSpeakHEMin_;
@@ -182,11 +188,50 @@ private:
   double TSmeanHOMin_;
   double TSmeanHOMax_;
 
-  double calibratioHBMin_;
-  double calibratioHEMin_;
-  double calibratioHOMin_;
-  double calibratioHFMin_;
+  /////////////////////////////////////////////
+  double ADCAmplHBMin_;
+  double ADCAmplHEMin_;
+  double ADCAmplHOMin_;
+  double ADCAmplHFMin_;
 
+  double calibrADCHBMin_;
+  double calibrADCHEMin_;
+  double calibrADCHOMin_;
+  double calibrADCHFMin_;
+
+  double calibrRatioHBMin_;
+  double calibrRatioHEMin_;
+  double calibrRatioHOMin_;
+  double calibrRatioHFMin_;
+
+  double calibrTSmaxHBMin_;
+  double calibrTSmaxHEMin_;
+  double calibrTSmaxHOMin_;
+  double calibrTSmaxHFMin_;
+  double calibrTSmaxHBMax_;
+  double calibrTSmaxHEMax_;
+  double calibrTSmaxHOMax_;
+  double calibrTSmaxHFMax_;
+
+  double calibrTSmeanHBMin_;
+  double calibrTSmeanHEMin_;
+  double calibrTSmeanHOMin_;
+  double calibrTSmeanHFMin_;
+  double calibrTSmeanHBMax_;
+  double calibrTSmeanHEMax_;
+  double calibrTSmeanHOMax_;
+  double calibrTSmeanHFMax_;
+
+  double calibrWidthHBMin_;
+  double calibrWidthHEMin_;
+  double calibrWidthHOMin_;
+  double calibrWidthHFMin_;
+  double calibrWidthHBMax_;
+  double calibrWidthHEMax_;
+  double calibrWidthHOMax_;
+  double calibrWidthHFMax_;
+
+  /////////////////////////////////////////////
   int nevent;
   int nnnnnn;
   int counter;
@@ -198,6 +243,7 @@ private:
   int nnnnnn4;
   int nnnnnn5;
 
+  /////////////////////////////////////////////
 
 
   TH1F* h_errorGeneral;
@@ -278,11 +324,18 @@ private:
   TH1F* h_repetedcapid_HO;
 
   /////////////////////////////////////////////
+  TH1F* h_ADCAmpl_HB;
+  TH2F* h_mapDepth1ADCAmpl_HB;
+  TH2F* h_mapDepth2ADCAmpl_HB;
+  TH2F* h_mapDepth1ADCAmpl225_HB;
+  TH2F* h_mapDepth2ADCAmpl225_HB;
+
   TH1F* h_TSmeanA_HB;
   TH2F* h_mapDepth1TSmeanA_HB;
   TH2F* h_mapDepth2TSmeanA_HB;
   TH2F* h_mapDepth1TSmeanA225_HB;
   TH2F* h_mapDepth2TSmeanA225_HB;
+
   TH1F* h_TSmaxA_HB;
   TH2F* h_mapDepth1TSmaxA_HB;
   TH2F* h_mapDepth2TSmaxA_HB;
@@ -303,11 +356,18 @@ private:
   TH2F* h_mapDepth1_HB;
   TH2F* h_mapDepth2_HB;
   /////////////////////////////////////////////
+  TH1F* h_ADCAmpl_HF;
+  TH2F* h_mapDepth1ADCAmpl_HF;
+  TH2F* h_mapDepth2ADCAmpl_HF;
+  TH2F* h_mapDepth1ADCAmpl225_HF;
+  TH2F* h_mapDepth2ADCAmpl225_HF;
+
   TH1F* h_TSmeanA_HF;
   TH2F* h_mapDepth1TSmeanA_HF;
   TH2F* h_mapDepth2TSmeanA_HF;
   TH2F* h_mapDepth1TSmeanA225_HF;
   TH2F* h_mapDepth2TSmeanA225_HF;
+
   TH1F* h_TSmaxA_HF;
   TH2F* h_mapDepth1TSmaxA_HF;
   TH2F* h_mapDepth2TSmaxA_HF;
@@ -328,9 +388,14 @@ private:
   TH2F* h_mapDepth1_HF;
   TH2F* h_mapDepth2_HF;
   /////////////////////////////////////////////
+  TH1F* h_ADCAmpl_HO;
+  TH2F* h_mapDepth4ADCAmpl_HO;
+  TH2F* h_mapDepth4ADCAmpl225_HO;
+
   TH1F* h_TSmeanA_HO;
   TH2F* h_mapDepth4TSmeanA_HO;
   TH2F* h_mapDepth4TSmeanA225_HO;
+
   TH1F* h_TSmaxA_HO;
   TH2F* h_mapDepth4TSmaxA_HO;
   TH2F* h_mapDepth4TSmaxA225_HO;
@@ -383,6 +448,14 @@ private:
   TH1F* h_runbadrate3_depth3_HE;
   TH1F* h_runbadrate0_depth3_HE;
 
+  TH1F* h_ADCAmpl_HE;
+  TH2F* h_mapDepth1ADCAmpl_HE;
+  TH2F* h_mapDepth2ADCAmpl_HE;
+  TH2F* h_mapDepth3ADCAmpl_HE;
+  TH2F* h_mapDepth1ADCAmpl225_HE;
+  TH2F* h_mapDepth2ADCAmpl225_HE;
+  TH2F* h_mapDepth3ADCAmpl225_HE;
+
   TH1F* h_TSmeanA_HE;
   TH2F* h_mapDepth1TSmeanA_HE;
   TH2F* h_mapDepth2TSmeanA_HE;
@@ -390,6 +463,7 @@ private:
   TH2F* h_mapDepth1TSmeanA225_HE;
   TH2F* h_mapDepth2TSmeanA225_HE;
   TH2F* h_mapDepth3TSmeanA225_HE;
+
   TH1F* h_TSmaxA_HE;
   TH2F* h_mapDepth1TSmaxA_HE;
   TH2F* h_mapDepth2TSmaxA_HE;
@@ -419,6 +493,7 @@ private:
   TH2F* h_mapDepth1_HE;
   TH2F* h_mapDepth2_HE;
   TH2F* h_mapDepth3_HE;
+  /////////////////////////////////////////////
   /*
   TH1F* h_GetRMSOverNormalizedSignal_HB;
   TH1F* h_GetRMSOverNormalizedSignal_HE;
@@ -437,25 +512,79 @@ private:
   TH2F* h_FullSignal3D0_HO;
   TH2F* h_FullSignal3D_HF;
   TH2F* h_FullSignal3D0_HF;
+  /////////////////////////////////////////////
 
 
+  TH1F* h_ADCCalib_HB;
+  TH1F* h_ADCCalib1_HB;
+  TH2F* h_mapADCCalib047_HB;
+  TH2F* h_mapADCCalib_HB;
   TH1F* h_RatioCalib_HB;
   TH2F* h_mapRatioCalib047_HB;
   TH2F* h_mapRatioCalib_HB;
+  TH1F* h_TSmaxCalib_HB;
+  TH2F* h_mapTSmaxCalib047_HB;
+  TH2F* h_mapTSmaxCalib_HB;
+  TH1F* h_TSmeanCalib_HB;
+  TH2F* h_mapTSmeanCalib047_HB;
+  TH2F* h_mapTSmeanCalib_HB;
+  TH1F* h_WidthCalib_HB;
+  TH2F* h_mapWidthCalib047_HB;
+  TH2F* h_mapWidthCalib_HB;
   TH2F* h_map_HB;
+  TH1F* h_ADCCalib_HE;
+  TH1F* h_ADCCalib1_HE;
+  TH2F* h_mapADCCalib047_HE;
+  TH2F* h_mapADCCalib_HE;
   TH1F* h_RatioCalib_HE;
   TH2F* h_mapRatioCalib047_HE;
   TH2F* h_mapRatioCalib_HE;
+  TH1F* h_TSmaxCalib_HE;
+  TH2F* h_mapTSmaxCalib047_HE;
+  TH2F* h_mapTSmaxCalib_HE;
+  TH1F* h_TSmeanCalib_HE;
+  TH2F* h_mapTSmeanCalib047_HE;
+  TH2F* h_mapTSmeanCalib_HE;
+  TH1F* h_WidthCalib_HE;
+  TH2F* h_mapWidthCalib047_HE;
+  TH2F* h_mapWidthCalib_HE;
   TH2F* h_map_HE;
+  TH1F* h_ADCCalib_HO;
+  TH1F* h_ADCCalib1_HO;
+  TH2F* h_mapADCCalib047_HO;
+  TH2F* h_mapADCCalib_HO;
   TH1F* h_RatioCalib_HO;
   TH2F* h_mapRatioCalib047_HO;
   TH2F* h_mapRatioCalib_HO;
+  TH1F* h_TSmaxCalib_HO;
+  TH2F* h_mapTSmaxCalib047_HO;
+  TH2F* h_mapTSmaxCalib_HO;
+  TH1F* h_TSmeanCalib_HO;
+  TH2F* h_mapTSmeanCalib047_HO;
+  TH2F* h_mapTSmeanCalib_HO;
+  TH1F* h_WidthCalib_HO;
+  TH2F* h_mapWidthCalib047_HO;
+  TH2F* h_mapWidthCalib_HO;
   TH2F* h_map_HO;
+  TH1F* h_ADCCalib_HF;
+  TH1F* h_ADCCalib1_HF;
+  TH2F* h_mapADCCalib047_HF;
+  TH2F* h_mapADCCalib_HF;
   TH1F* h_RatioCalib_HF;
   TH2F* h_mapRatioCalib047_HF;
   TH2F* h_mapRatioCalib_HF;
+  TH1F* h_TSmaxCalib_HF;
+  TH2F* h_mapTSmaxCalib047_HF;
+  TH2F* h_mapTSmaxCalib_HF;
+  TH1F* h_TSmeanCalib_HF;
+  TH2F* h_mapTSmeanCalib047_HF;
+  TH2F* h_mapTSmeanCalib_HF;
+  TH1F* h_WidthCalib_HF;
+  TH2F* h_mapWidthCalib047_HF;
+  TH2F* h_mapWidthCalib_HF;
   TH2F* h_map_HF;
 
+  /////////////////////////////////////////////
   // for ROOT
   // Readouts
   
@@ -479,6 +608,10 @@ private:
   int myCalEta[5][40];
   int myCalPhi[5][40];
   
+  float calibt[4][82][72];
+  double caliba[4][82][72];
+  double calibw[4][82][72];
+
   double calib0[4][82][72];
   double signal[4][82][72];
   //  double calib3[4][82][72];
@@ -535,7 +668,7 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   studyTSmeanShapeHist_=iConfig.getUntrackedParameter<bool>("studyTSmeanShapeHist"); 
   studyDiffAmplHist_=iConfig.getUntrackedParameter<bool>("studyDiffAmplHist"); 
   studyCalibCellsHist_=iConfig.getUntrackedParameter<bool>("studyCalibCellsHist"); 
-
+  studyADCAmplHist_=iConfig.getUntrackedParameter<bool>("studyADCAmplHist");
   //
   ratioHBMin_      = iConfig.getParameter<double>("ratioHBMin");//
   ratioHBMax_      = iConfig.getParameter<double>("ratioHBMax");//
@@ -559,10 +692,47 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   rmsHOMin_      = iConfig.getParameter<double>("rmsHOMin");//
   rmsHOMax_      = iConfig.getParameter<double>("rmsHOMax");//
   //
-  calibratioHBMin_ = iConfig.getParameter<double>("calibratioHBMin");//
-  calibratioHEMin_ = iConfig.getParameter<double>("calibratioHEMin");//
-  calibratioHOMin_ = iConfig.getParameter<double>("calibratioHOMin");//
-  calibratioHFMin_ = iConfig.getParameter<double>("calibratioHFMin");//
+  ADCAmplHBMin_ = iConfig.getParameter<double>("ADCAmplHBMin");//
+  ADCAmplHEMin_ = iConfig.getParameter<double>("ADCAmplHEMin");//
+  ADCAmplHOMin_ = iConfig.getParameter<double>("ADCAmplHOMin");//
+  ADCAmplHFMin_ = iConfig.getParameter<double>("ADCAmplHFMin");//
+  //
+  calibrADCHBMin_ = iConfig.getParameter<double>("calibrADCHBMin");//
+  calibrADCHEMin_ = iConfig.getParameter<double>("calibrADCHEMin");//
+  calibrADCHOMin_ = iConfig.getParameter<double>("calibrADCHOMin");//
+  calibrADCHFMin_ = iConfig.getParameter<double>("calibrADCHFMin");//
+  //
+  calibrRatioHBMin_ = iConfig.getParameter<double>("calibrRatioHBMin");//
+  calibrRatioHEMin_ = iConfig.getParameter<double>("calibrRatioHEMin");//
+  calibrRatioHOMin_ = iConfig.getParameter<double>("calibrRatioHOMin");//
+  calibrRatioHFMin_ = iConfig.getParameter<double>("calibrRatioHFMin");//
+  //
+  calibrTSmaxHBMin_ = iConfig.getParameter<double>("calibrTSmaxHBMin");//
+  calibrTSmaxHEMin_ = iConfig.getParameter<double>("calibrTSmaxHEMin");//
+  calibrTSmaxHOMin_ = iConfig.getParameter<double>("calibrTSmaxHOMin");//
+  calibrTSmaxHFMin_ = iConfig.getParameter<double>("calibrTSmaxHFMin");//
+  calibrTSmaxHBMax_ = iConfig.getParameter<double>("calibrTSmaxHBMax");//
+  calibrTSmaxHEMax_ = iConfig.getParameter<double>("calibrTSmaxHEMax");//
+  calibrTSmaxHOMax_ = iConfig.getParameter<double>("calibrTSmaxHOMax");//
+  calibrTSmaxHFMax_ = iConfig.getParameter<double>("calibrTSmaxHFMax");//
+  //
+  calibrTSmeanHBMin_ = iConfig.getParameter<double>("calibrTSmeanHBMin");//
+  calibrTSmeanHEMin_ = iConfig.getParameter<double>("calibrTSmeanHEMin");//
+  calibrTSmeanHOMin_ = iConfig.getParameter<double>("calibrTSmeanHOMin");//
+  calibrTSmeanHFMin_ = iConfig.getParameter<double>("calibrTSmeanHFMin");//
+  calibrTSmeanHBMax_ = iConfig.getParameter<double>("calibrTSmeanHBMax");//
+  calibrTSmeanHEMax_ = iConfig.getParameter<double>("calibrTSmeanHEMax");//
+  calibrTSmeanHOMax_ = iConfig.getParameter<double>("calibrTSmeanHOMax");//
+  calibrTSmeanHFMax_ = iConfig.getParameter<double>("calibrTSmeanHFMax");//
+  //
+  calibrWidthHBMin_ = iConfig.getParameter<double>("calibrWidthHBMin");//
+  calibrWidthHEMin_ = iConfig.getParameter<double>("calibrWidthHEMin");//
+  calibrWidthHOMin_ = iConfig.getParameter<double>("calibrWidthHOMin");//
+  calibrWidthHFMin_ = iConfig.getParameter<double>("calibrWidthHFMin");//
+  calibrWidthHBMax_ = iConfig.getParameter<double>("calibrWidthHBMax");//
+  calibrWidthHEMax_ = iConfig.getParameter<double>("calibrWidthHEMax");//
+  calibrWidthHOMax_ = iConfig.getParameter<double>("calibrWidthHOMax");//
+  calibrWidthHFMax_ = iConfig.getParameter<double>("calibrWidthHFMax");//
   //
   fOutputFileName   = iConfig.getUntrackedParameter<std::string>("HistOutFile"); 
   MAPOutputFileName = iConfig.getUntrackedParameter<std::string>("MAPOutFile");
@@ -597,6 +767,8 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   std::cout<<" studyTSmeanShapeHist_ = " <<studyTSmeanShapeHist_ << std::endl; 
   std::cout<<" studyDiffAmplHist_ = " <<studyDiffAmplHist_ << std::endl; 
   std::cout<<" studyCalibCellsHist_ = " <<studyCalibCellsHist_ << std::endl; 
+  std::cout<<" studyADCAmplHist_ = " <<studyADCAmplHist_ << std::endl; 
+
   std::cout<<" ratioHBMin_ = " <<ratioHBMin_ << std::endl;   
   std::cout<<" ratioHBMax_ = " <<ratioHBMax_ << std::endl;   
   std::cout<<" ratioHEMin_ = " <<ratioHEMin_ << std::endl;   
@@ -616,11 +788,46 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   std::cout<<" rmsHFMax_ = " <<rmsHFMax_ << std::endl;   
   std::cout<<" rmsHOMin_ = " <<rmsHOMin_ << std::endl;   
   std::cout<<" rmsHOMax_ = " <<rmsHOMax_ << std::endl;   
-  std::cout<<" calibratioHBMin_ = " <<calibratioHBMin_ << std::endl;   
-  std::cout<<" calibratioHEMin_ = " <<calibratioHEMin_ << std::endl;   
-  std::cout<<" calibratioHOMin_ = " <<calibratioHOMin_ << std::endl;   
-  std::cout<<" calibratioHFMin_ = " <<calibratioHFMin_ << std::endl;   
-  std::cout<<" TSpeakHBMin_ = " <<TSpeakHBMin_ << std::endl;   
+
+  std::cout<<" ADCAmplHBMin_ = " <<ADCAmplHBMin_ << std::endl;   
+  std::cout<<" ADCAmplHEMin_ = " <<ADCAmplHEMin_ << std::endl;   
+  std::cout<<" ADCAmplHOMin_ = " <<ADCAmplHOMin_ << std::endl;   
+  std::cout<<" ADCAmplHFMin_ = " <<ADCAmplHFMin_ << std::endl;   
+
+  std::cout<<" calibrADCHBMin_ = " <<calibrADCHBMin_ << std::endl;   
+  std::cout<<" calibrADCHEMin_ = " <<calibrADCHEMin_ << std::endl;   
+  std::cout<<" calibrADCHOMin_ = " <<calibrADCHOMin_ << std::endl;   
+  std::cout<<" calibrADCHFMin_ = " <<calibrADCHFMin_ << std::endl;   
+
+  std::cout<<" calibrRatioHBMin_ = " <<calibrRatioHBMin_ << std::endl;   
+  std::cout<<" calibrRatioHEMin_ = " <<calibrRatioHEMin_ << std::endl;   
+  std::cout<<" calibrRatioHOMin_ = " <<calibrRatioHOMin_ << std::endl;   
+  std::cout<<" calibrRatioHFMin_ = " <<calibrRatioHFMin_ << std::endl;   
+  std::cout<<" calibrTSmaxHBMin_ = " <<calibrTSmaxHBMin_ << std::endl;   
+  std::cout<<" calibrTSmaxHEMin_ = " <<calibrTSmaxHEMin_ << std::endl;   
+  std::cout<<" calibrTSmaxHOMin_ = " <<calibrTSmaxHOMin_ << std::endl;   
+  std::cout<<" calibrTSmaxHFMin_ = " <<calibrTSmaxHFMin_ << std::endl;   
+  std::cout<<" calibrTSmaxHBMax_ = " <<calibrTSmaxHBMax_ << std::endl;   
+  std::cout<<" calibrTSmaxHEMax_ = " <<calibrTSmaxHEMax_ << std::endl;   
+  std::cout<<" calibrTSmaxHOMax_ = " <<calibrTSmaxHOMax_ << std::endl;   
+  std::cout<<" calibrTSmaxHFMax_ = " <<calibrTSmaxHFMax_ << std::endl;   
+  std::cout<<" calibrTSmeanHBMin_ = " <<calibrTSmeanHBMin_ << std::endl;   
+  std::cout<<" calibrTSmeanHEMin_ = " <<calibrTSmeanHEMin_ << std::endl;   
+  std::cout<<" calibrTSmeanHOMin_ = " <<calibrTSmeanHOMin_ << std::endl;   
+  std::cout<<" calibrTSmeanHFMin_ = " <<calibrTSmeanHFMin_ << std::endl;   
+  std::cout<<" calibrTSmeanHBMax_ = " <<calibrTSmeanHBMax_ << std::endl;   
+  std::cout<<" calibrTSmeanHEMax_ = " <<calibrTSmeanHEMax_ << std::endl;   
+  std::cout<<" calibrTSmeanHOMax_ = " <<calibrTSmeanHOMax_ << std::endl;   
+  std::cout<<" calibrTSmeanHFMax_ = " <<calibrTSmeanHFMax_ << std::endl;   
+   std::cout<<" calibrWidthHBMin_ = " <<calibrWidthHBMin_ << std::endl;   
+  std::cout<<" calibrWidthHEMin_ = " <<calibrWidthHEMin_ << std::endl;   
+  std::cout<<" calibrWidthHOMin_ = " <<calibrWidthHOMin_ << std::endl;   
+  std::cout<<" calibrWidthHFMin_ = " <<calibrWidthHFMin_ << std::endl;   
+  std::cout<<" calibrWidthHBMax_ = " <<calibrWidthHBMax_ << std::endl;   
+  std::cout<<" calibrWidthHEMax_ = " <<calibrWidthHEMax_ << std::endl;   
+  std::cout<<" calibrWidthHOMax_ = " <<calibrWidthHOMax_ << std::endl;   
+  std::cout<<" calibrWidthHFMax_ = " <<calibrWidthHFMax_ << std::endl;   
+ std::cout<<" TSpeakHBMin_ = " <<TSpeakHBMin_ << std::endl;   
   std::cout<<" TSpeakHBMax_ = " <<TSpeakHBMax_ << std::endl;   
   std::cout<<" TSpeakHEMin_ = " <<TSpeakHEMin_ << std::endl;   
   std::cout<<" TSpeakHEMax_ = " <<TSpeakHEMax_ << std::endl;   
@@ -743,6 +950,9 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       for(int k3 = 0; k3<72; k3++) {
 	if(studyCalibCellsHist_) {
 	  signal[k1][k2][k3] = 0.;
+	  calibt[k1][k2][k3] = 0.;
+	  caliba[k1][k2][k3] = 0.;
+	  calibw[k1][k2][k3] = 0.;
 	  calib0[k1][k2][k3] = 0.;
 	  //	signal3[k1][k2][k3] = 0.;
 	  //	calib3[k1][k2][k3] = 0.;
@@ -1067,6 +1277,7 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       int cal_phi=digi->id().iphi();
       int cal_eta=digi->id().ieta();
       int cal_cbox=digi->id().cboxChannel();
+      //      int cal_depth=digi->id().depth();//class HcalCalibDetId has no member named 'depth'
       /////////////////////////////////////////////     
       if(recordHistoes_ && studyCalibCellsHist_) {
 	if(cal_det>0 && cal_det<5 && cal_cbox == 0 ) {
@@ -1074,8 +1285,11 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	  int ieta  = cal_eta;
 	  if(ieta > 0) ieta -= 1;
 	  nTS=digi->size();
-	  double max_signal = 0.;
+	  double max_signal = -100.;
 	  int ts_with_max_signal = -100;
+	  double timew = 0.;
+
+	  //
 	  if(nTS<=numOfTS) for(int i=0;i<nTS;i++) {
 	    double ampldefault = adc2fC[digi->sample(i).adc()&0xff];
 	    if(max_signal < ampldefault ) {
@@ -1083,7 +1297,30 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	      ts_with_max_signal = i;
 	    }
 	    calib0[cal_det-1][ieta+41][iphi] += ampldefault;
-	  }
+	    timew += (i+1)*ampldefault;
+	  }// for
+	  //
+
+	  double amplitude = calib0[cal_det-1][ieta+41][iphi];
+	  double aveamplitude = -100.;
+	  if(amplitude !=0)  aveamplitude = timew/amplitude;// average_TS +1
+	  double aveamplitude1 = aveamplitude-1;// means iTS=0-9
+	  caliba[cal_det-1][ieta+41][iphi] = aveamplitude1;
+
+	  double rmsamp = 0.;
+	  for (int ii=0; ii<10; ii++) {  
+	    double ampldefault = adc2fC[digi->sample(ii).adc()&0xff];
+	    double aaaaaa = (ii+1)-aveamplitude;
+	    double aaaaaa2 = aaaaaa*aaaaaa;
+	    rmsamp+=(aaaaaa2*ampldefault);// fC
+	  }//for 2
+	  double rmsamplitude = -100.;
+	  if(amplitude !=0)  rmsamplitude = sqrt( rmsamp/amplitude );
+	  calibw[cal_det-1][ieta+41][iphi] = rmsamplitude;
+	  //
+	  calibt[cal_det-1][ieta+41][iphi] = ts_with_max_signal;
+	  //
+
 	  if(ts_with_max_signal > -1 && ts_with_max_signal < nTS) calib2[cal_det-1][ieta+41][iphi] = adc2fC[digi->sample(ts_with_max_signal).adc()&0xff];
 	  if(ts_with_max_signal+1 > -1 && ts_with_max_signal+1 < nTS) calib2[cal_det-1][ieta+41][iphi] += adc2fC[digi->sample(ts_with_max_signal+1).adc()&0xff];
 	  if(ts_with_max_signal+2 > -1 && ts_with_max_signal+2 < nTS) calib2[cal_det-1][ieta+41][iphi] += adc2fC[digi->sample(ts_with_max_signal+2).adc()&0xff];
@@ -1234,41 +1471,157 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	    if(k1==3) h_GetRMSOverNormalizedSignal3_HF->Fill(GetRMSOverNormalizedSignal,1.);  
 	  }
 */
-	  ////////////////////////////////////////////////////////////////  for zcalib.C script:
-	  
-	  double ratio =2.;
-	  if(calib0[k1][kkk2][kkk3]>0. && signal[k1][k2][k3]>0.) ratio = calib2[k1][kkk2][kkk3]/calib0[k1][kkk2][kkk3];
-	  if(k1==0) {
-	    h_RatioCalib_HB->Fill(ratio,1.);
-	    if(ratio < calibratioHBMin_ ) h_mapRatioCalib047_HB->Fill(double(k2plot), double(k3), 1.);
-	    h_mapRatioCalib_HB->Fill(double(k2plot), double(k3), ratio);    
-	    h_map_HB->Fill(double(k2plot), double(k3), 1.);    
-	  }
-	  if(k1==1) {
-	    h_RatioCalib_HE->Fill(ratio,1.);
-	    if(ratio < calibratioHEMin_ ) h_mapRatioCalib047_HE->Fill(double(k2plot), double(k3), 1.);
-	    h_mapRatioCalib_HE->Fill(double(k2plot), double(k3), ratio);    
-	    h_map_HE->Fill(double(k2plot), double(k3), 1.);    
-	  }
-	  if(k1==2) {
-	    h_RatioCalib_HO->Fill(ratio,1.);
-	    if(ratio < calibratioHOMin_ ) h_mapRatioCalib047_HO->Fill(double(k2plot), double(k3), 1.);
-	    h_mapRatioCalib_HO->Fill(double(k2plot), double(k3), ratio);    
-	    h_map_HO->Fill(double(k2plot), double(k3), 1.);    
-	  }
-	  if(k1==3) {
-	    h_RatioCalib_HF->Fill(ratio,1.);
-	    if(ratio < calibratioHFMin_ ) h_mapRatioCalib047_HF->Fill(double(k2plot), double(k3), 1.);
-	    h_mapRatioCalib_HF->Fill(double(k2plot), double(k3), ratio);    
-	    h_map_HF->Fill(double(k2plot), double(k3), 1.);    
-	  }
+	  ////////////////////////////////////////////////////////////////  for zcalib....C script:
+	  if(signal[k1][k2][k3]>0.) {
+	    // ADC
+	    double adc =0.;
+	    if(calib0[k1][kkk2][kkk3]>0. ) adc = calib0[k1][kkk2][kkk3];
+	    // Ratio
+	    double ratio =2.;
+	    if(calib0[k1][kkk2][kkk3]>0. ) ratio = calib2[k1][kkk2][kkk3]/calib0[k1][kkk2][kkk3];
+	    // TSmax
+	    float calibtsmax = calibt[k1][kkk2][kkk3]; 
+	    // TSmean
+	    float calibtsmean = caliba[k1][kkk2][kkk3]; 
+	    // Width
+	    float calibwidth = calibw[k1][kkk2][kkk3]; 
+	    //                 HB:
+	    if(k1==0) {
+	      // ADC
+	      h_ADCCalib_HB->Fill(adc,1.);
+	      h_ADCCalib1_HB->Fill(adc,1.);
+	      if(adc < calibrADCHBMin_ ) h_mapADCCalib047_HB->Fill(double(k2plot),double(k3),1.);
+	      h_mapADCCalib_HB->Fill(double(k2plot), double(k3), adc);    
+	      // Ratio
+	      h_RatioCalib_HB->Fill(ratio,1.);
+	      if(ratio < calibrRatioHBMin_ ) h_mapRatioCalib047_HB->Fill(double(k2plot),double(k3),1.);
+	      h_mapRatioCalib_HB->Fill(double(k2plot), double(k3), ratio);    
+	      // TSmax
+	      if(calibtsmax > -0.5) {
+		h_TSmaxCalib_HB->Fill(calibtsmax,1.);
+		if(calibtsmax< calibrTSmaxHBMin_ || calibtsmax> calibrTSmaxHBMax_ ) h_mapTSmaxCalib047_HB->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmaxCalib_HB->Fill(double(k2plot), double(k3), calibtsmax); 
+	      }   
+	      // TSmean
+	      if(calibtsmean > -0.5) {
+		h_TSmeanCalib_HB->Fill(calibtsmean,1.);
+		if(calibtsmean< calibrTSmeanHBMin_ || calibtsmean> calibrTSmeanHBMax_ ) h_mapTSmeanCalib047_HB->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmeanCalib_HB->Fill(double(k2plot), double(k3), calibtsmean); 
+	      }   
+	      // Width
+	      if(calibwidth > -0.5) {
+		h_WidthCalib_HB->Fill(calibwidth,1.);
+		if(calibwidth< calibrWidthHBMin_ || calibwidth> calibrWidthHBMax_ ) h_mapWidthCalib047_HB->Fill(double(k2plot),double(k3),1.);
+		h_mapWidthCalib_HB->Fill(double(k2plot), double(k3), calibwidth); 
+	      }   
+	      //       
+	      h_map_HB->Fill(double(k2plot), double(k3), 1.);    
+	    }
+	    //                 HE:
+	    if(k1==1) {
+	      // ADC
+	      h_ADCCalib_HE->Fill(adc,1.);
+	      h_ADCCalib1_HE->Fill(adc,1.);
+	      if(adc < calibrADCHEMin_ ) h_mapADCCalib047_HE->Fill(double(k2plot),double(k3),1.);
+	      h_mapADCCalib_HE->Fill(double(k2plot), double(k3), adc);    
+	      // Ratio
+	      h_RatioCalib_HE->Fill(ratio,1.);
+	      if(ratio < calibrRatioHEMin_ ) h_mapRatioCalib047_HE->Fill(double(k2plot),double(k3),1.);
+	      h_mapRatioCalib_HE->Fill(double(k2plot), double(k3), ratio);    
+	      // TSmax
+	      if(calibtsmax > -0.5) {
+		h_TSmaxCalib_HE->Fill(calibtsmax,1.);
+		if(calibtsmax< calibrTSmaxHEMin_  || calibtsmax> calibrTSmaxHEMax_ )h_mapTSmaxCalib047_HE->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmaxCalib_HE->Fill(double(k2plot), double(k3), calibtsmax); 
+	      }   
+	      // TSmean
+	      if(calibtsmean > -0.5) {
+		h_TSmeanCalib_HE->Fill(calibtsmean,1.);
+		if(calibtsmean< calibrTSmeanHEMin_  || calibtsmean> calibrTSmeanHEMax_ )h_mapTSmeanCalib047_HE->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmeanCalib_HE->Fill(double(k2plot), double(k3), calibtsmean); 
+	      }   
+	      // Width
+	      if(calibwidth > -0.5) {
+		h_WidthCalib_HE->Fill(calibwidth,1.);
+		if(calibwidth< calibrWidthHEMin_  || calibwidth> calibrWidthHEMax_ )h_mapWidthCalib047_HE->Fill(double(k2plot),double(k3),1.);
+		h_mapWidthCalib_HE->Fill(double(k2plot), double(k3), calibwidth); 
+	      }   
+	      //                
+	      h_map_HE->Fill(double(k2plot), double(k3), 1.);    
+	    }
+	    //                 HO: 
+	    if(k1==2) {
+	      // ADC
+	      h_ADCCalib_HO->Fill(adc,1.);
+	      h_ADCCalib1_HO->Fill(adc,1.);
+	      if(adc < calibrADCHOMin_ ) h_mapADCCalib047_HO->Fill(double(k2plot),double(k3),1.);
+	      h_mapADCCalib_HO->Fill(double(k2plot), double(k3), adc);    
+	      // Ratio
+	      h_RatioCalib_HO->Fill(ratio,1.);
+	      if(ratio < calibrRatioHOMin_ ) h_mapRatioCalib047_HO->Fill(double(k2plot), double(k3), 1.);
+	      h_mapRatioCalib_HO->Fill(double(k2plot), double(k3), ratio);    
+	      // TSmax
+	      if(calibtsmax > -0.5) {
+		h_TSmaxCalib_HO->Fill(calibtsmax,1.);
+		if(calibtsmax< calibrTSmaxHOMin_  || calibtsmax> calibrTSmaxHOMax_ )h_mapTSmaxCalib047_HO->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmaxCalib_HO->Fill(double(k2plot), double(k3), calibtsmax);    
+	      }
+	      // TSmean
+	      if(calibtsmean > -0.5) {
+		h_TSmeanCalib_HO->Fill(calibtsmean,1.);
+		if(calibtsmean< calibrTSmeanHOMin_  || calibtsmean> calibrTSmeanHOMax_ )h_mapTSmeanCalib047_HO->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmeanCalib_HO->Fill(double(k2plot), double(k3), calibtsmean);    
+	      }
+	      // Width
+	      if(calibwidth > -0.5) {
+		h_WidthCalib_HO->Fill(calibwidth,1.);
+		if(calibwidth< calibrWidthHOMin_  || calibwidth> calibrWidthHOMax_ )h_mapWidthCalib047_HO->Fill(double(k2plot),double(k3),1.);
+		h_mapWidthCalib_HO->Fill(double(k2plot), double(k3), calibwidth);    
+	      }
+	      //                 
+	      h_map_HO->Fill(double(k2plot), double(k3), 1.);    
+	    }
+	    //                 HF: 
+	    if(k1==3) {
+	      // ADC
+	      h_ADCCalib_HF->Fill(adc,1.);
+	      h_ADCCalib1_HF->Fill(adc,1.);
+	      if(adc < calibrADCHFMin_ ) h_mapADCCalib047_HF->Fill(double(k2plot),double(k3),1.);
+	      h_mapADCCalib_HF->Fill(double(k2plot), double(k3), adc);    
+	      // Ratio
+	      h_RatioCalib_HF->Fill(ratio,1.);
+	      if(ratio < calibrRatioHFMin_ ) h_mapRatioCalib047_HF->Fill(double(k2plot), double(k3), 1.);
+	      h_mapRatioCalib_HF->Fill(double(k2plot), double(k3), ratio);    
+	      // TSmax
+	      if(calibtsmax > -0.5) {
+		h_TSmaxCalib_HF->Fill(calibtsmax,1.);
+		if(calibtsmax< calibrTSmaxHFMin_ || calibtsmax> calibrTSmaxHFMax_ ) h_mapTSmaxCalib047_HF->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmaxCalib_HF->Fill(double(k2plot), double(k3), calibtsmax);  
+	      }  
+	      // TSmean
+	      if(calibtsmean > -0.5) {
+		h_TSmeanCalib_HF->Fill(calibtsmean,1.);
+		if(calibtsmean< calibrTSmeanHFMin_ || calibtsmean> calibrTSmeanHFMax_ ) h_mapTSmeanCalib047_HF->Fill(double(k2plot),double(k3),1.);
+		h_mapTSmeanCalib_HF->Fill(double(k2plot), double(k3), calibtsmean);  
+	      }  
+	      // Width
+	      if(calibwidth > -0.5) {
+		h_WidthCalib_HF->Fill(calibwidth,1.);
+		if(calibwidth< calibrWidthHFMin_ || calibwidth> calibrWidthHFMax_ ) h_mapWidthCalib047_HF->Fill(double(k2plot),double(k3),1.);
+		h_mapWidthCalib_HF->Fill(double(k2plot), double(k3), calibwidth);  
+	      }  
+	      // 
+	      h_map_HF->Fill(double(k2plot), double(k3), 1.);    
+	    }
+	    ////////// 
+	  }// if(signal[k1][k2][k3]>0.) 
 	  ////////// 
 	} // k3 
       }  // k2
     }  // k1
-
-  /////
-
+    
+    /////
+    
   }//if(recordHistoes_)
   /////////////////////////////////////////////////// 
   if(recordNtuples_) myTree->Fill();
@@ -1392,6 +1745,11 @@ void VeRawAnalyzer::beginJob()
     h_repetedcapid_HO = new TH1F("h_repetedcapid_HO"," ", 5, 0., 5.);
     
     /////////////////////////////////////////////////////////////////////////////////////////////////
+    h_ADCAmpl_HB = new TH1F("h_ADCAmpl_HB"," ", 100, 10.,10000.);
+    h_mapDepth1ADCAmpl225_HB = new TH2F("h_mapDepth1ADCAmpl225_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth2ADCAmpl225_HB = new TH2F("h_mapDepth2ADCAmpl225_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth1ADCAmpl_HB = new TH2F("h_mapDepth1ADCAmpl_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth2ADCAmpl_HB = new TH2F("h_mapDepth2ADCAmpl_HB"," ", 82, -41., 41., 72, 0., 72.);
     h_TSmeanA_HB = new TH1F("h_TSmeanA_HB"," ", 100, -1.,11.);
     h_mapDepth1TSmeanA225_HB = new TH2F("h_mapDepth1TSmeanA225_HB"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth2TSmeanA225_HB = new TH2F("h_mapDepth2TSmeanA225_HB"," ", 82, -41., 41., 72, 0., 72.);
@@ -1418,6 +1776,13 @@ void VeRawAnalyzer::beginJob()
     h_mapDepth2_HB = new TH2F("h_mapDepth2_HB"," ", 82, -41., 41., 72, 0., 72.);
     
     /////////////////////////////////////////////////////////////////////////////////////////////////
+    h_ADCAmpl_HE = new TH1F("h_ADCAmpl_HE"," ", 100, 10.,10000.);
+    h_mapDepth1ADCAmpl225_HE = new TH2F("h_mapDepth1ADCAmpl225_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth2ADCAmpl225_HE = new TH2F("h_mapDepth2ADCAmpl225_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth3ADCAmpl225_HE = new TH2F("h_mapDepth3ADCAmpl225_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth1ADCAmpl_HE = new TH2F("h_mapDepth1ADCAmpl_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth2ADCAmpl_HE = new TH2F("h_mapDepth2ADCAmpl_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth3ADCAmpl_HE = new TH2F("h_mapDepth3ADCAmpl_HE"," ", 82, -41., 41., 72, 0., 72.);
     h_TSmeanA_HE = new TH1F("h_TSmeanA_HE"," ", 100, -1.,11.);
     h_mapDepth1TSmeanA225_HE = new TH2F("h_mapDepth1TSmeanA225_HE"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth2TSmeanA225_HE = new TH2F("h_mapDepth2TSmeanA225_HE"," ", 82, -41., 41., 72, 0., 72.);
@@ -1456,6 +1821,11 @@ void VeRawAnalyzer::beginJob()
     h_mapDepth3_HE = new TH2F("h_mapDepth3_HE"," ", 82, -41., 41., 72, 0., 72.);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
+    h_ADCAmpl_HF = new TH1F("h_ADCAmpl_HF"," ", 100, 10.,10000.);
+    h_mapDepth1ADCAmpl225_HF = new TH2F("h_mapDepth1ADCAmpl225_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth2ADCAmpl225_HF = new TH2F("h_mapDepth2ADCAmpl225_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth1ADCAmpl_HF = new TH2F("h_mapDepth1ADCAmpl_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth2ADCAmpl_HF = new TH2F("h_mapDepth2ADCAmpl_HF"," ", 82, -41., 41., 72, 0., 72.);
     h_TSmeanA_HF = new TH1F("h_TSmeanA_HF"," ", 100, -1.,11.);
     h_mapDepth1TSmeanA225_HF = new TH2F("h_mapDepth1TSmeanA225_HF"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth2TSmeanA225_HF = new TH2F("h_mapDepth2TSmeanA225_HF"," ", 82, -41., 41., 72, 0., 72.);
@@ -1483,6 +1853,9 @@ void VeRawAnalyzer::beginJob()
     h_mapDepth2_HF = new TH2F("h_mapDepth2_HF"," ", 82, -41., 41., 72, 0., 72.);
     
     /////////////////////////////////////////////////////////////////////////////////////////////////
+    h_ADCAmpl_HO = new TH1F("h_ADCAmpl_HO"," ", 100, 10.,10000.);
+    h_mapDepth4ADCAmpl225_HO = new TH2F("h_mapDepth4ADCAmpl225_HO"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapDepth4ADCAmpl_HO = new TH2F("h_mapDepth4ADCAmpl_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_TSmeanA_HO = new TH1F("h_TSmeanA_HO"," ", 100, -1.,11.);
     h_mapDepth4TSmeanA225_HO = new TH2F("h_mapDepth4TSmeanA225_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth4TSmeanA_HO = new TH2F("h_mapDepth4TSmeanA_HO"," ", 82, -41., 41., 72, 0., 72.);
@@ -1562,22 +1935,74 @@ void VeRawAnalyzer::beginJob()
     h_FullSignal3D0_HO = new TH2F("h_FullSignal3D0_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_FullSignal3D_HF = new TH2F("h_FullSignal3D_HF"," ",   82, -41., 41., 72, 0., 72.);
     h_FullSignal3D0_HF = new TH2F("h_FullSignal3D0_HF"," ", 82, -41., 41., 72, 0., 72.);
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    h_ADCCalib_HB       = new TH1F("h_ADCCalib_HB"," ",      100, 10.,10000.);
+    h_ADCCalib1_HB       = new TH1F("h_ADCCalib1_HB"," ",      100, 0.1,100.1);
+    h_mapADCCalib047_HB = new TH2F("h_mapADCCalib047_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapADCCalib_HB    = new TH2F("h_mapADCCalib_HB"," ",    82, -41., 41., 72, 0., 72.);
     h_RatioCalib_HB       = new TH1F("h_RatioCalib_HB"," ",      100, 0.,1.);
     h_mapRatioCalib047_HB = new TH2F("h_mapRatioCalib047_HB"," ", 82, -41., 41., 72, 0., 72.);
     h_mapRatioCalib_HB    = new TH2F("h_mapRatioCalib_HB"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmaxCalib_HB       = new TH1F("h_TSmaxCalib_HB"," ",      100, 0.,10.);
+    h_mapTSmaxCalib047_HB = new TH2F("h_mapTSmaxCalib047_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmaxCalib_HB    = new TH2F("h_mapTSmaxCalib_HB"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmeanCalib_HB       = new TH1F("h_TSmeanCalib_HB"," ",      100, 0.,10.);
+    h_mapTSmeanCalib047_HB = new TH2F("h_mapTSmeanCalib047_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmeanCalib_HB    = new TH2F("h_mapTSmeanCalib_HB"," ",    82, -41., 41., 72, 0., 72.);
+    h_WidthCalib_HB       = new TH1F("h_WidthCalib_HB"," ",      100, 0.,5.);
+    h_mapWidthCalib047_HB = new TH2F("h_mapWidthCalib047_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapWidthCalib_HB    = new TH2F("h_mapWidthCalib_HB"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HB              = new TH2F("h_map_HB"," ",              82, -41., 41., 72, 0., 72.);
+    h_ADCCalib_HE       = new TH1F("h_ADCCalib_HE"," ",      100, 10.,10000.);
+    h_ADCCalib1_HE       = new TH1F("h_ADCCalib1_HE"," ",      100, 0.1,100.1);
+    h_mapADCCalib047_HE = new TH2F("h_mapADCCalib047_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapADCCalib_HE    = new TH2F("h_mapADCCalib_HE"," ",    82, -41., 41., 72, 0., 72.);
     h_RatioCalib_HE       = new TH1F("h_RatioCalib_HE"," ",      100, 0.,1.);
     h_mapRatioCalib047_HE = new TH2F("h_mapRatioCalib047_HE"," ", 82, -41., 41., 72, 0., 72.);
     h_mapRatioCalib_HE    = new TH2F("h_mapRatioCalib_HE"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmaxCalib_HE       = new TH1F("h_TSmaxCalib_HE"," ",      100, 0.,10.);
+    h_mapTSmaxCalib047_HE = new TH2F("h_mapTSmaxCalib047_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmaxCalib_HE    = new TH2F("h_mapTSmaxCalib_HE"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmeanCalib_HE       = new TH1F("h_TSmeanCalib_HE"," ",      100, 0.,10.);
+    h_mapTSmeanCalib047_HE = new TH2F("h_mapTSmeanCalib047_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmeanCalib_HE    = new TH2F("h_mapTSmeanCalib_HE"," ",    82, -41., 41., 72, 0., 72.);
+    h_WidthCalib_HE       = new TH1F("h_WidthCalib_HE"," ",      100, 0.,5.);
+    h_mapWidthCalib047_HE = new TH2F("h_mapWidthCalib047_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapWidthCalib_HE    = new TH2F("h_mapWidthCalib_HE"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HE              = new TH2F("h_map_HE"," ",              82, -41., 41., 72, 0., 72.);
+    h_ADCCalib_HO       = new TH1F("h_ADCCalib_HO"," ",      100, 10.,10000.);
+    h_ADCCalib1_HO       = new TH1F("h_ADCCalib1_HO"," ",      100, 0.1,100.1);
+    h_mapADCCalib047_HO = new TH2F("h_mapADCCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapADCCalib_HO    = new TH2F("h_mapADCCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
     h_RatioCalib_HO       = new TH1F("h_RatioCalib_HO"," ",      100, 0.,1.);
     h_mapRatioCalib047_HO = new TH2F("h_mapRatioCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_mapRatioCalib_HO    = new TH2F("h_mapRatioCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmaxCalib_HO       = new TH1F("h_TSmaxCalib_HO"," ",      100, 0.,10.);
+    h_mapTSmaxCalib047_HO = new TH2F("h_mapTSmaxCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmaxCalib_HO    = new TH2F("h_mapTSmaxCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmeanCalib_HO       = new TH1F("h_TSmeanCalib_HO"," ",      100, 0.,10.);
+    h_mapTSmeanCalib047_HO = new TH2F("h_mapTSmeanCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmeanCalib_HO    = new TH2F("h_mapTSmeanCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
+    h_WidthCalib_HO       = new TH1F("h_WidthCalib_HO"," ",      100, 0.,5.);
+    h_mapWidthCalib047_HO = new TH2F("h_mapWidthCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapWidthCalib_HO    = new TH2F("h_mapWidthCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HO              = new TH2F("h_map_HO"," ",              82, -41., 41., 72, 0., 72.);
+    h_ADCCalib_HF       = new TH1F("h_ADCCalib_HF"," ",      100, 10.,10000.);
+    h_ADCCalib1_HF       = new TH1F("h_ADCCalib1_HF"," ",      100, 0.1,100.1);
+    h_mapADCCalib047_HF = new TH2F("h_mapADCCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapADCCalib_HF    = new TH2F("h_mapADCCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
     h_RatioCalib_HF       = new TH1F("h_RatioCalib_HF"," ",      100, 0.,1.);
     h_mapRatioCalib047_HF = new TH2F("h_mapRatioCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
     h_mapRatioCalib_HF    = new TH2F("h_mapRatioCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmaxCalib_HF       = new TH1F("h_TSmaxCalib_HF"," ",      100, 0.,10.);
+    h_mapTSmaxCalib047_HF = new TH2F("h_mapTSmaxCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmaxCalib_HF    = new TH2F("h_mapTSmaxCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
+    h_TSmeanCalib_HF       = new TH1F("h_TSmeanCalib_HF"," ",      100, 0.,10.);
+    h_mapTSmeanCalib047_HF = new TH2F("h_mapTSmeanCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapTSmeanCalib_HF    = new TH2F("h_mapTSmeanCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
+    h_WidthCalib_HF       = new TH1F("h_WidthCalib_HF"," ",      100, 0.,5.);
+    h_mapWidthCalib047_HF = new TH2F("h_mapWidthCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapWidthCalib_HF    = new TH2F("h_mapWidthCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HF              = new TH2F("h_map_HF"," ",              82, -41., 41., 72, 0., 72.);
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -1808,11 +2233,8 @@ void VeRawAnalyzer::fillDigiErrors(HBHEDigiCollection::const_iterator& digiItr)
 // ------------ method called for each event  ------------
 void VeRawAnalyzer::fillDigiErrorsHF(HFDigiCollection::const_iterator& digiItr)
 {
-
     CaloSamples tool;  // TS
-    
     if (verbosity == -22) std::cout << "**************   loop over HF Digis    " << std::endl;
-   
     HcalDetId cell(digiItr->id()); 
     int mdepth = cell.depth();
     int iphi  = cell.iphi()-1;
@@ -1823,7 +2245,6 @@ void VeRawAnalyzer::fillDigiErrorsHF(HFDigiCollection::const_iterator& digiItr)
 				 << "sub, ieta, iphi, mdepth = "  
 				 <<  sub << ", " << ieta << ", " << iphi << ", " << mdepth 
 				 << std::endl;
-
     // !!!!!!
     int errorGeneral =  0;
     int error1 =  0;
@@ -1845,10 +2266,7 @@ void VeRawAnalyzer::fillDigiErrorsHF(HFDigiCollection::const_iterator& digiItr)
     int ERRORfiberChan = -10;
     int ERRORfiberAndChan = -10;
     int repetedcapid = 0;
-
-
     if (verbosity == -22) std::cout <<" Size of HF Digi "<<(*digiItr).size()<<std::endl;
-
     ///////////////////////////////////////    
     for  (int ii=0;ii<(*digiItr).size();ii++) {
       capid = (*digiItr)[ii].capid(); // capId (0-3, sequential)
@@ -2127,8 +2545,6 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
     // !!!!!!
     if (verbosity == -22) std::cout <<" fillDigiAmplitude     Size of Digi "<<(*digiItr).size()<<std::endl;
     
-
-
     ///////////////////////////////////////Energy
     // Energy:    
 //    int firstSample  = 2;  // RECO window parameters
@@ -2205,10 +2621,25 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
 
 
     double aveamplitude1 = aveamplitude-1;// means iTS=0-9
+
     ///////////////////////////////////////Digis
     // HB
     if ( sub == 1 ) {
       
+      //   //   //   //   //   //   //   //   //  HB       ADCAmpl:
+      if(studyADCAmplHist_) {
+	h_ADCAmpl_HB->Fill(amplitude,1.);
+	if(amplitude < ADCAmplHBMin_ ) {
+	  if(mdepth==1) h_mapDepth1ADCAmpl225_HB->Fill(double(ieta), double(iphi), 1.);
+	  if(mdepth==2) h_mapDepth2ADCAmpl225_HB->Fill(double(ieta), double(iphi), 1.);
+	  if (verbosity == -56) std::cout << "***BAD HB channels from ADCAmpl: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" amplitude= " << amplitude << std::endl;
+	}// if
+	// for averaged values:
+	if(mdepth==1) h_mapDepth1ADCAmpl_HB->Fill(double(ieta), double(iphi), amplitude);
+	if(mdepth==2) h_mapDepth2ADCAmpl_HB->Fill(double(ieta), double(iphi), amplitude);
+      }//if(studyADCAmplHist_
+      ///////////////////////////////
+
       //   //   //   //   //   //   //   //   //  HB       TSmean:
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HB->Fill(aveamplitude1,1.);
@@ -2222,6 +2653,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
 	if(mdepth==2) h_mapDepth2TSmeanA_HB->Fill(double(ieta), double(iphi), aveamplitude1);
       }//if(studyTSmeanShapeHist_
       ///////////////////////////////
+
       //   //   //   //   //   //   //   //   //  HB       TSmax:
       if(studyTSmaxShapeHist_) {
 	h_TSmaxA_HB->Fill(float(ts_with_max_signal),1.);
@@ -2289,6 +2721,21 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
     // HE
     if ( sub == 2 ) {
       
+      //   //   //   //   //   //   //   //   //  HE       ADCAmpl:
+      if(studyADCAmplHist_) {
+	h_ADCAmpl_HE->Fill(amplitude,1.);
+	if(amplitude < ADCAmplHEMin_ ) {
+	  if(mdepth==1) h_mapDepth1ADCAmpl225_HE->Fill(double(ieta), double(iphi), 1.);
+	  if(mdepth==2) h_mapDepth2ADCAmpl225_HE->Fill(double(ieta), double(iphi), 1.);
+	  if(mdepth==3) h_mapDepth3ADCAmpl225_HE->Fill(double(ieta), double(iphi), 1.);
+	  if (verbosity == -56) std::cout << "***BAD HE channels from ADCAmpl: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" amplitude= " << amplitude << std::endl;
+	}// if
+	// for averaged values:
+	if(mdepth==1) h_mapDepth1ADCAmpl_HE->Fill(double(ieta), double(iphi), amplitude);
+	if(mdepth==2) h_mapDepth2ADCAmpl_HE->Fill(double(ieta), double(iphi), amplitude);
+	if(mdepth==3) h_mapDepth3ADCAmpl_HE->Fill(double(ieta), double(iphi), amplitude);
+      }//if(studyADCAmplHist_
+      ///////////////////////////////
       //   //   //   //   //   //   //   //   //  HE       TSmean:
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HE->Fill(aveamplitude1,1.);
@@ -2476,6 +2923,20 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
     // HF
     if ( sub == 4 ) {
       
+      //   //   //   //   //   //   //   //   //  HF       ADCAmpl:
+      if(studyADCAmplHist_) {
+	h_ADCAmpl_HF->Fill(amplitude,1.);
+	if(amplitude < ADCAmplHFMin_ ) {
+	  if(mdepth==1) h_mapDepth1ADCAmpl225_HF->Fill(double(ieta), double(iphi), 1.);
+	  if(mdepth==2) h_mapDepth2ADCAmpl225_HF->Fill(double(ieta), double(iphi), 1.);
+	  if (verbosity == -56) std::cout << "***BAD HF channels from ADCAmpl: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" amplitude= " << amplitude << std::endl;
+	}// if
+	// for averaged values:
+	if(mdepth==1) h_mapDepth1ADCAmpl_HF->Fill(double(ieta), double(iphi), amplitude);
+	if(mdepth==2) h_mapDepth2ADCAmpl_HF->Fill(double(ieta), double(iphi), amplitude);
+      }//if(studyADCAmplHist_
+      ///////////////////////////////
+
       //   //   //   //   //   //   //   //   //  HF       TSmean:
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HF->Fill(aveamplitude1,1.);
@@ -2657,6 +3118,18 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
     // HO
     if ( sub == 3 ) {
       
+      //   //   //   //   //   //   //   //   //  HO       ADCAmpl:
+      if(studyADCAmplHist_) {
+	h_ADCAmpl_HO->Fill(amplitude,1.);
+	if(amplitude < ADCAmplHOMin_ ) {
+	  if(mdepth==4) h_mapDepth4ADCAmpl225_HO->Fill(double(ieta), double(iphi), 1.);
+	  if (verbosity == -56) std::cout << "***BAD HO channels from ADCAmpl: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" amplitude= " << amplitude << std::endl;
+	}// if
+	// for averaged values:
+	if(mdepth==4) h_mapDepth4ADCAmpl_HO->Fill(double(ieta), double(iphi), amplitude);
+      }//if(studyADCAmplHist_
+      ///////////////////////////////
+
       //   //   //   //   //   //   //   //   //  HO       TSmean:
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HO->Fill(aveamplitude1,1.);
@@ -2897,11 +3370,18 @@ void VeRawAnalyzer::endJob(){
     h_repetedcapid_HO->Write();
     
     ///////////////////////
+    h_ADCAmpl_HB->Write();
+    h_mapDepth1ADCAmpl225_HB->Write();
+    h_mapDepth2ADCAmpl225_HB->Write();
+    h_mapDepth1ADCAmpl_HB->Write();
+    h_mapDepth2ADCAmpl_HB->Write();
+
     h_TSmeanA_HB->Write();
     h_mapDepth1TSmeanA225_HB->Write();
     h_mapDepth2TSmeanA225_HB->Write();
     h_mapDepth1TSmeanA_HB->Write();
     h_mapDepth2TSmeanA_HB->Write();
+
     h_TSmaxA_HB->Write();
     h_mapDepth1TSmaxA225_HB->Write();
     h_mapDepth2TSmaxA225_HB->Write();
@@ -2925,11 +3405,18 @@ void VeRawAnalyzer::endJob(){
     h_mapDepth2_HB->Write();
 
     ///////////////////////
+    h_ADCAmpl_HF->Write();
+    h_mapDepth1ADCAmpl225_HF->Write();
+    h_mapDepth2ADCAmpl225_HF->Write();
+    h_mapDepth1ADCAmpl_HF->Write();
+    h_mapDepth2ADCAmpl_HF->Write();
+
     h_TSmeanA_HF->Write();
     h_mapDepth1TSmeanA225_HF->Write();
     h_mapDepth2TSmeanA225_HF->Write();
     h_mapDepth1TSmeanA_HF->Write();
     h_mapDepth2TSmeanA_HF->Write();
+
     h_TSmaxA_HF->Write();
     h_mapDepth1TSmaxA225_HF->Write();
     h_mapDepth2TSmaxA225_HF->Write();
@@ -2953,9 +3440,14 @@ void VeRawAnalyzer::endJob(){
     h_mapDepth2_HF->Write();
 
     ///////////////////////
+    h_ADCAmpl_HO->Write();
+    h_mapDepth4ADCAmpl225_HO->Write();
+    h_mapDepth4ADCAmpl_HO->Write();
+
     h_TSmeanA_HO->Write();
     h_mapDepth4TSmeanA225_HO->Write();
     h_mapDepth4TSmeanA_HO->Write();
+
     h_TSmaxA_HO->Write();
     h_mapDepth4TSmaxA225_HO->Write();
     h_mapDepth4TSmaxA_HO->Write();
@@ -2970,6 +3462,14 @@ void VeRawAnalyzer::endJob(){
     h_mapDepth4_HO->Write();
 
     //////////////////////////////////////////    
+    h_ADCAmpl_HE->Write();
+    h_mapDepth1ADCAmpl225_HE->Write();
+    h_mapDepth2ADCAmpl225_HE->Write();
+    h_mapDepth3ADCAmpl225_HE->Write();
+    h_mapDepth1ADCAmpl_HE->Write();
+    h_mapDepth2ADCAmpl_HE->Write();
+    h_mapDepth3ADCAmpl_HE->Write();
+
     h_TSmeanA_HE->Write();
     h_mapDepth1TSmeanA225_HE->Write();
     h_mapDepth2TSmeanA225_HE->Write();
@@ -2977,6 +3477,7 @@ void VeRawAnalyzer::endJob(){
     h_mapDepth1TSmeanA_HE->Write();
     h_mapDepth2TSmeanA_HE->Write();
     h_mapDepth3TSmeanA_HE->Write();
+
     h_TSmaxA_HE->Write();
     h_mapDepth1TSmaxA225_HE->Write();
     h_mapDepth2TSmaxA225_HE->Write();
@@ -3069,21 +3570,73 @@ void VeRawAnalyzer::endJob(){
     h_runbadrate0_depth3_HE->Write();
     ///////////////////////
 
+    h_ADCCalib_HB->Write();
+    h_ADCCalib1_HB->Write();
+    h_mapADCCalib047_HB->Write();
+    h_mapADCCalib_HB->Write();
     h_RatioCalib_HB->Write();
     h_mapRatioCalib047_HB->Write();
     h_mapRatioCalib_HB->Write();
+    h_TSmaxCalib_HB->Write();
+    h_mapTSmaxCalib047_HB->Write();
+    h_mapTSmaxCalib_HB->Write();
+    h_TSmeanCalib_HB->Write();
+    h_mapTSmeanCalib047_HB->Write();
+    h_mapTSmeanCalib_HB->Write();
+    h_WidthCalib_HB->Write();
+    h_mapWidthCalib047_HB->Write();
+    h_mapWidthCalib_HB->Write();
     h_map_HB->Write();
+    h_ADCCalib_HE->Write();
+    h_ADCCalib1_HE->Write();
+    h_mapADCCalib047_HE->Write();
+    h_mapADCCalib_HE->Write();
     h_RatioCalib_HE->Write();
     h_mapRatioCalib047_HE->Write();
     h_mapRatioCalib_HE->Write();
+    h_TSmaxCalib_HE->Write();
+    h_mapTSmaxCalib047_HE->Write();
+    h_mapTSmaxCalib_HE->Write();
+    h_TSmeanCalib_HE->Write();
+    h_mapTSmeanCalib047_HE->Write();
+    h_mapTSmeanCalib_HE->Write();
+    h_WidthCalib_HE->Write();
+    h_mapWidthCalib047_HE->Write();
+    h_mapWidthCalib_HE->Write();
     h_map_HE->Write();
+    h_ADCCalib_HO->Write();
+    h_ADCCalib1_HO->Write();
+    h_mapADCCalib047_HO->Write();
+    h_mapADCCalib_HO->Write();
     h_RatioCalib_HO->Write();
     h_mapRatioCalib047_HO->Write();
     h_mapRatioCalib_HO->Write();
+    h_TSmaxCalib_HO->Write();
+    h_mapTSmaxCalib047_HO->Write();
+    h_mapTSmaxCalib_HO->Write();
+    h_TSmeanCalib_HO->Write();
+    h_mapTSmeanCalib047_HO->Write();
+    h_mapTSmeanCalib_HO->Write();
+    h_WidthCalib_HO->Write();
+    h_mapWidthCalib047_HO->Write();
+    h_mapWidthCalib_HO->Write();
     h_map_HO->Write();
+    h_ADCCalib_HF->Write();
+    h_ADCCalib1_HF->Write();
+    h_mapADCCalib047_HF->Write();
+    h_mapADCCalib_HF->Write();
     h_RatioCalib_HF->Write();
     h_mapRatioCalib047_HF->Write();
     h_mapRatioCalib_HF->Write();
+    h_TSmaxCalib_HF->Write();
+    h_mapTSmaxCalib047_HF->Write();
+    h_mapTSmaxCalib_HF->Write();
+    h_TSmeanCalib_HF->Write();
+    h_mapTSmeanCalib047_HF->Write();
+    h_mapTSmeanCalib_HF->Write();
+    h_WidthCalib_HF->Write();
+    h_mapWidthCalib047_HF->Write();
+    h_mapWidthCalib_HF->Write();
     h_map_HF->Write();
     ///////////////////////
   }//if
