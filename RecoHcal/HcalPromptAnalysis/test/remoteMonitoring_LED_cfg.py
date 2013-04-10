@@ -17,16 +17,18 @@ process.source = cms.Source("HcalTBSource",
 #     'file:rfiles/USC_178165.root' ## only HF digis 10K
 #     'file:rfiles/USC_178455.root' ## only HF digis 10K
 #     'file:rfiles/USC_211875.root' ## only HBHE digis 10K problems
+#     'file:rfiles/USC_211775.root' ## only HF digis 10K
+#     'file:rfiles/USC_211673.root' ## only HBHE digis 10K
 #
 ##LED:
      'file:rfiles/USC_195682.root',
-#     'file:rfiles/USC_196870.root',
-#     'file:rfiles/USC_201305.root',
-#     'file:rfiles/USC_202341.root',
-#     'file:rfiles/USC_203339.root',
-#     'file:rfiles/USC_204172.root',
-#     'file:rfiles/USC_205355.root',
-#     'file:rfiles/USC_206456.root'
+     'file:rfiles/USC_196870.root',
+     'file:rfiles/USC_201305.root',
+     'file:rfiles/USC_202341.root',
+     'file:rfiles/USC_203339.root',
+     'file:rfiles/USC_204172.root',
+     'file:rfiles/USC_205355.root',
+     'file:rfiles/USC_206456.root'
 ## short:
 #     'file:rfiles/USC_188148.root',
 #     'file:rfiles/USC_191392.root',
@@ -75,6 +77,10 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   studyRatioShapeHist = cms.untracked.bool(True),
                                   #studyRatioShapeHist = cms.untracked.bool(False),
                                   #
+                                  ##scripts: zadcamplitude.C
+                                  studyADCAmplHist = cms.untracked.bool(True),
+                                  #studyADCAmplHist = cms.untracked.bool(False),
+                                  #
                                   ##scripts: ztsmean.C
                                   studyTSmeanShapeHist = cms.untracked.bool(True),
                                   #studyTSmeanShapeHist = cms.untracked.bool(False),
@@ -83,13 +89,13 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   studyTSmaxShapeHist = cms.untracked.bool(True),
                                   #studyTSmaxShapeHist = cms.untracked.bool(False),
                                   #
+                                  ##scripts: zcalib....C
+                                  studyCalibCellsHist = cms.untracked.bool(True),
+                                  #studyCalibCellsHist = cms.untracked.bool(False),
+                                  #
                                   ##scripts: zdifampl.C
                                   studyDiffAmplHist = cms.untracked.bool(True),
                                   #studyDiffAmplHist = cms.untracked.bool(False),
-                                  #
-                                  ##scripts: zcalib.C
-                                  studyCalibCellsHist = cms.untracked.bool(True),
-                                  #studyCalibCellsHist = cms.untracked.bool(False),
                                   #
                                   ##DigiCollectionLabel = cms.untracked.InputTag("hcalDigis"),
                                   #Verbosity = cms.untracked.int32(-54),
@@ -100,6 +106,9 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   #Verbosity = cms.untracked.int32(-24),
                                   #Verbosity = cms.untracked.int32(-244),
                                   Verbosity = cms.untracked.int32(0),
+                                  #
+                                  #
+                                  #         Normal channels:
                                   #
                                   # -53 for  BAD HBHEHF channels from study on shape Ratio
                                   #Verbosity = cms.untracked.int32(-53),
@@ -141,11 +150,61 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   TSpeakHFMax = cms.double(5.5),
                                   TSpeakHOMin = cms.double(0.5),
                                   TSpeakHOMax = cms.double(5.5),
+                                  # -56 for  BAD HBHEHOHF channels from study on ADC Amplitude
+                                  #Verbosity = cms.untracked.int32(-56),
+                                  ADCAmplHBMin = cms.double(100.),
+                                  ADCAmplHEMin = cms.double(200.),
+                                  ADCAmplHFMin = cms.double(30.),
+                                  ADCAmplHOMin = cms.double(300.),
+                                  #
+                                  #             CALIBRATION channels:
+                                  #
+                                  # for  BAD HBHEHOHF CALIBRATION channels from study on ADC amplitude
+                                  # cuts for Laser runs:
+                                  #calibrADCHBMin = cms.double(15.0),
+                                  #calibrADCHEMin = cms.double(15.0),
+                                  #calibrADCHOMin = cms.double(15.0),
+                                  #calibrADCHFMin = cms.double(15.0),
+                                  # cuts for LED runs:
+                                  calibrADCHBMin = cms.double(200.),
+                                  calibrADCHEMin = cms.double(200.),
+                                  calibrADCHOMin = cms.double(200.),
+                                  calibrADCHFMin = cms.double(200.),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on shape Ratio
-                                  calibratioHBMin = cms.double(0.65),
-                                  calibratioHEMin = cms.double(0.65),
-                                  calibratioHOMin = cms.double(0.25),
-                                  calibratioHFMin = cms.double(0.25),
+                                  calibrRatioHBMin = cms.double(0.70),
+                                  calibrRatioHEMin = cms.double(0.65),
+                                  calibrRatioHOMin = cms.double(0.20),
+                                  calibrRatioHFMin = cms.double(0.25),
+                                  # for  BAD HBHEHOHF CALIBRATION channels from study on TSmax
+                                  calibrTSmaxHBMin = cms.double(0.50),
+                                  calibrTSmaxHBMax = cms.double(8.50),
+                                  calibrTSmaxHEMin = cms.double(0.50),
+                                  calibrTSmaxHEMax = cms.double(8.50),
+                                  calibrTSmaxHOMin = cms.double(0.50),
+                                  calibrTSmaxHOMax = cms.double(8.50),
+                                  calibrTSmaxHFMin = cms.double(0.50),
+                                  calibrTSmaxHFMax = cms.double(8.50),
+                                  # for  BAD HBHEHOHF CALIBRATION channels from study on TSmean
+                                  calibrTSmeanHBMin = cms.double(1.00),
+                                  calibrTSmeanHBMax = cms.double(4.30),
+                                  calibrTSmeanHEMin = cms.double(1.00),
+                                  calibrTSmeanHEMax = cms.double(4.30),
+                                  calibrTSmeanHOMin = cms.double(1.00),
+                                  calibrTSmeanHOMax = cms.double(4.30),
+                                  calibrTSmeanHFMin = cms.double(1.00),
+                                  calibrTSmeanHFMax = cms.double(5.20),
+                                  # for  BAD HBHEHOHF CALIBRATION channels from study on Width
+                                  calibrWidthHBMin = cms.double(1.00),
+                                  calibrWidthHBMax = cms.double(2.30),
+                                  calibrWidthHEMin = cms.double(1.00),
+                                  calibrWidthHEMax = cms.double(2.30),
+                                  calibrWidthHOMin = cms.double(1.00),
+                                  calibrWidthHOMax = cms.double(2.20),
+                                  calibrWidthHFMin = cms.double(0.20),
+                                  calibrWidthHFMax = cms.double(2.40),
+                                  #
+                                  # Special task of run or LS quality:
+                                  #
                                   # to see run dependence of rate of events with Nbadchannels > :
                                   nbadchannels1 = cms.int32(10),
                                   nbadchannels2 = cms.int32(30),

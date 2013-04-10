@@ -3,7 +3,7 @@
       printf("reco: gROOT Reset \n");
         gROOT->Reset();
         gROOT->SetStyle("Plain");
-				gStyle->SetOptStat(0);   //  no statistics _or_
+					gStyle->SetOptStat(0);   //  no statistics _or_
 	//	        	  gStyle->SetOptStat(11111111);
 	//gStyle->SetOptStat(1101);// mame mean and rms 
 	//	gStyle->SetOptStat(0101);// name and entries
@@ -129,7 +129,7 @@
       
       c1->cd(2);
       TH1F *aaaaaa1= (TH1F*)hfile1->Get("h_TSmeanA_HB");
-      gPad->SetLogy();
+          gPad->SetLogy();
       aaaaaa1->SetMarkerStyle(20);
       aaaaaa1->SetMarkerSize(0.8);
       aaaaaa1->GetYaxis()->SetLabelSize(0.04);
@@ -335,7 +335,7 @@
       
       c1->cd(2);
       TH1F *aaaaaa1= (TH1F*)hfile1->Get("h_TSmeanA_HE");
-      gPad->SetLogy();
+          gPad->SetLogy();
       aaaaaa1->SetMarkerStyle(20);
       aaaaaa1->SetMarkerSize(0.8);
       aaaaaa1->GetYaxis()->SetLabelSize(0.04);
