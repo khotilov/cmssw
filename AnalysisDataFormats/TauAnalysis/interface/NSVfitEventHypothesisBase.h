@@ -4,6 +4,7 @@
 #include "DataFormats/CLHEP/interface/AlgebraicObjects.h"
 #include "DataFormats/Common/interface/OwnVector.h"
 #include "DataFormats/Candidate/interface/Candidate.h" 
+#include "DataFormats/METReco/interface/MET.h" 
 
 #include "AnalysisDataFormats/TauAnalysis/interface/NSVfitResonanceHypothesisBase.h"
 
@@ -75,7 +76,13 @@ class NSVfitEventHypothesisBase
     stream << "<NSVfitEventHypothesisBase::print>:" << std::endl;
     stream << " name = " << name_ << std::endl;
     stream << " barcode = " << barcode_ << std::endl;
-    stream << " met(id:key) = " << met_.id() << ":" << met_.key() << std::endl;
+    stream << " met(id = " << met_.id() << ", key =" << met_.key() << "): Pt = " << met_->pt() << ", phi = " << met_->phi() 
+	   << " (Px = " << met_->px() << ", Py = " << met_->py() << ")" << std::endl;
+    const reco::MET* met = dynamic_cast<const reco::MET*>(met_.get());
+    if ( met ) {
+      stream << " metCov:" << std::endl;
+      met->getSignificanceMatrix().Print();
+    }
     for ( edm::OwnVector<NSVfitResonanceHypothesisBase>::const_iterator resonance = resonances_.begin();
           resonance != resonances_.end(); ++resonance ) {
       resonance->print(stream);
