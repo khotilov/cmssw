@@ -26,6 +26,8 @@
 
 using namespace reco;
 
+typedef edm::View<reco::Candidate> CandidateView;
+
 namespace
 {
   template <typename T>
@@ -77,6 +79,7 @@ PFMETProducerMVA::PFMETProducerMVA(const edm::ParameterSet& cfg)
   srcPFCandidates_ = cfg.getParameter<edm::InputTag>("srcPFCandidates");
   srcVertices_     = cfg.getParameter<edm::InputTag>("srcVertices");
   srcLeptons_      = cfg.getParameter<vInputTag>("srcLeptons");
+  minNumLeptons_   = cfg.getParameter<int>("minNumLeptons");
   srcRho_          = cfg.getParameter<edm::InputTag>("srcRho");
 
   globalThreshold_ = cfg.getParameter<double>("globalThreshold");
@@ -106,6 +109,29 @@ PFMETProducerMVA::~PFMETProducerMVA(){}
 
 void PFMETProducerMVA::produce(edm::Event& evt, const edm::EventSetup& es) 
 { 
+  // CV: check if the event is to be skipped
+  if ( minNumLeptons_ > 0 ) {
+    int numLeptons = 0;
+    for ( vInputTag::const_iterator srcLeptons_i = srcLeptons_.begin();
+	  srcLeptons_i != srcLeptons_.end(); ++srcLeptons_i ) {
+      edm::Handle<CandidateView> leptons;
+      evt.getByLabel(*srcLeptons_i, leptons);
+      numLeptons += leptons->size();
+    }
+    if ( !(numLeptons >= minNumLeptons_) ) {
+      if ( verbosity_ ) {
+	std::cout << "<PFMETProducerMVA::produce>:" << std::endl;
+	std::cout << "Run: " << evt.id().run() << ", LS: " << evt.luminosityBlock()  << ", Event: " << evt.id().event() << std::endl;
+	std::cout << " numLeptons = " << numLeptons << ", minNumLeptons = " << minNumLeptons_ << " --> skipping !!" << std::endl;
+      }
+      reco::PFMET pfMEt;
+      std::auto_ptr<reco::PFMETCollection> pfMEtCollection(new reco::PFMETCollection());
+      pfMEtCollection->push_back(pfMEt);
+      evt.put(pfMEtCollection);
+      return;
+    }
+  }
+
   // get jets (corrected and uncorrected)
   edm::Handle<reco::PFJetCollection> corrJets;
   evt.getByLabel(srcCorrJets_, corrJets);
@@ -120,7 +146,6 @@ void PFMETProducerMVA::produce(edm::Event& evt, const edm::EventSetup& es)
   edm::Handle<reco::PFCandidateCollection> pfCandidates;
   evt.getByLabel(srcPFCandidates_, pfCandidates);
 
-  typedef edm::View<reco::Candidate> CandidateView;
   edm::Handle<CandidateView> pfCandidates_view;
   evt.getByLabel(srcPFCandidates_, pfCandidates_view);
 

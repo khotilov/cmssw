@@ -8,9 +8,9 @@
  * \authors Phil Harris, CERN
  *          Christian Veelken, LLR
  *
- * \version $Revision: 1.3 $
+ * \version $Revision: 1.4 $
  *
- * $Id: PFMETProducerMVA.h,v 1.3 2012/12/23 11:10:25 pharris Exp $
+ * $Id: PFMETProducerMVA.h,v 1.4 2013/04/13 08:42:29 veelken Exp $
  *
  */
 
@@ -71,11 +71,12 @@ namespace reco
     edm::InputTag srcVertices_;
     typedef std::vector<edm::InputTag> vInputTag;
     vInputTag srcLeptons_;
+    int minNumLeptons_; // CV: option to skip MVA MET computation in case there are less than specified number of leptons in the event
     edm::InputTag srcRho_;
 
-    std::string  correctorLabel_;
-    bool         isOld42_ ;
-    bool         useType1_;
+    std::string correctorLabel_;
+    bool isOld42_ ;
+    bool useType1_;
     
     double globalThreshold_;
 
