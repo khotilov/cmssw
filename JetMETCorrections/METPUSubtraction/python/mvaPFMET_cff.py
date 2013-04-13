@@ -2,14 +2,17 @@
 import FWCore.ParameterSet.Config as cms
 
 #from RecoMET.METProducers.PFMET_cfi import pfMet
-from JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff  import *
-from JetMETCorrections.Configuration.DefaultJEC_cff                     import *
-##from JetMETCorrections.METPUSubtraction.mvaPFMET_leptons_cfi            import *
+from JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff import *
+from JetMETCorrections.Configuration.DefaultJEC_cff import *
+##from JetMETCorrections.METPUSubtraction.mvaPFMET_leptons_cfi import *
 ## CV: importing mvaPFMET_leptons_cfi breaks produceAndDiscriminateHPSPFTaus sequence
 ##    (hpsPFTauDiscriminationByDecayModeFinding module gets overwritten by None,
 ##     in case RecoTauTag/Configuration/python/RecoPFTauTag_cff.py is loaded by
 ##     by top-level cfg.py file before JetMETCorrections/METPUSubtraction/python/mvaPFMET_cff.py gets loaded)
-from RecoJets.JetProducers.PileupJetIDParams_cfi                        import JetIdParams
+##from RecoJets.JetProducers.PileupJetIDCutParams_cfi import full_53x_wp
+from RecoJets.JetProducers.PileupJetIDParams_cfi import JetIdParams
+
+from JetMETCorrections.METPUSubtraction.mvaPFMET_db_cfi import mvaPFMEtGBRForestsFromDB
 
 calibratedAK5PFJetsForPFMEtMVA = cms.EDProducer('PFJetCorrectionProducer',
     src = cms.InputTag('ak5PFJets'),
@@ -26,12 +29,21 @@ pfMEtMVA = cms.EDProducer("PFMETProducerMVA",
     srcRho = cms.InputTag('kt6PFJets','rho'),
     globalThreshold = cms.double(-1.),#pfMet.globalThreshold,
     minCorrJetPt = cms.double(-1.),
-    inputFileNames = cms.PSet(
-        U     = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbrmet_53_Dec2012.root'),
-        DPhi  = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbrmetphi_53_Dec2012.root'),
-        CovU1 = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbru1cov_53_Dec2012.root'),
-        CovU2 = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbru2cov_53_Dec2012.root')
+    ##inputFileNames = cms.PSet(
+    ##    U     = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbrmet_53_Dec2012.root'),
+    ##    DPhi  = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbrmetphi_53_Dec2012.root'),
+    ##    CovU1 = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbru1cov_53_Dec2012.root'),
+    ##    CovU2 = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbru2cov_53_Dec2012.root')
+    ##),
+    ##loadMVAfromDB = cms.bool(False),                             
+    inputRecords = cms.PSet(
+        U     = cms.string('mvaPFMET_53_Dec2012_U'),
+        DPhi  = cms.string('mvaPFMET_53_Dec2012_DPhi'),
+        CovU1 = cms.string('mvaPFMET_53_Dec2012_CovU1'),
+        CovU2 = cms.string('mvaPFMET_53_Dec2012_CovU2')
     ),
+    loadMVAfromDB = cms.bool(True),
+    is42 = cms.bool(False), # CV: set this flag to true if you are running mvaPFMET in CMSSW_4_2_x
     corrector = cms.string("ak5PFL1Fastjet"),
     useType1  = cms.bool(False), 
     useOld42  = cms.bool(False),
@@ -60,7 +72,8 @@ pfMEtMVA = cms.EDProducer("PFMETProducerMVA",
         "frac05"
     ),
     tmvaSpectators = cms.vstring(),
-    JetIdParams = JetIdParams,
+    ##JetIdParams = full_53x_wp,
+    JetIdParams = JetIdParams,                      
     verbosity = cms.int32(0)
 )
 

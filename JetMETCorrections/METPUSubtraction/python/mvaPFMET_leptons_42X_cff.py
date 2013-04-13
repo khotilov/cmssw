@@ -32,6 +32,8 @@ pfMEtMVA = cms.EDProducer("PFMETProducerMVA",
         CovU1 = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbru1cov_42.root'),
         CovU2 = cms.FileInPath('JetMETCorrections/METPUSubtraction/data/gbru2cov_42.root')
     ),
+    loadMVAfromDB = cms.bool(False),
+    is42 = cms.bool(True), # CV: set this flag to true if you are running mvaPFMET in CMSSW_4_2_x                      
     corrector = cms.string("ak5PFL1Fastjet"),
     useType1  = cms.bool(False),
     dZcut = cms.double(0.1),

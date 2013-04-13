@@ -8,12 +8,13 @@
  * \authors Phil Harris, CERN
  *          Christian Veelken, LLR
  *
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  *
- * $Id: PFMETAlgorithmMVA.h,v 1.2 2012/12/23 11:10:25 pharris Exp $
+ * $Id: PFMETAlgorithmMVA.h,v 1.3 2013/01/08 19:04:13 pharris Exp $
  *
  */
 
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "CondFormats/EgammaObjects/interface/GBRForest.h"
@@ -36,7 +37,9 @@ class PFMETAlgorithmMVA
   PFMETAlgorithmMVA(const edm::ParameterSet& cfg);
   ~PFMETAlgorithmMVA();
 
-  void setHasPhotons(bool iHasPhotons) { hasPhotons_=iHasPhotons;}
+  void initialize(const edm::EventSetup&);
+
+  void setHasPhotons(bool hasPhotons) { hasPhotons_ = hasPhotons; }
 
   void setInput(const std::vector<mvaMEtUtilities::leptonInfo>&,
 		const std::vector<mvaMEtUtilities::JetInfo>&,
@@ -128,9 +131,13 @@ class PFMETAlgorithmMVA
   reco::Candidate::LorentzVector mvaMEt_;
   TMatrixD mvaMEtCov_;
 
-  GBRForest* mvaReaderU_;
-  GBRForest* mvaReaderDPhi_;
-  GBRForest* mvaReaderCovU1_;
-  GBRForest* mvaReaderCovU2_;
+  const GBRForest* mvaReaderU_;
+  const GBRForest* mvaReaderDPhi_;
+  const GBRForest* mvaReaderCovU1_;
+  const GBRForest* mvaReaderCovU2_;
+
+  bool loadMVAfromDB_;
+
+  edm::ParameterSet cfg_;
 };
 #endif

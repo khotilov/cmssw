@@ -8,16 +8,18 @@
  * \authors Phil Harris, CERN
  *          Christian Veelken, LLR
  *
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  *
- * $Id: PFMETProducerMVA.h,v 1.2 2012/10/01 14:05:26 pharris Exp $
+ * $Id: PFMETProducerMVA.h,v 1.3 2012/12/23 11:10:25 pharris Exp $
  *
  */
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -82,6 +84,7 @@ namespace reco
     METAlgo metAlgo_;
     PFSpecificAlgo pfMEtSpecificAlgo_;
     PFMETAlgorithmMVA mvaMEtAlgo_;
+    bool mvaMEtAlgo_isInitialized_;
     PileupJetIdAlgo mvaJetIdAlgo_;
 
     int verbosity_;

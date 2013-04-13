@@ -68,7 +68,9 @@ namespace
 }
 
 PFMETProducerMVA::PFMETProducerMVA(const edm::ParameterSet& cfg) 
-  : mvaMEtAlgo_(cfg),mvaJetIdAlgo_(cfg)
+  : mvaMEtAlgo_(cfg),
+    mvaMEtAlgo_isInitialized_(false),
+    mvaJetIdAlgo_(cfg)   
 {
   srcCorrJets_     = cfg.getParameter<edm::InputTag>("srcCorrJets");
   srcUncorrJets_   = cfg.getParameter<edm::InputTag>("srcUncorrJets");
@@ -112,7 +114,7 @@ void PFMETProducerMVA::produce(edm::Event& evt, const edm::EventSetup& es)
   evt.getByLabel(srcUncorrJets_, uncorrJets);
 
   const JetCorrector* corrector = 0;
-  if(useType1_) corrector = JetCorrector::getJetCorrector (correctorLabel_, es);
+  if( useType1_ ) corrector = JetCorrector::getJetCorrector(correctorLabel_, es);
 
   // get PFCandidates
   edm::Handle<reco::PFCandidateCollection> pfCandidates;
@@ -178,6 +180,14 @@ void PFMETProducerMVA::produce(edm::Event& evt, const edm::EventSetup& es)
   //edm::Handle<double> rho;
   //evt.getByLabel(srcRho_, rho);
 
+  // initialize MVA MET algorithm
+  // (this will load the BDTs, stored as GBRForrest objects;
+  //  either in input ROOT files or in SQL-lite files/the Conditions Database) 
+  if ( !mvaMEtAlgo_isInitialized_ ) {
+    mvaMEtAlgo_.initialize(es);
+    mvaMEtAlgo_isInitialized_ = true;
+  }
+
   // reconstruct "standard" particle-flow missing Et
   CommonMETData pfMEt_data;
   metAlgo_.run(pfCandidates_view, &pfMEt_data, globalThreshold_);
@@ -197,9 +207,10 @@ void PFMETProducerMVA::produce(edm::Event& evt, const edm::EventSetup& es)
   pfMEt.setSignificanceMatrix(mvaMEtAlgo_.getMEtCov());
   if ( verbosity_ ) {
     std::cout << "<PFMETProducerMVA::produce>:" << std::endl;
+    std::cout << "Run: " << evt.id().run() << ", LS: " << evt.luminosityBlock()  << ", Event: " << evt.id().event() << std::endl;
     std::cout << " PFMET: Pt = " << pfMEtP4_original.pt() << ", phi = " << pfMEtP4_original.phi() << " "
 	      << "(Px = " << pfMEtP4_original.px() << ", Py = " << pfMEtP4_original.py() << ")" << std::endl;
-    std::cout << " MVA MET: Pt = " << pfMEt.pt() << " phi = " << pfMEt.phi() << " " << evt.luminosityBlock() << " " << evt.id().event() << " (Px = " << pfMEt.px() << ", Py = " << pfMEt.py() << ")" << std::endl;
+    std::cout << " MVA MET: Pt = " << pfMEt.pt() << " phi = " << pfMEt.phi() << " (Px = " << pfMEt.px() << ", Py = " << pfMEt.py() << ")" << std::endl;
     std::cout << " Cov:" << std::endl;
     mvaMEtAlgo_.getMEtCov().Print();
     mvaMEtAlgo_.print(std::cout);
