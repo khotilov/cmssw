@@ -44,6 +44,8 @@ NoPileUpPFMEtProducer::NoPileUpPFMEtProducer(const edm::ParameterSet& cfg)
   sfType0Correction_ = cfg.getParameter<double>("sfType0Correction");
 
   pfMEtSignInterface_ = new PFMEtSignInterfaceBase(cfg.getParameter<edm::ParameterSet>("resolution"));
+  sfMEtCovMin_ = cfg.getParameter<double>("sfMEtCovMin");
+  sfMEtCovMax_ = cfg.getParameter<double>("sfMEtCovMax");
 
   saveInputs_ = ( cfg.exists("saveInputs") ) ?
     cfg.getParameter<bool>("saveInputs") : false;
@@ -94,16 +96,20 @@ void finalizeCommonMETData(CommonMETData& metData)
   metData.phi = TMath::ATan2(metData.mey, metData.mex);
 }
 
-void scaleAndAddPFMEtSignObjects(std::vector<metsig::SigInputObj>& metSignObjects_scaled, const std::vector<metsig::SigInputObj>& metSignObjects, double sf)
+void scaleAndAddPFMEtSignObjects(std::vector<metsig::SigInputObj>& metSignObjects_scaled, const std::vector<metsig::SigInputObj>& metSignObjects, 
+				 double sf, double sfMin, double sfMax)
 {
+  double sf_value = sf;
+  if ( sf_value > sfMax ) sf = sfMax;
+  if ( sf_value < sfMin ) sf = sfMin;
   for ( std::vector<metsig::SigInputObj>::const_iterator metSignObject = metSignObjects.begin();
 	metSignObject != metSignObjects.end(); ++metSignObject ) {
     metsig::SigInputObj metSignObject_scaled;
     metSignObject_scaled.set(
       metSignObject->get_type(), 
-      sf*metSignObject->get_energy(), 
+      sf_value*metSignObject->get_energy(), 
       metSignObject->get_phi(),
-      sf*metSignObject->get_sigma_e(), 
+      sf_value*metSignObject->get_sigma_e(), 
       metSignObject->get_sigma_tan());
     metSignObjects_scaled.push_back(metSignObject_scaled);
   }
@@ -379,13 +385,13 @@ void NoPileUpPFMEtProducer::produce(edm::Event& evt, const edm::EventSetup& es)
   //noPileUpMEt.setSignificanceMatrix(pfMEtCov);
 
   std::vector<metsig::SigInputObj> metSignObjects_scaled;
-  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsLeptons, 1.0);
-  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsNoPUjetOffsetEnCorr, sfNoPUjetOffsetEnCorr_);
-  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsNoPUjets, sfNoPUjets_);
-  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsPUjets, noPileUpScaleFactor*sfPUjets_);
-  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsNoPUunclChargedCands, sfNoPUunclChargedCands_);
-  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsPUunclChargedCands, noPileUpScaleFactor*sfPUunclChargedCands_);
-  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsUnclNeutralCands, noPileUpScaleFactor*sfUnclNeutralCands_);
+  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsLeptons, 1.0, sfMEtCovMin_, sfMEtCovMax_);
+  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsNoPUjetOffsetEnCorr, sfNoPUjetOffsetEnCorr_, sfMEtCovMin_, sfMEtCovMax_);
+  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsNoPUjets, sfNoPUjets_, sfMEtCovMin_, sfMEtCovMax_);
+  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsPUjets, noPileUpScaleFactor*sfPUjets_, sfMEtCovMin_, sfMEtCovMax_);
+  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsNoPUunclChargedCands, sfNoPUunclChargedCands_, sfMEtCovMin_, sfMEtCovMax_);
+  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsPUunclChargedCands, noPileUpScaleFactor*sfPUunclChargedCands_, sfMEtCovMin_, sfMEtCovMax_);
+  scaleAndAddPFMEtSignObjects(metSignObjects_scaled, metSignObjectsUnclNeutralCands, noPileUpScaleFactor*sfUnclNeutralCands_, sfMEtCovMin_, sfMEtCovMax_);
   TMatrixD pfMEtCov_recomputed = computePFMEtSignificance(metSignObjects_scaled);
   noPileUpMEt.setSignificanceMatrix(pfMEtCov_recomputed);
 

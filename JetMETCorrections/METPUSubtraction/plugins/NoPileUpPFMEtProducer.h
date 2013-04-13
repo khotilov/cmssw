@@ -8,9 +8,9 @@
  *
  * \authors Christian Veelken, LLR
  *
- * \version $Revision: 1.2 $
+ * \version $Revision: 1.3 $
  *
- * $Id: NoPileUpPFMEtProducer.h,v 1.2 2013/02/22 15:47:16 veelken Exp $
+ * $Id: NoPileUpPFMEtProducer.h,v 1.3 2013/02/25 15:08:39 veelken Exp $
  *
  */
 
@@ -55,6 +55,8 @@ class NoPileUpPFMEtProducer : public edm::EDProducer
   double sfType0Correction_;
   
   PFMEtSignInterfaceBase* pfMEtSignInterface_;
+  double sfMEtCovMin_;
+  double sfMEtCovMax_;
 
   bool saveInputs_;
 

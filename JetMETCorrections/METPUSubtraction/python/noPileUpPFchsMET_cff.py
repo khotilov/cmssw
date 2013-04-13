@@ -82,6 +82,8 @@ noPileUpPFchsMEt = cms.EDProducer("NoPileUpPFMEtProducer",
     sfUnclNeutralCands = cms.double(0.6),
     sfType0Correction = cms.double(1.0),
     resolution = met_config.METSignificance_params,
+    sfMEtCovMin = cms.double(0.6),
+    sfMEtCovMax = cms.double(1.0),                               
     saveInputs = cms.bool(True),
     verbosity = cms.int32(0)                               
 )

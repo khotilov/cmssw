@@ -11,7 +11,14 @@ ak5PFJetSequenceForNoPileUpPFMEt = cms.Sequence(calibratedAK5PFJetsForNoPileUpPF
 noPileUpPFMEtSequence += ak5PFJetSequenceForNoPileUpPFMEt
 
 from RecoJets.JetProducers.PileupJetID_cfi import pileupJetIdProducer
+##from RecoJets.JetProducers.PileupJetIDParams_cfi import full_53x
+##from RecoJets.JetProducers.PileupJetIDCutParams_cfi import full_53x_wp
 puJetIdForNoPileUpPFMEt = pileupJetIdProducer.clone(
+    ##algos = cms.VPSet(
+    ##    full_53x.clone(
+    ##        JetIdParams = full_53x_wp
+    ##    )
+    ##),
     produceJetIds = cms.bool(True),
     runMvas = cms.bool(True),
     jets = cms.InputTag("calibratedAK5PFJetsForNoPileUpPFMEt"),
@@ -70,6 +77,8 @@ noPileUpPFMEt = cms.EDProducer("NoPileUpPFMEtProducer",
     sfUnclNeutralCands = cms.double(0.6),
     sfType0Correction = cms.double(1.0),
     resolution = met_config.METSignificance_params,
+    sfMEtCovMin = cms.double(0.6),
+    sfMEtCovMax = cms.double(1.0),                           
     saveInputs = cms.bool(True),
     verbosity = cms.int32(0)                               
 )
