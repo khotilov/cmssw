@@ -135,6 +135,7 @@ private:
 
   /////////////////////////////////////////////
   bool recordNtuples_;
+  int maxNeventsInNtuple_;
   bool recordHistoes_;
   bool studyRunDependenceHist_;
   bool studyCapIDErrorsHist_;
@@ -155,6 +156,8 @@ private:
   double ratioHFMax_;
   double ratioHOMin_;
   double ratioHOMax_;
+
+  int flagtodefinebadchannel_;
   int nbadchannels1_;
   int nbadchannels2_;
   int nbadchannels3_;
@@ -514,6 +517,10 @@ private:
   TH2F* h_FullSignal3D0_HF;
   /////////////////////////////////////////////
 
+  TH2F* h_mapCapCalib047_HB;
+  TH2F* h_mapCapCalib047_HE;
+  TH2F* h_mapCapCalib047_HO;
+  TH2F* h_mapCapCalib047_HF;
 
   TH1F* h_ADCCalib_HB;
   TH1F* h_ADCCalib1_HB;
@@ -608,6 +615,7 @@ private:
   int myCalEta[5][40];
   int myCalPhi[5][40];
   
+  int calibcapiderror[4][82][72];
   float calibt[4][82][72];
   double caliba[4][82][72];
   double calibw[4][82][72];
@@ -659,6 +667,8 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   MAPcreation   =  iConfig.getUntrackedParameter<int>("MapCreation");
   //
   recordNtuples_=iConfig.getUntrackedParameter<bool>("recordNtuples");
+  maxNeventsInNtuple_ = iConfig.getParameter<int>("maxNeventsInNtuple");
+  //
   recordHistoes_=iConfig.getUntrackedParameter<bool>("recordHistoes");
   studyRunDependenceHist_=iConfig.getUntrackedParameter<bool>("studyRunDependenceHist"); 
   studyCapIDErrorsHist_=iConfig.getUntrackedParameter<bool>("studyCapIDErrorsHist"); 
@@ -679,6 +689,7 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   ratioHOMin_      = iConfig.getParameter<double>("ratioHOMin");//
   ratioHOMax_      = iConfig.getParameter<double>("ratioHOMax");//
   //
+  flagtodefinebadchannel_ = iConfig.getParameter<int>("flagtodefinebadchannel");//
   nbadchannels1_      = iConfig.getParameter<int>("nbadchannels1");//
   nbadchannels2_      = iConfig.getParameter<int>("nbadchannels2");//
   nbadchannels3_      = iConfig.getParameter<int>("nbadchannels3");//
@@ -757,7 +768,8 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   TSmeanHOMax_      = iConfig.getParameter<double>("TSmeanHOMax");//
   
   std::cout<<" Look on parameters you booked:" << std::endl;   
-  std::cout<<" recordNtuples_ = " <<recordNtuples_ << std::endl;   
+  std::cout<<" recordNtuples_ = " <<recordNtuples_ << std::endl;  
+  std::cout<<" maxNeventsInNtuple_ = " <<maxNeventsInNtuple_ << std::endl;  
   std::cout<<" recordHistoes_ = " <<recordHistoes_ << std::endl; 
   std::cout<<" studyRunDependenceHist_ = " <<studyRunDependenceHist_ << std::endl; 
   std::cout<<" studyCapIDErrorsHist_ = " <<studyCapIDErrorsHist_ << std::endl; 
@@ -777,6 +789,8 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   std::cout<<" ratioHFMax_ = " <<ratioHFMax_ << std::endl;   
   std::cout<<" ratioHOMin_ = " <<ratioHOMin_ << std::endl;   
   std::cout<<" ratioHOMax_ = " <<ratioHOMax_ << std::endl;   
+
+  std::cout<<" flagtodefinebadchannel_ = " <<flagtodefinebadchannel_ << std::endl;   
   std::cout<<" nbadchannels1_ = " <<nbadchannels1_ << std::endl;   
   std::cout<<" nbadchannels2_ = " <<nbadchannels2_ << std::endl;   
   std::cout<<" nbadchannels3_ = " <<nbadchannels3_ << std::endl;   
@@ -951,6 +965,7 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	if(studyCalibCellsHist_) {
 	  signal[k1][k2][k3] = 0.;
 	  calibt[k1][k2][k3] = 0.;
+	  calibcapiderror[k1][k2][k3] = 0;
 	  caliba[k1][k2][k3] = 0.;
 	  calibw[k1][k2][k3] = 0.;
 	  calib0[k1][k2][k3] = 0.;
@@ -1041,92 +1056,23 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     unsigned int N =  hbhe->size();
     if (verbosity == -22) std::cout << " HBHEDigiCollection size : " << N << std::endl;
 
+    int qwert1= 0; int qwert2= 0;int qwert3= 0;int qwert4= 0;int qwert5= 0;
     for(HBHEDigiCollection::const_iterator digi=hbhe->begin();digi!=hbhe->end();digi++)
       {
 	eta=digi->id().ieta(); phi=digi->id().iphi(); depth=digi->id().depth(); nTS=digi->size();      
 	
 	/////////////////////////////////////// counters of event*digis
-	nnnnnn++;    
-	if(digi->id().subdet()==HcalBarrel && depth == 1) nnnnnn1++;    
-	if(digi->id().subdet()==HcalBarrel && depth == 2) nnnnnn2++;    
-	if(digi->id().subdet()==HcalEndcap && depth == 1) nnnnnn3++;    
-	if(digi->id().subdet()==HcalEndcap && depth == 2) nnnnnn4++;    
-	if(digi->id().subdet()==HcalEndcap && depth == 3) nnnnnn5++;    
-	
+	nnnnnn++;  
+	//////////////////////////////////  counters of event for subdet & depth
+	if(digi->id().subdet()==HcalBarrel && depth == 1 && qwert1==0 ){nnnnnn1++;qwert1=1;}
+	if(digi->id().subdet()==HcalBarrel && depth == 2 && qwert2==0 ){nnnnnn2++;qwert2=1;}    
+	if(digi->id().subdet()==HcalEndcap && depth == 1 && qwert3==0 ){nnnnnn3++;qwert3=1;}    
+	if(digi->id().subdet()==HcalEndcap && depth == 2 && qwert4==0 ){nnnnnn4++;qwert4=1;}    
+	if(digi->id().subdet()==HcalEndcap && depth == 3 && qwert5==0 ){nnnnnn5++;qwert5=1;}    
 	////////////////////////////////////////////////////////////  for zerrors.C script:
 	if(recordHistoes_ && studyCapIDErrorsHist_) fillDigiErrors(digi); 
 	//////////////////////////////////////  for ztsmaxa.C,zratio34.C,zrms.C & zdifampl.C scripts:
 	if(recordHistoes_) fillDigiAmplitude(digi); 
-	///////////////////////////////////////////////  for zRunRatio34.C & zRunNbadchan.C scripts:
-	if(recordHistoes_ && studyRunDependenceHist_) {
-	  //////////// k0(sub): =0 HB; =1 HE; =2 HO; =2 HF;
-	  //////////// k1(depth+1): = 1 - 4 ;
-	  for(int k0 = 0; k0<4; k0++) {
-	    for(int k1 = 0; k1<4; k1++) {
-	      //////////
-	      int nbadchannels = 0;	
-	      for(int k2 = 0; k2<82; k2++) {
-		for(int k3 = 0; k3<72; k3++) {
-		  if(badchannels[k0][k1][k2][k3] !=0) ++nbadchannels;
-		}//k3
-	      }//k2
-	      //////////
-	      //HB
-	      if(k0 == 0) {
-		if(k1 == 0) { 
-		  h_nbadchannels_depth1_HB->Fill(double(nbadchannels) );
-		  h_runnbadchannels_depth1_HB->Fill( double(runcounter) ,double(nbadchannels) );
-		  if(nbadchannels != 0 ) h_runbadrate_depth1_HB->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels1_) h_runbadrate1_depth1_HB->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels2_) h_runbadrate2_depth1_HB->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels3_) h_runbadrate3_depth1_HB->Fill(double(runcounter),1.);
-		  h_runbadrate0_depth1_HB->Fill( double(runcounter),1.);
-		}
-		if(k1 == 1) { 
-		  h_nbadchannels_depth2_HB->Fill( double(nbadchannels) );
-		  h_runnbadchannels_depth2_HB->Fill( double(runcounter) , double(nbadchannels) );
-		  if(nbadchannels != 0 ) h_runbadrate_depth2_HB->Fill( double(runcounter) , 1.);
-		  if(nbadchannels > nbadchannels1_) h_runbadrate1_depth2_HB->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels2_) h_runbadrate2_depth2_HB->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels3_) h_runbadrate3_depth2_HB->Fill(double(runcounter),1.);
-		  h_runbadrate0_depth2_HB->Fill( double(runcounter) , 1. );
-		}
-	      }
-	      //HE
-	      if(k0 == 1) {
-		if(k1 == 0) { 
-		  h_nbadchannels_depth1_HE->Fill( double(nbadchannels) );
-		  h_runnbadchannels_depth1_HE->Fill( double(runcounter) , double(nbadchannels) );
-		  if(nbadchannels != 0 ) h_runbadrate_depth1_HE->Fill( double(runcounter) , 1.);
-		  if(nbadchannels > nbadchannels1_) h_runbadrate1_depth1_HE->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels2_) h_runbadrate2_depth1_HE->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels3_) h_runbadrate3_depth1_HE->Fill(double(runcounter),1.);
-		  h_runbadrate0_depth1_HE->Fill( double(runcounter) , 1. );
-		}
-		if(k1 == 1) { 
-		  h_nbadchannels_depth2_HE->Fill( double(nbadchannels) );
-		  h_runnbadchannels_depth2_HE->Fill( double(runcounter) , double(nbadchannels) );
-		  if(nbadchannels != 0 ) h_runbadrate_depth2_HE->Fill( double(runcounter) , 1.);
-		  if(nbadchannels > nbadchannels1_) h_runbadrate1_depth2_HE->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels2_) h_runbadrate2_depth2_HE->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels3_) h_runbadrate3_depth2_HE->Fill(double(runcounter),1.);
-		  h_runbadrate0_depth2_HE->Fill( double(runcounter) , 1. );
-		}
-		if(k1 == 2) { 
-		  h_nbadchannels_depth3_HE->Fill( double(nbadchannels) );
-		  h_runnbadchannels_depth3_HE->Fill( double(runcounter) , double(nbadchannels) );
-		  if(nbadchannels != 0 ) h_runbadrate_depth3_HE->Fill( double(runcounter) , 1.);
-		  if(nbadchannels > nbadchannels1_) h_runbadrate1_depth3_HE->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels2_) h_runbadrate2_depth3_HE->Fill(double(runcounter),1.);
-		  if(nbadchannels > nbadchannels3_) h_runbadrate3_depth3_HE->Fill(double(runcounter),1.);
-		  h_runbadrate0_depth3_HE->Fill( double(runcounter) , 1. );
-		}
-	      }////
-	      //////////
-	    }//k1
-	  }//k0
-	  ////////////
-	}//if(recordHistoes_&& studyRunDependenceHist_) 
 	  
 	if(recordHistoes_ && studyCalibCellsHist_) {
 	  int iphi  = phi-1;
@@ -1155,7 +1101,7 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	  ////////////////////////////////////////////////////////////////
 	
 	////////////////////////////////////////////////////////////////  for Olga's script:
-	if(recordNtuples_) {
+	if(recordNtuples_ && nevent < maxNeventsInNtuple_) {
 	  
 	  if(digi->id().subdet()==HcalBarrel) 
 	    {                 
@@ -1200,6 +1146,7 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     
   }//hbhe.isValid
   
+  
   ///////////////////////////////////////////////////   HODigiCollection
   edm::Handle<HODigiCollection> ho; 
   iEvent.getByType(ho);
@@ -1242,6 +1189,86 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     }//for HODigiCollection
   }//ho.isValid(
   
+  ///////////////////////////////////////////////  for zRunRatio34.C & zRunNbadchan.C scripts:
+  if(recordHistoes_ && studyRunDependenceHist_) {
+    //////////// k0(sub): =0 HB; =1 HE; =2 HO; =2 HF;
+    //////////// k1(depth-1): = 0 - 3 or depth: = 1 - 4;
+    // 1st version include only HBdepth1,2 and HEdepth1,2,3, therefore:
+    for(int k0 = 0; k0<2; k0++) {
+      for(int k1 = 0; k1<3; k1++) {
+	// for(int k0 = 0; k0<4; k0++) {
+	// for(int k1 = 0; k1<4; k1++) {
+	if(k0 ==0 && k1==2) break;
+	
+	//////////
+	int nbadchannels = 0;	
+	for(int k2 = 0; k2<82; k2++) {
+	  for(int k3 = 0; k3<72; k3++) {
+	    if(badchannels[k0][k1][k2][k3] !=0) ++nbadchannels;
+	  }//k3
+	}//k2
+	if (verbosity == -12) {
+	  std::cout << " ********   k0 = " << k0 << "  k1 = " << k1 << std::endl;
+	  std::cout << " nbadchannels = " << nbadchannels << std::endl;
+	}
+	//////////
+	//HB
+	if(k0 == 0) {
+	  if(k1 == 0) { 
+	    h_nbadchannels_depth1_HB->Fill(float(nbadchannels) );
+	    h_runnbadchannels_depth1_HB->Fill( float(runcounter) ,float(nbadchannels) );
+	    if(nbadchannels != 0 ) h_runbadrate_depth1_HB->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels1_) h_runbadrate1_depth1_HB->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels2_) h_runbadrate2_depth1_HB->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels3_) h_runbadrate3_depth1_HB->Fill(float(runcounter),1.);
+	    h_runbadrate0_depth1_HB->Fill( float(runcounter),1.);
+	  }
+	  if(k1 == 1) { 
+	    h_nbadchannels_depth2_HB->Fill( float(nbadchannels) );
+	    h_runnbadchannels_depth2_HB->Fill( float(runcounter) , float(nbadchannels) );
+	    if(nbadchannels != 0 ) h_runbadrate_depth2_HB->Fill( float(runcounter) , 1.);
+	    if(nbadchannels > nbadchannels1_) h_runbadrate1_depth2_HB->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels2_) h_runbadrate2_depth2_HB->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels3_) h_runbadrate3_depth2_HB->Fill(float(runcounter),1.);
+	    h_runbadrate0_depth2_HB->Fill( float(runcounter) , 1. );
+	  }
+	}////if(k0 == 0)
+	//HE
+	if(k0 == 1) {
+	  if(k1 == 0) { 
+	    h_nbadchannels_depth1_HE->Fill( float(nbadchannels) );
+	    h_runnbadchannels_depth1_HE->Fill( float(runcounter) , float(nbadchannels) );
+	    if(nbadchannels != 0 ) h_runbadrate_depth1_HE->Fill( float(runcounter) , 1.);
+	    if(nbadchannels > nbadchannels1_) h_runbadrate1_depth1_HE->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels2_) h_runbadrate2_depth1_HE->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels3_) h_runbadrate3_depth1_HE->Fill(float(runcounter),1.);
+	    h_runbadrate0_depth1_HE->Fill( float(runcounter) , 1. );
+	  }
+	  if(k1 == 1) { 
+	    h_nbadchannels_depth2_HE->Fill( float(nbadchannels) );
+	    h_runnbadchannels_depth2_HE->Fill( float(runcounter) , float(nbadchannels) );
+	    if(nbadchannels != 0 ) h_runbadrate_depth2_HE->Fill( float(runcounter) , 1.);
+	    if(nbadchannels > nbadchannels1_) h_runbadrate1_depth2_HE->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels2_) h_runbadrate2_depth2_HE->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels3_) h_runbadrate3_depth2_HE->Fill(float(runcounter),1.);
+	    h_runbadrate0_depth2_HE->Fill( float(runcounter) , 1. );
+	  }
+	  if(k1 == 2) { 
+	    h_nbadchannels_depth3_HE->Fill( float(nbadchannels) );
+	    h_runnbadchannels_depth3_HE->Fill( float(runcounter) , float(nbadchannels) );
+	    if(nbadchannels != 0 ) h_runbadrate_depth3_HE->Fill( float(runcounter) , 1.);
+	    if(nbadchannels > nbadchannels1_) h_runbadrate1_depth3_HE->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels2_) h_runbadrate2_depth3_HE->Fill(float(runcounter),1.);
+	    if(nbadchannels > nbadchannels3_) h_runbadrate3_depth3_HE->Fill(float(runcounter),1.);
+	    h_runbadrate0_depth3_HE->Fill( float(runcounter) , 1. );
+	  }
+	}////if(k0 == 1)
+	
+	//////////
+      }//k1
+    }//k0
+    ////////////
+  }//if(recordHistoes_&& studyRunDependenceHist_) 
   
   /////////////////////////////////////////////////// HcalCalibDigiCollection
   for(int k1 = 0; k1<40; k1++) {
@@ -1265,6 +1292,8 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       
     } // k2
   } // k1 
+
+
   edm::Handle<HcalCalibDigiCollection> calib;
   iEvent.getByType(calib);
   
@@ -1277,6 +1306,7 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       int cal_phi=digi->id().iphi();
       int cal_eta=digi->id().ieta();
       int cal_cbox=digi->id().cboxChannel();
+
       //      int cal_depth=digi->id().depth();//class HcalCalibDetId has no member named 'depth'
       /////////////////////////////////////////////     
       if(recordHistoes_ && studyCalibCellsHist_) {
@@ -1338,12 +1368,35 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		<< " TS4= " << adc2fC[digi->sample(4).adc()&0xff] 
 		<< " TS5= " << adc2fC[digi->sample(5).adc()&0xff] << endl;
 	  }
+
+	  bool anycapid   =  true;
+	  bool anyer      =  false;
+	  bool anydv      =  true;
+	  int error1=0,error2=0,error3=0; 
+	  int lastcapid=0, capid=0;
+	  for  (int ii=0;ii<(*digi).size();ii++) {
+	    capid = (*digi)[ii].capid(); // capId (0-3, sequential)
+	    bool er    = (*digi)[ii].er();   // error
+	    bool dv    = (*digi)[ii].dv();  // valid data
+	    if(ii!=0 && ((lastcapid+1)%4)!=capid) anycapid =  false;    
+	    lastcapid=capid;  
+	    if(er) anyer =  true;    
+	    if(!dv) anydv =  false;    
+	  }
+	  if( !anycapid ) error1 = 1; 
+	  if( anyer )     error2 = 1; 
+	  if( !anydv )    error3 = 1; 
+	  if(error1 !=0 || error2 !=0 || error3 !=0 ) calibcapiderror[cal_det-1][ieta+41][iphi] = 100;
+	  if(verbosity == -233 &&cal_det==1 && calibcapiderror[cal_det-1][ieta+41][iphi] ==100) {
+	    cout << "in Coolection  ieta+41= " << ieta+41 << " iphi= " << iphi << endl;
+	  }
+	  
 	}// if(cal_det>0 && cal_det<5
       }//if(recordHistoes_ && studyCalibCellsHist_)
       ///////////////////////////////////////////// 
       
       
-      if(recordNtuples_) {    
+      if(recordNtuples_ && nevent < maxNeventsInNtuple_) {    
 	if (cal_cbox<2){
 	  nTS=digi->size();
 	  if(nTS<=numOfTS) for(int i=0;i<nTS;i++) {
@@ -1409,10 +1462,11 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	  ////////////////////////////////////////////////////////////////
 
 	  ////////////////////////////////////////////////////////////////  for zcalib.C script:
+	  // k2 = 0-81, k3= 0-71
 	  // return to real indexes in eta and phi ( k20 and k30)
-	  int k20=k2-41;
-	  if(k2>0 || k2==0) k20=k2+1;
-	  int k30=k3+1; 
+	  int k20=k2-41;    // k20 = -41 - 40
+	  if(k20>0 || k20==0) k20 += 1;// k20 = -41 - -1 and +1 - +41
+	  int k30=k3+1; // k30= 1-72
 	  
 	  // find calibration indexes in eta and phi ( kk2 and kk3) 
 	  int kk2=0, kk3=0;
@@ -1485,6 +1539,10 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	    float calibtsmean = caliba[k1][kkk2][kkk3]; 
 	    // Width
 	    float calibwidth = calibw[k1][kkk2][kkk3]; 
+	    // CapIdErrors
+	    float calibcap =  -100.;
+	    calibcap =  calibcapiderror[k1][kkk2][kkk3];
+
 	    //                 HB:
 	    if(k1==0) {
 	      // ADC
@@ -1514,6 +1572,16 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		if(calibwidth< calibrWidthHBMin_ || calibwidth> calibrWidthHBMax_ ) h_mapWidthCalib047_HB->Fill(double(k2plot),double(k3),1.);
 		h_mapWidthCalib_HB->Fill(double(k2plot), double(k3), calibwidth); 
 	      }   
+	      // CapIdErrors
+	      if(calibcap > 0) h_mapCapCalib047_HB->Fill(double(k2plot),double(k3),1.);
+
+	      if(verbosity == -233 && k3==51 && abs(k2plot)==5  && calibcap > 0) {
+		cout << "******************************Initial indexes:  k2= " << k2 << "  k2plot= " << k2plot << " k3= " << k3 << " k1= " << k1 << endl;
+		cout << "real indexes  k20= " << k20 << " k30= " << k30 << endl;
+		cout << "calibration indexes  kk2= " << kk2 << " kk3= " << kk3 << endl;
+		cout << "calibration indexes in massiv  kkk2= " << kkk2 << " kkk3= " << kkk3 << endl;
+	      }
+	      
 	      //       
 	      h_map_HB->Fill(double(k2plot), double(k3), 1.);    
 	    }
@@ -1546,6 +1614,8 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		if(calibwidth< calibrWidthHEMin_  || calibwidth> calibrWidthHEMax_ )h_mapWidthCalib047_HE->Fill(double(k2plot),double(k3),1.);
 		h_mapWidthCalib_HE->Fill(double(k2plot), double(k3), calibwidth); 
 	      }   
+	      // CapIdErrors
+	      if(calibcap > 0) h_mapCapCalib047_HE->Fill(double(k2plot),double(k3),1.);
 	      //                
 	      h_map_HE->Fill(double(k2plot), double(k3), 1.);    
 	    }
@@ -1578,6 +1648,8 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		if(calibwidth< calibrWidthHOMin_  || calibwidth> calibrWidthHOMax_ )h_mapWidthCalib047_HO->Fill(double(k2plot),double(k3),1.);
 		h_mapWidthCalib_HO->Fill(double(k2plot), double(k3), calibwidth);    
 	      }
+	      // CapIdErrors
+	      if(calibcap > 0) h_mapCapCalib047_HO->Fill(double(k2plot),double(k3),1.);
 	      //                 
 	      h_map_HO->Fill(double(k2plot), double(k3), 1.);    
 	    }
@@ -1610,6 +1682,8 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		if(calibwidth< calibrWidthHFMin_ || calibwidth> calibrWidthHFMax_ ) h_mapWidthCalib047_HF->Fill(double(k2plot),double(k3),1.);
 		h_mapWidthCalib_HF->Fill(double(k2plot), double(k3), calibwidth);  
 	      }  
+	      // CapIdErrors
+	      if(calibcap > 0) h_mapCapCalib047_HF->Fill(double(k2plot),double(k3),1.);
 	      // 
 	      h_map_HF->Fill(double(k2plot), double(k3), 1.);    
 	    }
@@ -1622,9 +1696,10 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     
     /////
     
-  }//if(recordHistoes_)
+  }//if(recordHistoes_&& studyCalibCellsHist_)
+
   /////////////////////////////////////////////////// 
-  if(recordNtuples_) myTree->Fill();
+  if(recordNtuples_ && nevent < maxNeventsInNtuple_) myTree->Fill();
   
   /////////////////////////////////////////////////// 
   if(++local_event%100==0)
@@ -1951,6 +2026,7 @@ void VeRawAnalyzer::beginJob()
     h_mapTSmeanCalib_HB    = new TH2F("h_mapTSmeanCalib_HB"," ",    82, -41., 41., 72, 0., 72.);
     h_WidthCalib_HB       = new TH1F("h_WidthCalib_HB"," ",      100, 0.,5.);
     h_mapWidthCalib047_HB = new TH2F("h_mapWidthCalib047_HB"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapCapCalib047_HB = new TH2F("h_mapCapCalib047_HB"," ", 82, -41., 41., 72, 0., 72.);
     h_mapWidthCalib_HB    = new TH2F("h_mapWidthCalib_HB"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HB              = new TH2F("h_map_HB"," ",              82, -41., 41., 72, 0., 72.);
     h_ADCCalib_HE       = new TH1F("h_ADCCalib_HE"," ",      100, 10.,10000.);
@@ -1968,6 +2044,7 @@ void VeRawAnalyzer::beginJob()
     h_mapTSmeanCalib_HE    = new TH2F("h_mapTSmeanCalib_HE"," ",    82, -41., 41., 72, 0., 72.);
     h_WidthCalib_HE       = new TH1F("h_WidthCalib_HE"," ",      100, 0.,5.);
     h_mapWidthCalib047_HE = new TH2F("h_mapWidthCalib047_HE"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapCapCalib047_HE = new TH2F("h_mapCapCalib047_HE"," ", 82, -41., 41., 72, 0., 72.);
     h_mapWidthCalib_HE    = new TH2F("h_mapWidthCalib_HE"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HE              = new TH2F("h_map_HE"," ",              82, -41., 41., 72, 0., 72.);
     h_ADCCalib_HO       = new TH1F("h_ADCCalib_HO"," ",      100, 10.,10000.);
@@ -1985,6 +2062,7 @@ void VeRawAnalyzer::beginJob()
     h_mapTSmeanCalib_HO    = new TH2F("h_mapTSmeanCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
     h_WidthCalib_HO       = new TH1F("h_WidthCalib_HO"," ",      100, 0.,5.);
     h_mapWidthCalib047_HO = new TH2F("h_mapWidthCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapCapCalib047_HO = new TH2F("h_mapCapCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_mapWidthCalib_HO    = new TH2F("h_mapWidthCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HO              = new TH2F("h_map_HO"," ",              82, -41., 41., 72, 0., 72.);
     h_ADCCalib_HF       = new TH1F("h_ADCCalib_HF"," ",      100, 10.,10000.);
@@ -2002,6 +2080,7 @@ void VeRawAnalyzer::beginJob()
     h_mapTSmeanCalib_HF    = new TH2F("h_mapTSmeanCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
     h_WidthCalib_HF       = new TH1F("h_WidthCalib_HF"," ",      100, 0.,5.);
     h_mapWidthCalib047_HF = new TH2F("h_mapWidthCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
+    h_mapCapCalib047_HF = new TH2F("h_mapCapCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
     h_mapWidthCalib_HF    = new TH2F("h_mapWidthCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HF              = new TH2F("h_map_HF"," ",              82, -41., 41., 72, 0., 72.);
 
@@ -2191,6 +2270,7 @@ void VeRawAnalyzer::fillDigiErrors(HBHEDigiCollection::const_iterator& digiItr)
       h_repetedcapid_HB->Fill(double(repetedcapid),1.); 
    
       if(error1 !=0 || error2 !=0 || error3 !=0 ) {
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==0) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	h_amplError_HB->Fill(ampl,1.);
 	if(mdepth==1) h_mapDepth1Error_HB->Fill(double(ieta), double(iphi));    
 	if(mdepth==2) h_mapDepth2Error_HB->Fill(double(ieta), double(iphi));    
@@ -2214,6 +2294,7 @@ void VeRawAnalyzer::fillDigiErrors(HBHEDigiCollection::const_iterator& digiItr)
       h_repetedcapid_HE->Fill(double(repetedcapid),1.); 
 
       if(error1 !=0 || error2 !=0 || error3 !=0 ) {
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==0) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	h_amplError_HE->Fill(ampl,1.);
 	if(mdepth==1) h_mapDepth1Error_HE->Fill(double(ieta), double(iphi));    
 	if(mdepth==2) h_mapDepth2Error_HE->Fill(double(ieta), double(iphi));    
@@ -2364,6 +2445,7 @@ void VeRawAnalyzer::fillDigiErrorsHF(HFDigiCollection::const_iterator& digiItr)
       h_repetedcapid_HF->Fill(double(repetedcapid),1.); 
    
       if(error1 !=0 || error2 !=0 || error3 !=0 ) {
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==0) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	h_amplError_HF->Fill(ampl,1.);
 	if(mdepth==1) h_mapDepth1Error_HF->Fill(double(ieta), double(iphi));    
 	if(mdepth==2) h_mapDepth2Error_HF->Fill(double(ieta), double(iphi));    
@@ -2518,6 +2600,7 @@ void VeRawAnalyzer::fillDigiErrorsHO(HODigiCollection::const_iterator& digiItr)
       h_repetedcapid_HO->Fill(double(repetedcapid),1.); 
    
       if(error1 !=0 || error2 !=0 || error3 !=0 ) {
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==0) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	h_amplError_HO->Fill(ampl,1.);
 	if(mdepth==4) h_mapDepth4Error_HO->Fill(double(ieta), double(iphi));    
 	h_fiber0_HO->Fill(double(ERRORfiber), 1. );    
@@ -2533,6 +2616,8 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
 {
     CaloSamples tool;  // TS
     
+      
+
     HcalDetId cell(digiItr->id()); 
     int mdepth = cell.depth();
 //    int iphi0  = cell.iphi();// 1-72
@@ -2630,6 +2715,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyADCAmplHist_) {
 	h_ADCAmpl_HB->Fill(amplitude,1.);
 	if(amplitude < ADCAmplHBMin_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==5) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1ADCAmpl225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2ADCAmpl225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -56) std::cout << "***BAD HB channels from ADCAmpl: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" amplitude= " << amplitude << std::endl;
@@ -2644,6 +2730,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HB->Fill(aveamplitude1,1.);
 	if(aveamplitude1 < TSmeanHBMin_ || aveamplitude1 > TSmeanHBMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==4) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1TSmeanA225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2TSmeanA225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -55) std::cout << "***BAD HB channels from TSmaxA: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" aveamplitude1= " << aveamplitude1 << std::endl;
@@ -2658,6 +2745,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyTSmaxShapeHist_) {
 	h_TSmaxA_HB->Fill(float(ts_with_max_signal),1.);
 	if(ts_with_max_signal < TSpeakHBMin_ || ts_with_max_signal > TSpeakHBMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==3) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1TSmaxA225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2TSmaxA225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -55) std::cout << "***BAD HB channels from TSmaxA: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" ts_with_max_signal= " << ts_with_max_signal << std::endl;
@@ -2673,6 +2761,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyRMSshapeHist_) {
 	h_Amplitude_HB->Fill(rmsamplitude,1.);
 	if(rmsamplitude < rmsHBMin_ || rmsamplitude > rmsHBMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==2) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1Amplitude225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2Amplitude225_HB->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -54) std::cout << "***BAD HB channels from shape RMS:  "  <<" ieta= " << ieta <<" iphi= " << iphi << std::endl;
@@ -2687,13 +2776,13 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       //   //   //   //   //   //   //   //   //  HB       Ratio:
       h_Ampl_HB->Fill(ratio,1.);
       if(ratio < ratioHBMin_ || ratio > ratioHBMax_  ) {
-	if(studyRunDependenceHist_) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==1) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	if(studyRatioShapeHist_) {
 	  if(mdepth==1) h_mapDepth1Ampl047_HB->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2Ampl047_HB->Fill(double(ieta), double(iphi), 1.);
 	  // //
 	  if (verbosity == -53) std::cout << "***BAD HB channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi << std::endl;
-	  if (verbosity == -51) std::cout << "***BAD HB channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
+	  if (verbosity == -51  ) std::cout << "***BAD HB channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
 	}//if(studyRatioShapeHist_)
       }//if(ratio
       // for averaged values:
@@ -2725,6 +2814,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyADCAmplHist_) {
 	h_ADCAmpl_HE->Fill(amplitude,1.);
 	if(amplitude < ADCAmplHEMin_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==5) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1ADCAmpl225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2ADCAmpl225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==3) h_mapDepth3ADCAmpl225_HE->Fill(double(ieta), double(iphi), 1.);
@@ -2740,6 +2830,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HE->Fill(aveamplitude1,1.);
 	if(aveamplitude1 < TSmeanHEMin_ || aveamplitude1 > TSmeanHEMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==4) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1TSmeanA225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2TSmeanA225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==3) h_mapDepth3TSmeanA225_HE->Fill(double(ieta), double(iphi), 1.);
@@ -2755,6 +2846,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyTSmaxShapeHist_) {
 	h_TSmaxA_HE->Fill(float(ts_with_max_signal),1.);
 	if(ts_with_max_signal < TSpeakHEMin_ || ts_with_max_signal > TSpeakHEMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==3) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1TSmaxA225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2TSmaxA225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==3) h_mapDepth3TSmaxA225_HE->Fill(double(ieta), double(iphi), 1.);
@@ -2772,6 +2864,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       if(studyRMSshapeHist_) {
 	h_Amplitude_HE->Fill(rmsamplitude,1.);
 	if(rmsamplitude < rmsHEMin_ || rmsamplitude > rmsHEMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==2) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1Amplitude225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2Amplitude225_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==3) h_mapDepth3Amplitude225_HE->Fill(double(ieta), double(iphi), 1.);
@@ -2788,14 +2881,14 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       //   //   //   //   //   //   //   //   //  HE       Ratio:
       h_Ampl_HE->Fill(ratio,1.);
       if(ratio < ratioHEMin_ || ratio > ratioHEMax_  ) {
-	if(studyRunDependenceHist_) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==1) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	if(studyRatioShapeHist_) {
 	  if(mdepth==1) h_mapDepth1Ampl047_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2Ampl047_HE->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==3) h_mapDepth3Ampl047_HE->Fill(double(ieta), double(iphi), 1.);
 	  // //
 	  if (verbosity == -53) std::cout << "***BAD HE channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi << std::endl;
-	  if (verbosity == -51) std::cout << "***BAD HE channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
+	  if (verbosity == -51  ) std::cout << "***BAD HE channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
 	}//if(studyRatioShapeHist_) 
       }
       // for averaged values:
@@ -2927,6 +3020,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
       if(studyADCAmplHist_) {
 	h_ADCAmpl_HF->Fill(amplitude,1.);
 	if(amplitude < ADCAmplHFMin_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==5) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1ADCAmpl225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2ADCAmpl225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -56) std::cout << "***BAD HF channels from ADCAmpl: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" amplitude= " << amplitude << std::endl;
@@ -2941,6 +3035,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HF->Fill(aveamplitude1,1.);
 	if(aveamplitude1 < TSmeanHFMin_ || aveamplitude1 > TSmeanHFMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==4) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1TSmeanA225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2TSmeanA225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -55) std::cout << "***BAD HF channels from TSmeanA: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" aveamplitude1= " << aveamplitude1 << std::endl;
@@ -2954,6 +3049,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
       if(studyTSmaxShapeHist_) {
 	h_TSmaxA_HF->Fill(float(ts_with_max_signal),1.);
 	if(ts_with_max_signal < TSpeakHFMin_ || ts_with_max_signal > TSpeakHFMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==3) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1TSmaxA225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2TSmaxA225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -55) std::cout << "***BAD HF channels from TSmaxA: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" ts_with_max_signal= " << ts_with_max_signal << std::endl;
@@ -2969,6 +3065,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
       if(studyRMSshapeHist_) {
 	h_Amplitude_HF->Fill(rmsamplitude,1.);
 	if(rmsamplitude < rmsHFMin_ || rmsamplitude > rmsHFMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==2) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==1) h_mapDepth1Amplitude225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2Amplitude225_HF->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -54) std::cout << "***BAD HF channels from shape RMS:  "  <<" ieta= " << ieta <<" iphi= " << iphi << std::endl;
@@ -2983,13 +3080,13 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
       //   //   //   //   //   //   //   //   //  HF       Ratio:
       h_Ampl_HF->Fill(ratio,1.);
       if(ratio < ratioHFMin_ || ratio > ratioHFMax_  ) {
-	if(studyRunDependenceHist_) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==1) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	if(studyRatioShapeHist_) {
 	  if(mdepth==1) h_mapDepth1Ampl047_HF->Fill(double(ieta), double(iphi), 1.);
 	  if(mdepth==2) h_mapDepth2Ampl047_HF->Fill(double(ieta), double(iphi), 1.);
 	  // //
 	  if (verbosity == -53) std::cout << "***BAD HF channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi << std::endl;
-	  if (verbosity == -51) std::cout << "***BAD HF channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
+	  if (verbosity == -51  ) std::cout << "***BAD HF channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
 	}//if(studyRatioShapeHist_)
       }//if(ratio
       // for averaged values:
@@ -3122,6 +3219,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
       if(studyADCAmplHist_) {
 	h_ADCAmpl_HO->Fill(amplitude,1.);
 	if(amplitude < ADCAmplHOMin_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==5) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==4) h_mapDepth4ADCAmpl225_HO->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -56) std::cout << "***BAD HO channels from ADCAmpl: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" amplitude= " << amplitude << std::endl;
 	}// if
@@ -3134,6 +3232,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
       if(studyTSmeanShapeHist_) {
 	h_TSmeanA_HO->Fill(aveamplitude1,1.);
 	if(aveamplitude1 < TSmeanHOMin_ || aveamplitude1 > TSmeanHOMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==4) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==4) h_mapDepth4TSmeanA225_HO->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -55) std::cout << "***BAD HO channels from TSmeanA: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" aveamplitude1= " << aveamplitude1 << std::endl;
 	}// if
@@ -3145,6 +3244,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
       if(studyTSmaxShapeHist_) {
 	h_TSmaxA_HO->Fill(float(ts_with_max_signal),1.);
 	if(ts_with_max_signal < TSpeakHOMin_ || ts_with_max_signal > TSpeakHOMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==3) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==4) h_mapDepth4TSmaxA225_HO->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -55) std::cout << "***BAD HO channels from TSmaxA: "  <<" ieta= " << ieta <<" iphi= " << iphi <<" ts_with_max_signal= " << ts_with_max_signal << std::endl;
 	}// if
@@ -3158,6 +3258,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
       if(studyRMSshapeHist_) {
 	h_Amplitude_HO->Fill(rmsamplitude,1.);
 	if(rmsamplitude < rmsHOMin_ || rmsamplitude > rmsHOMax_ ) {
+	  if(studyRunDependenceHist_ && flagtodefinebadchannel_==2) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	  if(mdepth==4) h_mapDepth4Amplitude225_HO->Fill(double(ieta), double(iphi), 1.);
 	  if (verbosity == -54) std::cout << "***BAD HO channels from shape RMS:  "  <<" ieta= " << ieta <<" iphi= " << iphi << std::endl;
 	}// if
@@ -3170,12 +3271,12 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
       //   //   //   //   //   //   //   //   //  HO       Ratio:
       h_Ampl_HO->Fill(ratio,1.);
       if(ratio < ratioHOMin_ || ratio > ratioHOMax_  ) {
-	if(studyRunDependenceHist_) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
+	if(studyRunDependenceHist_ && flagtodefinebadchannel_==1) ++badchannels[sub-1][mdepth-1][ieta+41][iphi];// 0-82 ; 0-71
 	if(studyRatioShapeHist_) {
 	  if(mdepth==4) h_mapDepth4Ampl047_HO->Fill(double(ieta), double(iphi), 1.);
 	  // //
 	  if (verbosity == -53) std::cout << "***BAD HO channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi << std::endl;
-	  if (verbosity == -51) std::cout << "***BAD HO channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
+	  if (verbosity == -51  ) std::cout << "***BAD HO channels from shape Ratio:  " <<" ieta= " << ieta <<" iphi= " << iphi <<" sub= " << sub <<" mdepth= " << mdepth <<" badchannels= " << badchannels[sub-1][mdepth-1][ieta+41][iphi] << std::endl;
 	}//if(studyRatioShapeHist_)
       }//if(ratio
       // for averaged values:
@@ -3269,7 +3370,7 @@ void VeRawAnalyzer::endJob(){
   
   std::cout << "===== Start writing user histograms =====" << std::endl;
   //////////////////////////////////////////////////////////////////////   scaling of some histoes:
-  /*
+  
   double ww = 1.;
   if(nnnnnn1 != 0) ww = 1./nnnnnn1;
   h_nbadchannels_depth1_HB->Scale(ww);
@@ -3289,7 +3390,7 @@ void VeRawAnalyzer::endJob(){
   ww = 1.;
   if(nnnnnn5 != 0) ww = 1./nnnnnn5;
   h_nbadchannels_depth3_HE->Scale(ww);
-*/
+
   ///////////////////////////////////////////->Write();
   if(recordHistoes_) {
     h_errorGeneral->Write();
@@ -3569,6 +3670,10 @@ void VeRawAnalyzer::endJob(){
     h_runbadrate3_depth3_HE->Write();
     h_runbadrate0_depth3_HE->Write();
     ///////////////////////
+    h_mapCapCalib047_HB->Write();
+    h_mapCapCalib047_HE->Write();
+    h_mapCapCalib047_HO->Write();
+    h_mapCapCalib047_HF->Write();
 
     h_ADCCalib_HB->Write();
     h_ADCCalib1_HB->Write();

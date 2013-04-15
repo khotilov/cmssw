@@ -16,15 +16,16 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   #
                                   MapCreation = cms.untracked.int32(1),
                                   #
-                                  recordNtuples = cms.untracked.bool(False),
-                                  #recordNtuples = cms.untracked.bool(True),
+                                  #recordNtuples = cms.untracked.bool(False),
+                                  recordNtuples = cms.untracked.bool(True),
+                                  maxNeventsInNtuple = cms.int32(100),
                                   #
                                   #recordHistoes = cms.untracked.bool(False),
                                   recordHistoes = cms.untracked.bool(True),
                                   #
                                   ##scripts: zRunRatio34.C, zRunNbadchan.C
-                                  #studyRunDependenceHist = cms.untracked.bool(True),
-                                  studyRunDependenceHist = cms.untracked.bool(False),
+                                  studyRunDependenceHist = cms.untracked.bool(True),
+                                  #studyRunDependenceHist = cms.untracked.bool(False),
                                   #
                                   ##scripts: zerrors.C
                                   studyCapIDErrorsHist = cms.untracked.bool(True),
@@ -62,10 +63,12 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   #Verbosity = cms.untracked.int32(-54),
                                   #Verbosity = cms.untracked.int32(-22),
                                   #Verbosity = cms.untracked.int32(-11),
+                                  #Verbosity = cms.untracked.int32(-12),
                                   #Verbosity = cms.untracked.int32(-13),
                                   #Verbosity = cms.untracked.int32(-51),
                                   #Verbosity = cms.untracked.int32(-24),
                                   #Verbosity = cms.untracked.int32(-244),
+                                  #Verbosity = cms.untracked.int32(-233),
                                   Verbosity = cms.untracked.int32(0),
                                   #
                                   #
@@ -130,28 +133,28 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   calibrADCHBMin = cms.double(200.),
                                   calibrADCHEMin = cms.double(200.),
                                   calibrADCHOMin = cms.double(200.),
-                                  calibrADCHFMin = cms.double(200.),
+                                  calibrADCHFMin = cms.double(100.),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on shape Ratio
-                                  calibrRatioHBMin = cms.double(0.70),
-                                  calibrRatioHEMin = cms.double(0.65),
-                                  calibrRatioHOMin = cms.double(0.20),
-                                  calibrRatioHFMin = cms.double(0.25),
+                                  calibrRatioHBMin = cms.double(0.63),
+                                  calibrRatioHEMin = cms.double(0.63),
+                                  calibrRatioHOMin = cms.double(0.10),
+                                  calibrRatioHFMin = cms.double(0.21),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on TSmax
                                   calibrTSmaxHBMin = cms.double(0.50),
                                   calibrTSmaxHBMax = cms.double(8.50),
                                   calibrTSmaxHEMin = cms.double(0.50),
                                   calibrTSmaxHEMax = cms.double(8.50),
                                   calibrTSmaxHOMin = cms.double(0.50),
-                                  calibrTSmaxHOMax = cms.double(8.50),
+                                  calibrTSmaxHOMax = cms.double(9.50),
                                   calibrTSmaxHFMin = cms.double(0.50),
-                                  calibrTSmaxHFMax = cms.double(8.50),
+                                  calibrTSmaxHFMax = cms.double(9.50),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on TSmean
                                   calibrTSmeanHBMin = cms.double(1.00),
-                                  calibrTSmeanHBMax = cms.double(4.30),
+                                  calibrTSmeanHBMax = cms.double(4.80),
                                   calibrTSmeanHEMin = cms.double(1.00),
-                                  calibrTSmeanHEMax = cms.double(4.30),
+                                  calibrTSmeanHEMax = cms.double(4.20),
                                   calibrTSmeanHOMin = cms.double(1.00),
-                                  calibrTSmeanHOMax = cms.double(4.30),
+                                  calibrTSmeanHOMax = cms.double(3.50),
                                   calibrTSmeanHFMin = cms.double(1.00),
                                   calibrTSmeanHFMax = cms.double(5.20),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on Width
@@ -166,8 +169,12 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   #
                                   # Special task of run or LS quality:
                                   #
-                                  # to see run dependence of rate of events with Nbadchannels > :
-                                  nbadchannels1 = cms.int32(10),
+                                  # flag for choise of criterion of bad channels:
+                                  # =0-CapIdErr, =1-Ratio, =2-Width, =3-TSmax, =4-TSmean, =5-adcAmplitud
+                                  flagtodefinebadchannel = cms.int32(0),
+                                  #
+                                  # to see run dependence of rate of events with Nbadchannels bigger:
+                                  nbadchannels1 = cms.int32(5),
                                   nbadchannels2 = cms.int32(30),
                                   nbadchannels3 = cms.int32(60),
                                   #
