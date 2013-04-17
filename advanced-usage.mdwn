@@ -174,10 +174,19 @@ can use it by setting the `CMSSW_MIRROR` environment variable. E.g.:
     export CMSSW_MIRROR=https://:@git.cern.ch/kerberos/CMSSW.git
     # setenv CMSSW_MIRROR https://:@git.cern.ch/kerberos/CMSSW.git
 
-for CERN. 
+for CERN.
 
 `git addpkg` will then use it to fetch most of the data, and then switch to the
 official repository for fetching the missing parts.
+
+If you happen to have a local copy of the reposiry on the machine you are working
+on you can speed up things even further by having:
+
+    export CMSSW_GIT_REFERENCE=<repository-path>
+
+in particular people working on lxplus can use:
+
+    export CMSSW_GIT_REFERENCE=/afs/cern.ch/cms/git-cmssw-mirror/cmssw.git
 
 ## How do I setup a local mirror?
 
