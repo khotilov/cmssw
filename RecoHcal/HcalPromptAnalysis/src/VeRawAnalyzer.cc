@@ -11,7 +11,7 @@ Implementation:
 <Notes on implementation>
 */
 //
-// $Id: VeRawAnalyzer.cc,v 1.5 2013/04/02 08:45:12 zhokin Exp $
+// $Id: VeRawAnalyzer.cc,v 1.7 2013/04/15 11:07:12 zhokin Exp $
 //
 
 // system include files
@@ -158,6 +158,7 @@ private:
   double ratioHOMax_;
 
   int flagtodefinebadchannel_;
+  int howmanybinsonplots_;
   int nbadchannels1_;
   int nbadchannels2_;
   int nbadchannels3_;
@@ -690,6 +691,7 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   ratioHOMax_      = iConfig.getParameter<double>("ratioHOMax");//
   //
   flagtodefinebadchannel_ = iConfig.getParameter<int>("flagtodefinebadchannel");//
+  howmanybinsonplots_ = iConfig.getParameter<int>("howmanybinsonplots");//
   nbadchannels1_      = iConfig.getParameter<int>("nbadchannels1");//
   nbadchannels2_      = iConfig.getParameter<int>("nbadchannels2");//
   nbadchannels3_      = iConfig.getParameter<int>("nbadchannels3");//
@@ -790,7 +792,8 @@ VeRawAnalyzer::VeRawAnalyzer(const edm::ParameterSet& iConfig)
   std::cout<<" ratioHOMin_ = " <<ratioHOMin_ << std::endl;   
   std::cout<<" ratioHOMax_ = " <<ratioHOMax_ << std::endl;   
 
-  std::cout<<" flagtodefinebadchannel_ = " <<flagtodefinebadchannel_ << std::endl;   
+  std::cout<<" flagtodefinebadchannel_ = " <<flagtodefinebadchannel_ << std::endl;
+  std::cout<<" howmanybinsonplots_ = " <<howmanybinsonplots_ << std::endl;
   std::cout<<" nbadchannels1_ = " <<nbadchannels1_ << std::endl;   
   std::cout<<" nbadchannels2_ = " <<nbadchannels2_ << std::endl;   
   std::cout<<" nbadchannels3_ = " <<nbadchannels3_ << std::endl;   
@@ -1333,7 +1336,7 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 	  double amplitude = calib0[cal_det-1][ieta+41][iphi];
 	  double aveamplitude = -100.;
-	  if(amplitude !=0)  aveamplitude = timew/amplitude;// average_TS +1
+	  if(amplitude >0 && timew >0)  aveamplitude = timew/amplitude;// average_TS +1
 	  double aveamplitude1 = aveamplitude-1;// means iTS=0-9
 	  caliba[cal_det-1][ieta+41][iphi] = aveamplitude1;
 
@@ -1345,7 +1348,7 @@ void VeRawAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	    rmsamp+=(aaaaaa2*ampldefault);// fC
 	  }//for 2
 	  double rmsamplitude = -100.;
-	  if(amplitude !=0)  rmsamplitude = sqrt( rmsamp/amplitude );
+	  if(amplitude >0)  rmsamplitude = sqrt( rmsamp/amplitude );
 	  calibw[cal_det-1][ieta+41][iphi] = rmsamplitude;
 	  //
 	  calibt[cal_det-1][ieta+41][iphi] = ts_with_max_signal;
@@ -1820,7 +1823,7 @@ void VeRawAnalyzer::beginJob()
     h_repetedcapid_HO = new TH1F("h_repetedcapid_HO"," ", 5, 0., 5.);
     
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    h_ADCAmpl_HB = new TH1F("h_ADCAmpl_HB"," ", 100, 10.,10000.);
+    h_ADCAmpl_HB = new TH1F("h_ADCAmpl_HB"," ", 100, 10.,3000.);
     h_mapDepth1ADCAmpl225_HB = new TH2F("h_mapDepth1ADCAmpl225_HB"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth2ADCAmpl225_HB = new TH2F("h_mapDepth2ADCAmpl225_HB"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth1ADCAmpl_HB = new TH2F("h_mapDepth1ADCAmpl_HB"," ", 82, -41., 41., 72, 0., 72.);
@@ -1851,7 +1854,7 @@ void VeRawAnalyzer::beginJob()
     h_mapDepth2_HB = new TH2F("h_mapDepth2_HB"," ", 82, -41., 41., 72, 0., 72.);
     
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    h_ADCAmpl_HE = new TH1F("h_ADCAmpl_HE"," ", 100, 10.,10000.);
+    h_ADCAmpl_HE = new TH1F("h_ADCAmpl_HE"," ", 100, 10.,3000.);
     h_mapDepth1ADCAmpl225_HE = new TH2F("h_mapDepth1ADCAmpl225_HE"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth2ADCAmpl225_HE = new TH2F("h_mapDepth2ADCAmpl225_HE"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth3ADCAmpl225_HE = new TH2F("h_mapDepth3ADCAmpl225_HE"," ", 82, -41., 41., 72, 0., 72.);
@@ -1896,7 +1899,7 @@ void VeRawAnalyzer::beginJob()
     h_mapDepth3_HE = new TH2F("h_mapDepth3_HE"," ", 82, -41., 41., 72, 0., 72.);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    h_ADCAmpl_HF = new TH1F("h_ADCAmpl_HF"," ", 100, 10.,10000.);
+    h_ADCAmpl_HF = new TH1F("h_ADCAmpl_HF"," ", 100, 10.,3000.);
     h_mapDepth1ADCAmpl225_HF = new TH2F("h_mapDepth1ADCAmpl225_HF"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth2ADCAmpl225_HF = new TH2F("h_mapDepth2ADCAmpl225_HF"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth1ADCAmpl_HF = new TH2F("h_mapDepth1ADCAmpl_HF"," ", 82, -41., 41., 72, 0., 72.);
@@ -1931,10 +1934,10 @@ void VeRawAnalyzer::beginJob()
     h_ADCAmpl_HO = new TH1F("h_ADCAmpl_HO"," ", 100, 10.,10000.);
     h_mapDepth4ADCAmpl225_HO = new TH2F("h_mapDepth4ADCAmpl225_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth4ADCAmpl_HO = new TH2F("h_mapDepth4ADCAmpl_HO"," ", 82, -41., 41., 72, 0., 72.);
-    h_TSmeanA_HO = new TH1F("h_TSmeanA_HO"," ", 100, -1.,11.);
+    h_TSmeanA_HO = new TH1F("h_TSmeanA_HO"," ", 100, 0.,10.);
     h_mapDepth4TSmeanA225_HO = new TH2F("h_mapDepth4TSmeanA225_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth4TSmeanA_HO = new TH2F("h_mapDepth4TSmeanA_HO"," ", 82, -41., 41., 72, 0., 72.);
-    h_TSmaxA_HO = new TH1F("h_TSmaxA_HO"," ", 100, -1.,11.);
+    h_TSmaxA_HO = new TH1F("h_TSmaxA_HO"," ", 100, 0.,10.);
     h_mapDepth4TSmaxA225_HO = new TH2F("h_mapDepth4TSmaxA225_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_mapDepth4TSmaxA_HO = new TH2F("h_mapDepth4TSmaxA_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_Amplitude_HO = new TH1F("h_Amplitude_HO"," ", 100, 0.,5.);
@@ -1947,8 +1950,9 @@ void VeRawAnalyzer::beginJob()
     h_mapDepth4_HO = new TH2F("h_mapDepth4_HO"," ", 82, -41., 41., 72, 0., 72.);
 
     //////////////////////////////////////////////////////////////////////////////////////
-    int bac= 10;
-    float bac2=11.;
+    int bac= howmanybinsonplots_;
+    //  int bac= 15;
+    float bac2=bac+1.;
     h_nbadchannels_depth1_HB = new TH1F("h_nbadchannels_depth1_HB"," ",   100, 1.,101.);
     h_runnbadchannels_depth1_HB = new TH1F("h_runnbadchannels_depth1_HB"," ",   bac, 1.,bac2);
     h_runbadrate_depth1_HB = new TH1F("h_runbadrate_depth1_HB"," ",             bac, 1.,bac2);
@@ -2065,7 +2069,7 @@ void VeRawAnalyzer::beginJob()
     h_mapCapCalib047_HO = new TH2F("h_mapCapCalib047_HO"," ", 82, -41., 41., 72, 0., 72.);
     h_mapWidthCalib_HO    = new TH2F("h_mapWidthCalib_HO"," ",    82, -41., 41., 72, 0., 72.);
     h_map_HO              = new TH2F("h_map_HO"," ",              82, -41., 41., 72, 0., 72.);
-    h_ADCCalib_HF       = new TH1F("h_ADCCalib_HF"," ",      100, 10.,10000.);
+    h_ADCCalib_HF       = new TH1F("h_ADCCalib_HF"," ",      100, 10.,2000.);
     h_ADCCalib1_HF       = new TH1F("h_ADCCalib1_HF"," ",      100, 0.1,100.1);
     h_mapADCCalib047_HF = new TH2F("h_mapADCCalib047_HF"," ", 82, -41., 41., 72, 0., 72.);
     h_mapADCCalib_HF    = new TH2F("h_mapADCCalib_HF"," ",    82, -41., 41., 72, 0., 72.);
@@ -2693,7 +2697,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
 
     
     double aveamplitude = 0.;
-    if(amplitude !=0)  aveamplitude = timew/amplitude;// average_TS +1
+    if(amplitude >0 && timew >0)  aveamplitude = timew/amplitude;// average_TS +1
     double rmsamp = 0.;
     for (int ii=0; ii<10; ii++) {  
       double ampldefault = tool[ii];
@@ -2702,7 +2706,7 @@ void VeRawAnalyzer::fillDigiAmplitude(HBHEDigiCollection::const_iterator& digiIt
       rmsamp+=(aaaaaa2*ampldefault);// fC
     }//for 2
     double rmsamplitude = 0.;
-    if(amplitude !=0)  rmsamplitude = sqrt( rmsamp/amplitude );
+    if(amplitude >0)  rmsamplitude = sqrt( rmsamp/amplitude );
 
 
     double aveamplitude1 = aveamplitude-1;// means iTS=0-9
@@ -2999,7 +3003,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
 
     
     double aveamplitude = 0.;
-    if(amplitude !=0)  aveamplitude = timew/amplitude;// average_TS +1
+    if(amplitude >0 && timew >0)  aveamplitude = timew/amplitude;// average_TS +1
     double rmsamp = 0.;
     for (int ii=0; ii<10; ii++) {  
       double ampldefault = tool[ii];
@@ -3008,7 +3012,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHF(HFDigiCollection::const_iterator& digiIt
       rmsamp+=(aaaaaa2*ampldefault);// fC
     }//for 2
     double rmsamplitude = 0.;
-    if(amplitude !=0)  rmsamplitude = sqrt( rmsamp/amplitude );
+    if(amplitude >0)  rmsamplitude = sqrt( rmsamp/amplitude );
 
 
     double aveamplitude1 = aveamplitude-1;// means iTS=0-9, so bad is iTS=0 and 9
@@ -3198,7 +3202,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
 
     
     double aveamplitude = 0.;
-    if(amplitude !=0)  aveamplitude = timew/amplitude;// average_TS +1
+    if(amplitude >0 && timew >0)  aveamplitude = timew/amplitude;// average_TS +1
     double rmsamp = 0.;
     for (int ii=0; ii<10; ii++) {  
       double ampldefault = tool[ii];
@@ -3207,7 +3211,7 @@ void VeRawAnalyzer::fillDigiAmplitudeHO(HODigiCollection::const_iterator& digiIt
       rmsamp+=(aaaaaa2*ampldefault);// fC
     }//for 2
     double rmsamplitude = 0.;
-    if(amplitude !=0)  rmsamplitude = sqrt( rmsamp/amplitude );
+    if(amplitude >0)  rmsamplitude = sqrt( rmsamp/amplitude );
 
 
     double aveamplitude1 = aveamplitude-1;// means iTS=0-9, so bad is iTS=0 and 9

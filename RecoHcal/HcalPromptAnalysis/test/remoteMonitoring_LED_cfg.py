@@ -12,33 +12,51 @@ process.source = cms.Source("HcalTBSource",
     fileNames = cms.untracked.vstring(
 #
 ## Laser:
-#     'file:rfiles/USC_133070.root' ## only HF digis 10K
-#     'file:rfiles/USC_141849.root' ## only HF digis 5K
-#     'file:rfiles/USC_178165.root' ## only HF digis 10K
-#     'file:rfiles/USC_178455.root' ## only HF digis 10K
-#     'file:rfiles/USC_211875.root' ## only HBHE digis 10K problems
 #     'file:rfiles/USC_211775.root' ## only HF digis 10K
 #     'file:rfiles/USC_211673.root' ## only HBHE digis 10K
 #
-##LED:
+## LED digis 10K:
+     'file:rfiles/USC_194057.root',
+#     'file:rfiles/USC_194124.root',
+#     'file:rfiles/USC_194165.root',
+#     'file:rfiles/USC_194807.root',
+#     'file:rfiles/USC_195172.root',
      'file:rfiles/USC_195682.root',
      'file:rfiles/USC_196870.root',
+#     'file:rfiles/USC_198084.root',
+#     'file:rfiles/USC_199392.root',
+#     'file:rfiles/USC_200281.root',
+     'file:rfiles/USC_200707.root',
      'file:rfiles/USC_201305.root',
+#     'file:rfiles/USC_201571.root',
+#     'file:rfiles/USC_202066.root',
      'file:rfiles/USC_202341.root',
      'file:rfiles/USC_203339.root',
+#     'file:rfiles/USC_203536.root',
      'file:rfiles/USC_204172.root',
      'file:rfiles/USC_205355.root',
-     'file:rfiles/USC_206456.root'
-## short:
-#     'file:rfiles/USC_188148.root',
-#     'file:rfiles/USC_191392.root',
-#     'file:rfiles/USC_193001.root'
-## problematic:
-##     'file:rfiles/USC_190161.root'
-##     'file:rfiles/USC_194167.root'    
-##     'file:rfiles/USC_195406.root'
-##     'file:rfiles/USC_206974.root'
-##     'file:rfiles/USC_207846.root'
+#     'file:rfiles/USC_205928.root',
+     'file:rfiles/USC_206456.root',
+#     'file:rfiles/USC_207167.root',
+     'file:rfiles/USC_207406.root',
+#     'file:rfiles/USC_207545.root',
+#     'file:rfiles/USC_207914.root',
+#     'file:rfiles/USC_208361.root',
+     'file:rfiles/USC_208565.root',
+#     'file:rfiles/USC_209311.root',
+#     'file:rfiles/USC_209997.root',
+     'file:rfiles/USC_210378.root',
+#     'file:rfiles/USC_211006.root',
+     'file:rfiles/USC_211659.root'
+#before:     
+#     'file:rfiles/USC_195682.root',
+#     'file:rfiles/USC_196870.root',
+#     'file:rfiles/USC_201305.root',
+#     'file:rfiles/USC_202341.root',
+#     'file:rfiles/USC_203339.root',
+#     'file:rfiles/USC_204172.root',
+#     'file:rfiles/USC_205355.root',
+#     'file:rfiles/USC_206456.root'
 #
    ), 
     streams = cms.untracked.vstring(
@@ -55,8 +73,8 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   #
                                   MapCreation = cms.untracked.int32(1),
                                   #
-                                  #recordNtuples = cms.untracked.bool(False),
-                                  recordNtuples = cms.untracked.bool(True),
+                                  recordNtuples = cms.untracked.bool(False),
+                                  #recordNtuples = cms.untracked.bool(True),
                                   maxNeventsInNtuple = cms.int32(100),
                                   #
                                   #recordHistoes = cms.untracked.bool(False),
@@ -115,34 +133,34 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   #
                                   # -53 for  BAD HBHEHF channels from study on shape Ratio
                                   #Verbosity = cms.untracked.int32(-53),
-                                  ratioHBMin = cms.double(0.50),
-                                  ratioHBMax = cms.double(0.88),
-                                  ratioHEMin = cms.double(0.50),
-                                  ratioHEMax = cms.double(0.93),
-                                  ratioHFMin = cms.double(0.30),
+                                  ratioHBMin = cms.double(0.48),
+                                  ratioHBMax = cms.double(0.92),
+                                  ratioHEMin = cms.double(0.48),
+                                  ratioHEMax = cms.double(0.92),
+                                  ratioHFMin = cms.double(0.48),
                                   ratioHFMax = cms.double(1.02),
-                                  ratioHOMin = cms.double(0.54),
+                                  ratioHOMin = cms.double(0.48),
                                   ratioHOMax = cms.double(1.04),
                                   # -54 for  BAD HBHEHF channels from study on RMS of shapes
                                   #Verbosity = cms.untracked.int32(-54),
-                                  rmsHBMin = cms.double(1.0),
-                                  rmsHBMax = cms.double(2.3),
-                                  rmsHEMin = cms.double(1.0),
-                                  rmsHEMax = cms.double(2.3),
-                                  rmsHFMin = cms.double(0.2),
-                                  rmsHFMax = cms.double(2.8),
-                                  rmsHOMin = cms.double(0.2),
-                                  rmsHOMax = cms.double(2.4),
+                                  rmsHBMin = cms.double(0.7),
+                                  rmsHBMax = cms.double(2.4),
+                                  rmsHEMin = cms.double(0.7),
+                                  rmsHEMax = cms.double(2.4),
+                                  rmsHFMin = cms.double(0.1),
+                                  rmsHFMax = cms.double(2.5),
+                                  rmsHOMin = cms.double(0.1),
+                                  rmsHOMax = cms.double(2.5),
                                   # -55 for  BAD HBHEHF channels from study on TSmean of shapes
                                   #Verbosity = cms.untracked.int32(-55),
                                   TSmeanHBMin = cms.double(1.0),
                                   TSmeanHBMax = cms.double(5.2),
                                   TSmeanHEMin = cms.double(1.0),
                                   TSmeanHEMax = cms.double(5.2),
-                                  TSmeanHFMin = cms.double(1.5),
+                                  TSmeanHFMin = cms.double(1.0),
                                   TSmeanHFMax = cms.double(4.5),
-                                  TSmeanHOMin = cms.double(2.5),
-                                  TSmeanHOMax = cms.double(4.5),
+                                  TSmeanHOMin = cms.double(1.0),
+                                  TSmeanHOMax = cms.double(5.3),
                                   # -55 for  BAD HBHEHF channels from study on TSmax of shapes
                                   #Verbosity = cms.untracked.int32(-55),
                                   TSpeakHBMin = cms.double(1.5),
@@ -150,14 +168,14 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   TSpeakHEMin = cms.double(1.5),
                                   TSpeakHEMax = cms.double(6.5),
                                   TSpeakHFMin = cms.double(0.5),
-                                  TSpeakHFMax = cms.double(5.5),
+                                  TSpeakHFMax = cms.double(6.5),
                                   TSpeakHOMin = cms.double(0.5),
-                                  TSpeakHOMax = cms.double(5.5),
+                                  TSpeakHOMax = cms.double(6.5),
                                   # -56 for  BAD HBHEHOHF channels from study on ADC Amplitude
                                   #Verbosity = cms.untracked.int32(-56),
-                                  ADCAmplHBMin = cms.double(100.),
-                                  ADCAmplHEMin = cms.double(200.),
-                                  ADCAmplHFMin = cms.double(30.),
+                                  ADCAmplHBMin = cms.double(70.),
+                                  ADCAmplHEMin = cms.double(70.),
+                                  ADCAmplHFMin = cms.double(40.),
                                   ADCAmplHOMin = cms.double(300.),
                                   #
                                   #             CALIBRATION channels:
@@ -169,29 +187,29 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   #calibrADCHOMin = cms.double(15.0),
                                   #calibrADCHFMin = cms.double(15.0),
                                   # cuts for LED runs:
-                                  calibrADCHBMin = cms.double(200.),
-                                  calibrADCHEMin = cms.double(200.),
-                                  calibrADCHOMin = cms.double(200.),
-                                  calibrADCHFMin = cms.double(100.),
+                                  calibrADCHBMin = cms.double(120.),
+                                  calibrADCHEMin = cms.double(120.),
+                                  calibrADCHOMin = cms.double(120.),
+                                  calibrADCHFMin = cms.double(60.),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on shape Ratio
-                                  calibrRatioHBMin = cms.double(0.63),
-                                  calibrRatioHEMin = cms.double(0.63),
-                                  calibrRatioHOMin = cms.double(0.10),
-                                  calibrRatioHFMin = cms.double(0.21),
+                                  calibrRatioHBMin = cms.double(0.60),
+                                  calibrRatioHEMin = cms.double(0.64),
+                                  calibrRatioHOMin = cms.double(0.25),
+                                  calibrRatioHFMin = cms.double(0.25),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on TSmax
                                   calibrTSmaxHBMin = cms.double(0.50),
                                   calibrTSmaxHBMax = cms.double(8.50),
                                   calibrTSmaxHEMin = cms.double(0.50),
                                   calibrTSmaxHEMax = cms.double(8.50),
                                   calibrTSmaxHOMin = cms.double(0.50),
-                                  calibrTSmaxHOMax = cms.double(9.50),
+                                  calibrTSmaxHOMax = cms.double(8.50),
                                   calibrTSmaxHFMin = cms.double(0.50),
                                   calibrTSmaxHFMax = cms.double(9.50),
                                   # for  BAD HBHEHOHF CALIBRATION channels from study on TSmean
                                   calibrTSmeanHBMin = cms.double(1.00),
-                                  calibrTSmeanHBMax = cms.double(4.80),
+                                  calibrTSmeanHBMax = cms.double(5.50),
                                   calibrTSmeanHEMin = cms.double(1.00),
-                                  calibrTSmeanHEMax = cms.double(4.20),
+                                  calibrTSmeanHEMax = cms.double(5.50),
                                   calibrTSmeanHOMin = cms.double(1.00),
                                   calibrTSmeanHOMax = cms.double(3.50),
                                   calibrTSmeanHFMin = cms.double(1.00),
@@ -201,16 +219,18 @@ process.Analyzer = cms.EDAnalyzer("VeRawAnalyzer",
                                   calibrWidthHBMax = cms.double(2.30),
                                   calibrWidthHEMin = cms.double(1.00),
                                   calibrWidthHEMax = cms.double(2.30),
-                                  calibrWidthHOMin = cms.double(1.00),
-                                  calibrWidthHOMax = cms.double(2.20),
+                                  calibrWidthHOMin = cms.double(0.50),
+                                  calibrWidthHOMax = cms.double(3.00),
                                   calibrWidthHFMin = cms.double(0.20),
-                                  calibrWidthHFMax = cms.double(2.40),
+                                  calibrWidthHFMax = cms.double(2.30),
                                   #
                                   # Special task of run or LS quality:
                                   #
                                   # flag for choise of criterion of bad channels:
-                                  # =0-CapIdErr, =1-Ratio, =2-Width, =3-TSmax, =4-TSmean, =5-adcAmplitud
-                                  flagtodefinebadchannel = cms.int32(0),
+                                  #=0-CapIdErr, =1-Ratio, =2-Width, =3-TSmax, =4-TSmean, =5-adcAmplitud
+                                  flagtodefinebadchannel = cms.int32(2),
+                                  #how many bins you want on the plots:better to choice (Nruns+1)
+                                  howmanybinsonplots = cms.int32(15),
                                   #
                                   # to see run dependence of rate of events with Nbadchannels bigger:
                                   nbadchannels1 = cms.int32(5),
