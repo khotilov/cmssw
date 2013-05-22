@@ -1,0 +1,119 @@
+---
+title: CMS Offline Software
+layout: default
+related:
+ - { name: Home, link: index.html }
+ - { name: Project, link: https://github.com/cms-sw/cmssw }
+ - { name: Topic Collector, link: https://eulisse.web.cern.ch/eulisse/cgi-bin/git-collector/cmsgit}
+ - { name: Feedback, link: https://github.com/cms-sw/cmssw/issues/new }
+---
+# CMS UserCode Migration FAQs
+
+## What is happening?
+
+Just like CMSSW, UserCode repositories will have to migrate away from
+`CVS`. The deadline for the migration is the 31st of July, i.e. after the
+Lepton-Photon and EPS. See also
+<https://indico.cern.ch/getFile.py/access?contribId=143&sessionId=10&resId=0&materialId=slides&confId=241277>.
+
+UserCode areas will not be centrally migrated, however we provide scripts and
+assistance to migrate them to github, reccomended, or the git / svn service of
+your preference.
+
+## Can I stick with CVS?
+
+Unfortunately no. CERN/IT wants to shut down the CVS service since years and
+while we have been able to postpone it so far to avoid disruption of Higgs
+discovery, the long shutdown removes that excuse. This is however a perfect
+time to improve how way of working and get rid of all the complications that
+came from using an obsolete VCS like CVS.
+
+## Can't we postpone it further?
+
+No.
+
+## Really?
+
+Yes.
+
+## Ok...
+
+Thanks for understanding. We will try to help as much as we possibly can during
+your transition.
+
+## Where should I host my repository?
+
+You are free of hosting your repository on any git / SVN hosting site you
+prefer, however given we will use <http://github.com> for the CMSSW code, it's
+probably a good idea if you stick with it too.
+
+## How do I migrate to github?
+
+Assuming you already have your own account on github (if not follow the
+instructions
+[here](http://cms-sw.github.io/cmssw/faq.html#how_do_i_subscribe_to_github)),
+the first step is to create a new repository to hold your usercode. 
+This can be done by simply going to [https://github.com/new]().
+
+![https://github.com/new](images/create-new-repository.png)
+
+Click on "Create Repository" and note down the URL of your newly created
+repository.
+
+Now you want to migrate your old `UserCode` area to git. This can be done
+from inside a CMSSW (`CMSSW_6_2_X or later`) release on `lxplus` by doing:
+
+    MYUSERCODE=Eulisse
+    cvs2git --blobfile=git-blob.dat --dumpfile=git-dump.dat \
+            /afs/cern.ch/project/cvs/reps/CMSSW/UserCode/$MYUSERCODE \
+            --symbol-transform="(.*)/:\1-" \
+            --use-external-blob-generator \
+            --fallback-encoding "UTF8" \
+            --username $USER 
+
+This step could take a few seconds or hours, depending on how much stuff you
+have in your user area. If you have large datafiles we reccomend split the
+repository into two parts, one for the datafiles, one for the actual code.
+
+You can now import your old CVS repository into a new git one you created
+on git hub:
+
+    MY_REMOTE=<your-usercode-repository-on-github>
+    # setenv MY_REMOTE <your-usercode-repository-on-github> # csh
+    git init usercode
+    cd usercode
+    git remote add origin $MY_REMOTE
+    cat ../git-blob.dat ../git-dump.dat | git fast-import
+    git config http.postBuffer 524288000
+    git push origin master
+    git push --mirror -u origin
+
+Further information about cvs2git can be found at <http://cvs2svn.tigris.org/cvs2git.html>.
+
+## I need a private repository!
+
+First of all, keep in mind that your UserCode area was never private, so you
+are asking for something new. If you really want to have a private repository you can 
+use CERN/IT provided service at <https://cernforge.cern.ch/cernforge/>. Simply adapt
+the above mentioned `MY_REMOTE` variable.
+
+## Do you have any more in-depth FAQs?
+
+Yes, please look at the [Standard git FAQ] or at the [Advanced
+Usage](advanced-usage) section.
+
+## How do I prevent people from committing to the old CVS area?
+
+Please [leave us a comment][new-faq-form] and we will make the CVS repository
+read-only.
+
+## Does this affect physics notes?
+
+No. They are hosted in SVN and this will continue to be the case.
+
+## How do I ask a question?
+
+If you have more questions about git and CMSSW on git, please use [this
+form][new-faq-form].
+
+[new-faq-form]: https://github.com/cms-sw/cmssw/issues/new
