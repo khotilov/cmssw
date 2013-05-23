@@ -14,7 +14,7 @@ related:
 Just like CMSSW, UserCode repositories will have to migrate away from
 `CVS`. The deadline for the migration is the 31st of July, i.e. after the
 Lepton-Photon and EPS. See also [the presentation in the spring CMS
-Week](cms-week-presentation).
+Week][cms-week-presentation].
 
 UserCode areas will **not** be centrally migrated, however we provide scripts
 and assistance to migrate them to github, reccomended, or the git / svn service
@@ -53,7 +53,7 @@ Assuming you already have your own account on github (if not follow the
 instructions
 [here](http://cms-sw.github.io/cmssw/faq.html#how_do_i_subscribe_to_github)),
 the first step is to create a new repository to hold your usercode. 
-This can be done by simply going to [https://github.com/new]().
+This can be done by simply going to [https://github.com/new](https://github.com/new).
 
 ![https://github.com/new](images/create-new-repository.png)
 
