@@ -80,6 +80,8 @@ on git hub:
 
     MY_REMOTE=<your-usercode-repository-on-github>
     # setenv MY_REMOTE <your-usercode-repository-on-github> # csh
+    # e.g.:
+    # MY_REMOTE=git@github.com:ktf/usercode.git
     git init usercode
     cd usercode
     git remote add origin $MY_REMOTE
