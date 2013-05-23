@@ -87,8 +87,9 @@ on git hub:
     git remote add origin $MY_REMOTE
     cat ../git-blob.dat ../git-dump.dat | git fast-import
     git config http.postBuffer 524288000
-    git push origin master
     git push --mirror -u origin
+
+In case you have some error, try `git push origin master` before the last line.
 
 Further information about cvs2git can be found at <http://cvs2svn.tigris.org/cvs2git.html>.
 
