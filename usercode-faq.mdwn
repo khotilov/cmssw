@@ -13,9 +13,8 @@ related:
 
 Just like CMSSW, UserCode repositories will have to migrate away from
 `CVS`. The deadline for the migration is the 31st of July, i.e. after the
-Lepton-Photon and EPS. See also the presentation in the spring CMS Week:
-
-<https://indico.cern.ch/getFile.py/access?contribId=143&sessionId=10&resId=0&materialId=slides&confId=241277>.
+Lepton-Photon and EPS. See also [the presentation in the spring CMS
+Week](cms-week-presentation).
 
 UserCode areas will **not** be centrally migrated, however we provide scripts
 and assistance to migrate them to github, reccomended, or the git / svn service
@@ -118,3 +117,4 @@ If you have more questions about git and CMSSW on git, please use [this
 form][new-faq-form].
 
 [new-faq-form]: https://github.com/cms-sw/cmssw/issues/new
+[cms-week-presentation]: https://indico.cern.ch/getFile.py/access?contribId=143&sessionId=10&resId=0&materialId=slides&confId=241277
