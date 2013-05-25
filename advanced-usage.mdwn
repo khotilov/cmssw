@@ -242,7 +242,12 @@ which will prompt for an updated message and will results in one single commit:
                 Some Feature added and tested.  Giulio Eulisse
 
 For more information about how to rewrite history, you can have a look at the
-[git guide](http://git-scm.com/book/en/Git-Tools-Rewriting-History).
+[git guide](http://git-scm.com/book/en/Git-Tools-Rewriting-History). In
+particular once you are familiar with the concept you might want to look at
+[`git rebase
+--interactive`](http://git-scm.com/book/en/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages) which provides
+more flexibility when you want to do more that simply merge a set of commits
+into one.
 
 ## How do I ask a question?
 
