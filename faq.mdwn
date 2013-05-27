@@ -154,7 +154,7 @@ Please have a look at the [UserCode FAQ](usercode-faq).
 | `checkdeps`                    | `git checkdeps`                              |
 | `cmstc tagset <tagset-id> -a`  | `git pull cmssw-main --track <topic-branch>` |
 | `cvs log`                      | `git log`                                    |
-| `cvs diff -r some tag`         | `git diff -r <some-tag>                      |
+| `cvs diff -r some tag`         | `git diff -r <some-tag>`                     |
 
 ## Do you have any more in-depth FAQs?
 
