@@ -21,5 +21,7 @@ The following choices where done when migrating.
   `CMSSW_6_1_1` and `CMSSW_6_2_0_pre3`.
 * `data` directories are not migrated.
 * `docs` directories are not migrated.
-* Old subsystems like `Iguana`, `IgProf` (which is now maintained in a separate repository [igprof][])
-  and `ISpy` are not migrated.
+* Old subsystems like `Iguana`, `IgProf` (which is now maintained in a separate
+  repository [igprof](http://www.igprof.org)) and `ISpy` are not migrated.
+
+[cvs2git]: http://cvs2svn.tigris.org/cvs2git.html
