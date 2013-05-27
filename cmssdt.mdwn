@@ -4,7 +4,7 @@ layout: default
 related:
  - { name: Home, link: index.html }
  - { name: Project, link: https://github.com/cms-sw/cmssw }
- - { name: Topic Collector, link: https://eulisse.web.cern.ch/eulisse/cgi-bin/git-collector/cmsgit}
+ - { name: Topic Collector, link: https://cern.ch/cmsgit/cmsgit}
  - { name: Feedback, link: https://github.com/cms-sw/cmssw/issues/new }
 ---
 
@@ -22,7 +22,7 @@ related:
 Four branches created `V00-16-XX`, `V00-20-XX`, `V00-21-XX`, `V00-22-XX`,
 corresponding to the latest greatest tag in their own series.
 
-## CMSDIST (IN PROGRESS)
+## CMSDIST (DONE)
 
 All tags migrated. Files in CVS Attic **NOT** are not migrated. A few old large
 files are not migrated. If you need a tag which has files in the Attic, you'll
