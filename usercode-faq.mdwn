@@ -123,6 +123,31 @@ read-only.
 
 No. They are hosted in SVN and this will continue to be the case.
 
+## I need to checkout subdirectories in a standalone manner.
+
+At first loop approximation git checks out the full repository, there are
+however a few workarounds to this which can help.
+
+The first one is to really think if checking out part of the repository is
+really something you need, and wether or not it wouldn't make sense to simply
+checkout everything and live with it.
+
+The main motivations for checking out a single subdirectory rather than many
+are mainly space and compilation time.
+
+* If you are compilation time bound, please make sure using `scram b -j 20`
+  does not already solve your problem by compiling things in parallel.
+* If you are space bound, e.g. you have one subdirectory containing lots of
+  datafiles, you probably want to split that subdirectory into a separate
+  repository, and have a look at how [git
+  submodules](http://git-scm.com/book/en/Git-Tools-Submodules) work.
+
+If you simply have too many files with different people working on it and you
+are annoyed by the burden, you can have a look at [git sparse
+checkout](http://www.kernel.org/pub/software/scm/git/docs/git-read-tree.html#_sparse_checkout),
+which will hide unneeded bits, in particular you can look at what we plan to do
+in in CMSSW, via [git-addpkg](http://cms-sw.github.io/cmssw/git-addpkg).
+
 ## How do I ask a question?
 
 If you have more questions about git and CMSSW on git, please use [this
