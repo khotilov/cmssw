@@ -78,10 +78,9 @@ repository into two parts, one for the datafiles, one for the actual code.
 You can now import your old CVS repository into a new git one you created
 on git hub:
 
-    MY_REMOTE=<your-usercode-repository-on-github>
-    # setenv MY_REMOTE <your-usercode-repository-on-github> # csh
-    # e.g.:
-    # MY_REMOTE=git@github.com:ktf/usercode.git
+    MY_GITHUB_USER=ktf
+    MY_REMOTE=git@github.com:$MY_GITHUB_USER/usercode.git
+    # setenv MY_REMOTE git@github.com:$MY_GITHUB_USER/usercode.git # csh
     git init usercode
     cd usercode
     git remote add origin $MY_REMOTE
