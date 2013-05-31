@@ -44,7 +44,7 @@ top left part of the page:
 ![branches-dialog](images/branches-dialog.png)
 
 The source-code of the official CMSSW can be searched by using
-<https://github.com/search?l=&q=repo%3Acms-sw%2Fcmssw&ref=advsearch&type=Code>.
+<https://github.com/cms-sw/cmssw/search>.
 
 If you prefer using the command line interface, you can do the same by using
 `git grep` command inside `CMSSW/src` area:
@@ -69,8 +69,6 @@ which will give you:
     ...
 
 for more information about `git grep` click [here](http://git-scm.com/docs/git-grep).
-
-*NOTES*: Clearly we need to find a way to shorten this url.
 
 ## How do I tell who is responsible for a given change?
 
