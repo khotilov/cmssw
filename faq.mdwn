@@ -165,4 +165,28 @@ Yes, please look at the [Advanced Usage](advanced-usage) section.
 If you have more questions about git and CMSSW on git, please use [this
 form][new-faq-form].
 
+## How do I contribute to these pages?
+
+The documentation you are reading uses [GitHub Pages](http://pages.github.com)
+to publish web pages. To contribute to it you need to:
+
+- Register to github.
+- Fork the cmssw project under your account ([click here to do
+  it](https://github.com/cms-sw/cmssw/fork)).
+- Checkout the `gh-pages` branch:
+
+      git clone -b gh-pages git@github.com:cms-sw/cmssw.git cmssw-pages
+
+- Edit the documentation and push it to your branch:
+
+      <edit-some-documentation>
+      git commit <my-changed-files>
+      git push git@github.com:<your-github-username>/cmssw.git gh-pages
+
+- Create a "pull request" for you changes by going 
+  [here](https://github.com/cms-sw/cmssw/pull/new/gh-pages).
+
+This will trigger a discussion (and most likely immediate approval) of your
+documentation changes.
+
 [new-faq-form]: https://github.com/cms-sw/cmssw/issues/new
